@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('dep_nombre', 255);
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

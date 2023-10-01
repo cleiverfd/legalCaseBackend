@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('usu_id');
             $table->unsignedBigInteger('exp_id');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('usu_id')
                 ->references('id')
