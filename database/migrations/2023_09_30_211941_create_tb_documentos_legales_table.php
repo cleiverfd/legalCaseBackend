@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tb_documentos_legales', function (Blueprint $table) {
+        Schema::create('legal_documents', function (Blueprint $table) {
             $table->id('doc_id');
             $table->string('doc_nombre', 255)->nullable();
             $table->string('doc_tipo', 255)->nullable();
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('exp_id');
             $table->foreign('exp_id')
                 ->references('exp_id')
-                ->on('tb_expediente');
+                ->on('proceedings');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tb_documentos_legales');
+        Schema::dropIfExists('legal_documents');
     }
 };

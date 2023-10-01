@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tb_alertas', function (Blueprint $table) {
+        Schema::create('alerts', function (Blueprint $table) {
             $table->id('ale_id');
             $table->string('ale_fecha_vencimiento', 255)->nullable();
             $table->text('ale_descripcion')->nullable();
             $table->unsignedBigInteger('cal_id');
             $table->foreign('cal_id')
                 ->references('cal_id')
-                ->on('tb_calendario')
+                ->on('calendars')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->timestamps();
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tb_alertas');
+        Schema::dropIfExists('alerts');
     }
 };

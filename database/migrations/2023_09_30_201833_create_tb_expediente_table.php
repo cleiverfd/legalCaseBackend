@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tb_expediente', function (Blueprint $table) {
+        Schema::create('proceedings', function (Blueprint $table) {
             $table->id('exp_id');
             $table->string('exp_numero', 255);
             $table->string('exp_fecha_inicio', 255)->nullable();
@@ -27,17 +27,17 @@ return new class extends Migration
 
             $table->foreign('exp_demandante')
                 ->references('per_id')
-                ->on('tb_personas')
+                ->on('persons')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->foreign('exp_demandado')
                 ->references('per_id')
-                ->on('tb_personas')
+                ->on('persons')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->foreign('abo_id')
                 ->references('abo_id')
-                ->on('tb_abogado')
+                ->on('lawyers')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
@@ -51,6 +51,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tb_expediente');
+        Schema::dropIfExists('proceedings');
     }
 };

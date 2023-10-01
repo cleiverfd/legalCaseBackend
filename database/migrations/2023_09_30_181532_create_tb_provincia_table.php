@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tb_provincia', function (Blueprint $table) {
+        Schema::create('provinces', function (Blueprint $table) {
             $table->id('pro_id');
             $table->string('pro_nombre', 255);
             $table->unsignedBigInteger('dep_id');
             $table->foreign('dep_id')
                 ->references('dep_id')
-                ->on('tb_departamento')
+                ->on('departments')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->timestamps();
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tb_provincia');
+        Schema::dropIfExists('provinces');
     }
 };

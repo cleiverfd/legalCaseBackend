@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tb_historial', function (Blueprint $table) {
+        Schema::create('histories', function (Blueprint $table) {
             $table->id('his_id');
             $table->string('his_fecha_hora', 255)->nullable();
             $table->string('his_medio_comuniacion', 255)->nullable();
@@ -22,17 +22,17 @@ return new class extends Migration
 
             $table->foreign('per_id')
                 ->references('per_id')
-                ->on('tb_personas')
+                ->on('persons')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->foreign('exp_id')
                 ->references('exp_id')
-                ->on('tb_expediente')
+                ->on('proceedings')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->foreign('abo_id')
                 ->references('abo_id')
-                ->on('tb_abogado')
+                ->on('lawyers')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
@@ -46,6 +46,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tb_historial');
+        Schema::dropIfExists('histories');
     }
 };

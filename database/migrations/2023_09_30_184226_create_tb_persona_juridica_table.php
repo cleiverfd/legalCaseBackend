@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tb_persona_juridica', function (Blueprint $table) {
+        Schema::create('people_juridics', function (Blueprint $table) {
             $table->id('jur_id');
             $table->string('jur_ruc', 255);
             $table->string('jur_razon_social', 255);
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tb_persona_juridica');
+        Schema::dropIfExists('people_juridics');
     }
 };

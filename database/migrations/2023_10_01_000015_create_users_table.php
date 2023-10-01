@@ -30,12 +30,12 @@ return new class extends Migration
             //     ->onUpdate('cascade');
             $table->foreign('email')
                 ->references('nat_correo')
-                ->on('tb_persona_natural')
+                ->on('people_naturals')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->foreign('per_id')
                 ->references('nat_id')
-                ->on('tb_persona_natural')
+                ->on('people_naturals')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 

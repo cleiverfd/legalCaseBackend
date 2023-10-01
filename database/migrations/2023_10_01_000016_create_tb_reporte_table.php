@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tb_reporte', function (Blueprint $table) {
+        Schema::create('reports', function (Blueprint $table) {
             $table->id('rep_id');
             $table->timestamp('rep_fecha_generacion');
             $table->string('rep_tipo', 255)->comment('excel, pdf, etc');
@@ -27,7 +27,7 @@ return new class extends Migration
                 ->onUpdate('cascade');
             $table->foreign('exp_id')
                 ->references('exp_id')
-                ->on('tb_expediente')
+                ->on('proceedings')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
@@ -38,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tb_reporte');
+        Schema::dropIfExists('reports');
     }
 };

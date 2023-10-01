@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tb_direccion', function (Blueprint $table) {
+        Schema::create('addresses', function (Blueprint $table) {
             $table->id('dir_id');
             $table->string('dir_calle_av', 255)->nullable();
             $table->unsignedBigInteger('dis_id')->nullable();
@@ -21,22 +21,22 @@ return new class extends Migration
 
             $table->foreign('dis_id')
                 ->references('dis_id')
-                ->on('tb_distrito')
+                ->on('districts')
                 ->onDelete('cascade');
            
             $table->foreign('pro_id')
                 ->references('pro_id')
-                ->on('tb_provincia')
+                ->on('provinces')
                 ->onDelete('cascade');
            
             $table->foreign('dep_id')
                 ->references('dep_id')
-                ->on('tb_departamento')
+                ->on('departments')
                 ->onDelete('cascade');
            
             $table->foreign('per_id')
                 ->references('per_id')
-                ->on('tb_personas')
+                ->on('persons')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
@@ -50,6 +50,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tb_direccion');
+        Schema::dropIfExists('addresses');
     }
 };

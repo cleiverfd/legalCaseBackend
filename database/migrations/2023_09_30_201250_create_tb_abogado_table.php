@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tb_abogado', function (Blueprint $table) {
+        Schema::create('lawyers', function (Blueprint $table) {
             $table->id('abo_id');
             $table->string('abo_carga_laboral', 255)->nullable()->comment('cantidad de casos');
             $table->string('abo_disponibilidad', 255)->nullable()->comment('ocupado o libre');
             $table->unsignedBigInteger('nat_id')->nullable();
             $table->foreign('nat_id')
                 ->references('nat_id')
-                ->on('tb_persona_natural')
+                ->on('people_naturals')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->timestamps();
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tb_abogado');
+        Schema::dropIfExists('lawyers');
     }
 };
