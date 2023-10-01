@@ -22,6 +22,7 @@ return new class extends Migration
                 ->references('exp_id')
                 ->on('tb_expediente');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

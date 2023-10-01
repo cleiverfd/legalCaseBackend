@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('nat_telefono', 55)->nullable();
             $table->string('nat_correo', 55)->unique()->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

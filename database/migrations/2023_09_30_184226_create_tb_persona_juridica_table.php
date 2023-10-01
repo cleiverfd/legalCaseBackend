@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('jur_correo', 255)->nullable();
             $table->string('jur_rep_legal', 255)->nullable()->comment('representante legal');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
