@@ -21,3 +21,13 @@ Route::prefix('/user')->group( function (){
     Route::post('/login','App\Http\Controllers\LoginController@login');    
     Route::post('/logout','App\Http\Controllers\LoginController@salir');
 });
+Route::middleware(['auth:api'])->group(function () {
+    Route::prefix('department')->group(function () {
+        Route::get('/', 'App\Http\Controllers\DepartmentController@index')->name('department.index');
+        // Route::post('/store', 'App\Http\Controllers\DepartmentController@store')->name('department.store');
+        Route::get('/{id}/show', 'App\Http\Controllers\DepartmentController@show')->name('department.show');
+        // Route::post('/update', 'App\Http\Controllers\DepartmentController@update')->name('department.update');
+        // Route::post('/destroy', 'App\Http\Controllers\DepartmentController@destroy')->name('department.destroy');
+        
+    });
+});

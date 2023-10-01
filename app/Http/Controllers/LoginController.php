@@ -47,14 +47,6 @@ class LoginController extends Controller
 
     public function salir(Request $request)
     {
-        // /** cerrar sesio de vigilancia */
-        // $session = \App\Models\SurveillanceSession::where('user_id',Auth::user()->id)->first();
-        // if($session){
-        //     $session->end = date('Y-m-d H:i:s');
-        //     $session->state=0;
-        //     $session->save();
-        // }
-        // Auth::user()->token()->revoke();
-        // return \response()->json(['state'=>200,'user'=> Auth::user()],200);
+    
     }
 }
