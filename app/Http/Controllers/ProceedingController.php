@@ -88,9 +88,9 @@ class ProceedingController extends Controller
     
             return response()->json([
                 'state' => 0,
-                'persona' => $per,
+                'per' => $per,
                 'direccion' => $direccion,
-                'people' => $persona
+                'persona' => $persona
             ], 200);
         } catch (\Exception $e) {
             \DB::rollback();
