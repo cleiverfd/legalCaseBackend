@@ -33,52 +33,56 @@ class ProceedingController extends Controller
             \DB::beginTransaction();
     
             // Inicializar variables
-            $persona = '';
-            $direccion = '';
-            $per='';
+            $persona = null;
+            $direccion = null;
+            $per = null;
     
-            if (($request->tipopersona) == 'NATURAL') {
-                $persona = \App\Models\PeopleNatural::create([
-                    'nat_dni' => strtoupper(trim($request->pn['nat_dni'])),
-                    'nat_apellido_paterno' => strtoupper(trim($request->pn['nat_apellido_paterno'])),
-                    'nat_apellido_materno' => strtoupper(trim($request->pn['nat_apellido_materno'])),
-                    'nat_nombres' => strtoupper(trim($request->pn['nat_nombres'])),
-                    'nat_telefono' => strtoupper(trim($request->pn['nat_telefono'])),
-                    'nat_correo' => strtoupper(trim($request->pn['nat_correo']))
-                ]);
+            // Verificar si la persona ya existe
+            if ($request->tipopersona == 'NATURAL') {
+                $persona = \App\Models\PeopleNatural::updateOrCreate(
+                    ['nat_dni' => strtoupper(trim($request->pn['nat_dni']))],
+                    [
+                        'nat_apellido_paterno' => strtoupper(trim($request->pn['nat_apellido_paterno'])),
+                        'nat_apellido_materno' => strtoupper(trim($request->pn['nat_apellido_materno'])),
+                        'nat_nombres' => strtoupper(trim($request->pn['nat_nombres'])),
+                        'nat_telefono' => strtoupper(trim($request->pn['nat_telefono'])),
+                        'nat_correo' => strtoupper(trim($request->pn['nat_correo']))
+                    ]
+                );
     
-                $per = \App\Models\Person::create([
-                    'nat_id' => $persona->nat_id,
-                ]);
-    
-                $direccion = \App\Models\Address::create([
-                    'dir_calle_av' => trim($request->dir['dir_calle_av']),
-                    'dis_id' => trim($request->dir['dis_id']),
-                    'pro_id' => trim($request->dir['prov_id']),
-                    'dep_id' => trim($request->dir['dep_id']),
-                    'per_id' => trim($per->per_id),
-                ]);
+                $per = \App\Models\Person::updateOrCreate(
+                    ['nat_id' => $persona->nat_id],
+                    []
+                );
             } else {
-                $persona = \App\Models\PeopleJuridic::create([
-                    'jur_ruc' => strtoupper(trim($request->pj['jur_ruc'])),
-                    'jur_razon_social' => strtoupper(trim($request->pj['jur_razon_social'])),
-                    'jur_telefono' => strtoupper(trim($request->pj['jur_telefono'])),
-                    'jur_correo' => strtoupper(trim($request->pj['jur_correo'])),
-                    'jur_rep_legal' => strtoupper(trim($request->pj['jur_rep_legal'])),
-                ]);
+                $persona = \App\Models\PeopleJuridic::updateOrCreate(
+                    ['jur_ruc' => strtoupper(trim($request->pj['jur_ruc']))],
+                    [
+                        'jur_razon_social' => strtoupper(trim($request->pj['jur_razon_social'])),
+                        'jur_telefono' => strtoupper(trim($request->pj['jur_telefono'])),
+                        'jur_correo' => strtoupper(trim($request->pj['jur_correo'])),
+                        'jur_rep_legal' => strtoupper(trim($request->pj['jur_rep_legal'])),
+                    ]
+                );
     
-                $per = \App\Models\Person::create([
-                    'jur_id' => $persona->jur_id,
-                ]);
+                $per = \App\Models\Person::updateOrCreate(
+                    ['jur_id' => $persona->jur_id],
+                    []
+                );
+            }
+            // Obtener el ID de la persona
+            $perId = $per->per_id;
     
-                $direccion = \App\Models\Address::create([
+            // Insertar o actualizar dirección
+            $direccion = \App\Models\Address::updateOrCreate(
+                ['per_id' => $perId],
+                [
                     'dir_calle_av' => trim($request->dir['dir_calle_av']),
                     'dis_id' => trim($request->dir['dis_id']),
-                    'pro_id' => trim($request->dir['prov_id']),
+                    'pro_id' => trim($request->dir['pro_id']),
                     'dep_id' => trim($request->dir['dep_id']),
-                    'per_id' => trim($per->per_id),
-                ]);
-            }
+                ]
+            );
     
             \DB::commit();
     
@@ -88,13 +92,11 @@ class ProceedingController extends Controller
                 'direccion' => $direccion,
                 'people' => $persona
             ], 200);
-    
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             \DB::rollback();
             return ['state' => '1', 'exception' => (string) $e];
         }
-    }
-    
+    } 
     protected function asignarabogado(Request $request)
     {
         try{
