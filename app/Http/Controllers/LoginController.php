@@ -27,23 +27,43 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $credentials = $this->credentials($request);
-        if (! Auth::attempt($credentials)) {
-            return \response()->json(["message"=>"Usuario y/o contraseña es invalido","state"=>401],200);
+        if (!Auth::attempt($credentials)) {
+            return response()->json(["message" => "Usuario y/o contraseña es inválido",
+             "state" => 401], 200);
         }
-
-        $accesToken = Auth::user()->createToken('authTestToken')->accessToken;
-        $user=[
-            'id'=> Auth::user()->id,
-            'name'=> Auth::user()->name,
-            'email'=>Auth::user()->email,
-            'token'=> $accesToken
-        ];
-         return \response()->json([
-             'user'=> $user,
-            
-             'state'=> 200
-         ],200);
+    
+        $user = Auth::user();
+        $accessToken = $user->createToken('authTestToken')->accessToken;
+    
+        // Acceder a la persona natural asociada al usuario
+        $personaNatural = $user->personaNatural;
+    
+        if ($personaNatural) {
+            $datosPersonaNatural = [
+                'dni' => $personaNatural->nat_dni,
+                'apellido_paterno' => $personaNatural->nat_apellido_paterno,
+                'apellido_materno' => $personaNatural->nat_apellido_materno,
+                'nombres' => $personaNatural->nat_nombres,
+                'telefono' => $personaNatural->nat_telefono,
+                'correo' => $personaNatural->nat_correo,
+            ];
+    
+            return response()->json([
+                'user' => [
+                    'id' => $user->id,
+                    'usu_rol'=>$user->usu_rol,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'token' => $accessToken,
+                    'datos' => $datosPersonaNatural,
+                ],
+                'state' => 200
+            ], 200);
+        }
+    
+        return response()->json(["message" => "Error al obtener datos de la persona", "state" => 500], 500);
     }
+    
 
     public function salir(Request $request)
     {

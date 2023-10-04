@@ -17,9 +17,9 @@ class LawyerController extends Controller
 
     //Obtener todos los datos
     protected function index(Request $request){
-        $Lawyer= \App\Models\Lawyer::OrderBy('created_at','DESC')->get();
-        $data = LawyerResource::collection($Lawyer);
+        $Lawyer= \App\Models\Lawyer::OrderBy('created_at','DESC')->with('persona')->get();
+        // $data = LawyerResource::collection($Lawyer);
 
-        return \response()->json(['data'=>$data],200);
+        return \response()->json(['data'=>$Lawyer],200);
     }   
 }

@@ -15,5 +15,9 @@ class Lawyer extends Model
         'nat_id'
     ];
     protected $dates = ['deleted_at'];
+    public function persona()
+    {
+        return $this->belongsTo(PeopleNatural::class, 'nat_id', 'nat_id');
+    }
 
 }
