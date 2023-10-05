@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class District extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
     protected $table = 'districts';
     protected $primaryKey = 'dis_id';
     protected $fillable = [
         'dis_nombre',
-        'pro_id'];
-    protected $dates = ['deleted_at']; 
+        'pro_id'
+    ];
+    protected $dates = ['created_at', 'updated_at', 'deleted_at'];
 }
