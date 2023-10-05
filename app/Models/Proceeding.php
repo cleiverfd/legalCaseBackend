@@ -23,4 +23,8 @@ class Proceeding extends Model
         'abo_id',
     ];
     protected $dates = ['deleted_at'];
+    public function person()
+    {
+        return $this->belongsTo(Person::class, 'exp_demandante', 'per_id');
+    }
 }

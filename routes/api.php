@@ -26,18 +26,22 @@ Route::middleware(['auth:api'])->group(function () {
     Route::prefix('department')->group(function () {
         Route::get('/', 'App\Http\Controllers\DepartmentController@index')->name('department.index');
          Route::get('/{id}/show', 'App\Http\Controllers\DepartmentController@show')->name('department.show');
-       
+         Route::post('/provincias', 'App\Http\Controllers\DepartmentController@provincias')->name('department.provincias');
+         Route::post('/distritos', 'App\Http\Controllers\DepartmentController@distritos')->name('department.distritos');
     });
     /*ABOGRADOS*/ 
     Route::prefix('lawyer')->group(function () {
         Route::get('/', 'App\Http\Controllers\LawyerController@index')->name('lawyer.index');
         Route::get('/{id}/show', 'App\Http\Controllers\LawyerController@show')->name('lawyer.show');
+        Route::post('/registrar', 'App\Http\Controllers\LawyerController@registrar')->name('lawyer.registrar');
     });
     Route::prefix('proceeding')->group(function () {
-        Route::post('/datosgeneralesexpediente', 'App\Http\Controllers\ProceedingController@datosgeneralesexpediente')->name('proceeding.datosgeneralesexpediente');
-        Route::post('/parteprocesal', 'App\Http\Controllers\ProceedingController@parteprocesal')->name('proceeding.parteprocesal');
-        Route::post('/asignarabogado', 'App\Http\Controllers\ProceedingController@asignarabogado')->name('proceeding.asignarabogado');
+         Route::get('/', 'App\Http\Controllers\ProceedingController@index')->name('proceeding.index');
+        
+        Route::post('/registrarcaso', 'App\Http\Controllers\ProceedingController@registrarcaso')->name('proceeding.registrarcaso');
+        // Route::post('/parteprocesal', 'App\Http\Controllers\ProceedingController@parteprocesal')->name('proceeding.parteprocesal');
+        // Route::post('/asignarabogado', 'App\Http\Controllers\ProceedingController@asignarabogado')->name('proceeding.asignarabogado');
         
         
     });
-});
+ });

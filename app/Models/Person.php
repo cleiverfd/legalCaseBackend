@@ -15,4 +15,13 @@ class Person extends Model
         'jur_id',  
     ];
     protected $dates = ['deleted_at'];
+    public function persona()
+    {
+        return $this->belongsTo(PeopleNatural::class, 'nat_id', 'nat_id');
+    }
+    public function juridica()
+    {
+        return $this->belongsTo(PeopleJuridic::class, 'jur_id', 'jur_id');
+    }
+
 }

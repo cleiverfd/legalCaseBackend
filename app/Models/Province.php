@@ -5,14 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
-class Department extends Model
+class Province extends Model
 {
     use HasFactory,SoftDeletes;
-    protected $primaryKey = 'dep_id';
+    protected $table = 'provinces';
+    protected $primaryKey = 'pro_id';
     protected $fillable = [
-        'dep_nombre',
-    ];
+        'pro_nombre',
+        'dep_id'];
     protected $dates = ['deleted_at']; 
-
 }

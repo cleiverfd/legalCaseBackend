@@ -19,6 +19,13 @@ class LawyerResource extends JsonResource
             'abo_carga_laboral' =>$this->abo_carga_laboral,
             'abo_disponibilidad'=>$this->abo_disponibilidad,
             'nat_id'=>$this->nat_id,
+            'nat_dni'=>$this->persona->nat_dni,
+            'nat_apellido_paterno'=>$this->persona->nat_apellido_paterno,
+            'nat_apellido_materno'=>$this->persona->nat_apellido_materno,
+            'nat_nombres'=>$this->persona->nat_nombres,
+            'nat_telefono'=>$this->persona->nat_telefono,
+            'nat_correo'=>$this->persona->nat_correo,
+           
         ];
     }
 }
