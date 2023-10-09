@@ -17,7 +17,9 @@ return new class extends Migration
             $table->string('exp_fecha_inicio', 255)->nullable();
             $table->string('exp_pretencion', 255)->nullable();
             $table->string('exp_materia', 255)->nullable();
-            $table->string('exp_juzgado', 255)->nullable();
+            $table->string('exp_distrito_judicial', 255)->nullable();
+            $table->string('exp_instancia', 255)->nullable();
+            $table->string('exp_especialidad', 255)->nullable();
             $table->float('exp_monto_pretencion')->nullable();
             $table->float('exp_monto_ejecucion')->nullable();
             $table->string('exp_estado_proceso', 255)->nullable();
