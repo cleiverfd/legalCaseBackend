@@ -45,4 +45,10 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/{id}', 'App\Http\Controllers\ProceedingController@show')->name('proceeding.show');
 
     });
+    //  DISTRITOS JUDICIALES
+    Route::prefix('judicialdistrict')->group(function () {
+        Route::get('/', 'App\Http\Controllers\JudicialDistrictController@index')->name('judicialdistrict.index');
+        Route::post('/instancias', 'App\Http\Controllers\JudicialDistrictController@instancia')->name('judicialdistrict.instancia');
+        Route::post('/especialidades', 'App\Http\Controllers\JudicialDistrictController@especialidad')->name('judicialdistrict.especilidad');
+    });
 });
