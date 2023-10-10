@@ -17,16 +17,18 @@ return new class extends Migration
             $table->string('exp_fecha_inicio', 255)->nullable();
             $table->string('exp_pretencion', 255)->nullable();
             $table->string('exp_materia', 255)->nullable();
-            $table->string('exp_distrito_judicial', 255)->nullable();
-            $table->string('exp_instancia', 255)->nullable();
-            $table->string('exp_especialidad', 255)->nullable();
+            $table->unsignedBigInteger('exp_especialidad')->nullable()->comment('parte_procesal_demandante');
             $table->float('exp_monto_pretencion')->nullable();
             $table->float('exp_monto_ejecucion')->nullable();
             $table->string('exp_estado_proceso', 255)->nullable();
             $table->unsignedBigInteger('exp_demandante')->nullable()->comment('parte_procesal_demandante');
             $table->unsignedBigInteger('exp_demandado')->nullable()->comment('parte_procesal_demandado');
             $table->unsignedBigInteger('abo_id')->nullable();
-
+            $table->foreign('exp_especialidad')
+                ->references('esp_id')
+                ->on('specialties')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
             $table->foreign('exp_demandante')
                 ->references('per_id')
                 ->on('persons')
