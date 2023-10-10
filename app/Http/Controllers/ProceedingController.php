@@ -49,9 +49,7 @@ class ProceedingController extends Controller
                 'exp_fecha_inicio' => $request->exp['exp_fecha_inicio'],
                 'exp_pretencion' => strtoupper(trim($request->exp['exp_pretencion'])),
                 'exp_materia' => strtoupper(trim($request->exp['exp_materia'])),
-                'exp_distrito_judicial' => strtoupper(trim($request->exp['exp_distrito_judicial'])),
-                'exp_instancia' => strtoupper(trim($request->exp['exp_instancia'])),
-                'exp_especialidad' => strtoupper(trim($request->exp['exp_especialidad'])),
+                'exp_especialidad' => trim($request->exp['exp_especialidad']),
                 'exp_monto_pretencion' => trim($request->exp['exp_monto_pretencion']),
                 'exp_estado_proceso' => 'EN TRAMITE',
             ]);
