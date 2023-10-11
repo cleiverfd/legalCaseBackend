@@ -14,7 +14,7 @@ class ProceedingController extends Controller
     protected function index(Request $request)
     {
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-            ->with('person')
+            ->with('person.address')
             ->get();
 
         $data = $proceedings->map(function ($proceeding) {
@@ -113,7 +113,7 @@ class ProceedingController extends Controller
             /*ACTULIZAR ESTADO DE ABOGADO */
             $abogado = \App\Models\Lawyer::find($request->abo_id);
             $abogado->abo_disponibilidad = 'OCUPADO';
-            $abogado->abo_carga_laboral = 1;
+            $abogado->abo_carga_laboral = $abogado->abo_carga_laboral+ 1;
             $abogado->save();
             \DB::commit();
 

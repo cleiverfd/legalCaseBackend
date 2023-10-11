@@ -23,5 +23,9 @@ class Person extends Model
     {
         return $this->belongsTo(PeopleJuridic::class, 'jur_id', 'jur_id');
     }
+    public function address()
+    {
+        return $this->belongsTo(Address::class, 'per_id', 'per_id');
+    }
 
 }

@@ -42,7 +42,7 @@ class LawyerController extends Controller
             $user = \App\Models\User::create([
                 'name' => strtoupper(trim($request->nat_apellido_paterno . ' '
                     . $request->nat_apellido_materno . ' ' . $request->nat_nombres)),
-                'email' => strtoupper(trim($request->nat_correo)),
+                'email' => trim($request->nat_correo),
                 'usu_rol' => 'ABOGADO',
                 'per_id' => $persona->nat_id,
                 'password' => bcrypt(trim($request->nat_dni)),
