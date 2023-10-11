@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\JudicialDistrict;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -20,5 +21,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ProvincesSeeder::class);
         $this->call(DistricSeeder::class);
         $this->call(UsersPersonSeeder::class);
+        $this->call(JudicialDistrictSeeder::class);
     }
 }
