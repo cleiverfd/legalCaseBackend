@@ -16,7 +16,7 @@ class Specialty extends Model
     ];
     protected $dates = ['created_at', 'updated_at', 'deleted_at'];
 
-    public function specialty()
+    public function instance()
     {
         return $this->belongsTo(Instance::class, 'ins_id', 'ins_id');
     }

@@ -14,8 +14,6 @@ class Proceeding extends Model
         'exp_fecha_inicio' ,
         'exp_pretencion',
         'exp_materia',
-        'exp_distrito_judicial',
-        'exp_instancia',
         'exp_especialidad',
         'exp_monto_pretencion',
         'exp_monto_ejecucion',
@@ -28,5 +26,9 @@ class Proceeding extends Model
     public function person()
     {
         return $this->belongsTo(Person::class, 'exp_demandante', 'per_id');
+    }
+    public function specialty()
+    {
+        return $this->belongsTo(Specialty::class, 'exp_especialidad', 'esp_id');
     }
 }

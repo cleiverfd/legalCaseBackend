@@ -128,6 +128,7 @@ class ProceedingController extends Controller
     {
         // Buscar el expediente por su ID
         $proceeding = \App\Models\Proceeding::with('person')
+        ->with('specialty.instance.judicialdistrict')
             ->find($id);
 
         if (!$proceeding) {
