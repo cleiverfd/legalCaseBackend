@@ -51,4 +51,10 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/instancias', 'App\Http\Controllers\JudicialDistrictController@instancia')->name('judicialdistrict.instancia');
         Route::post('/especialidades', 'App\Http\Controllers\JudicialDistrictController@especialidad')->name('judicialdistrict.especilidad');
     });
+    //demandantes
+    Route::prefix('demandante')->group(function () {
+        Route::get('detalledemandante/{doc}', 'App\Http\Controllers\PersonController@detalledemandante')->
+        name('demandante.detalledemandante');
+
+    });
 });

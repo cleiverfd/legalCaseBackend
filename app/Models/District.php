@@ -16,4 +16,8 @@ class District extends Model
         'pro_id'
     ];
     protected $dates = ['created_at', 'updated_at', 'deleted_at'];
+    public function province()
+    {
+        return $this->belongsTo(Province::class, 'pro_id', 'pro_id');
+    }
 }

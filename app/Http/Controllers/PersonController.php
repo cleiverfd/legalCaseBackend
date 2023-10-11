@@ -15,16 +15,30 @@ class PersonController extends Controller
     {
         $this->middleware('auth');
     }
-    protected function show($doc)
+    protected function detalledemandante($doc)
     {
-        // Buscar el expediente por su ID
-        $person= \App\Models\Proceeding::with('person')
-        ->with('specialty.instance.judicialdistrict')
-            ->find($id);
-
+        $persona=null;
+        $person=null;
+        if (strlen($doc) === 8) {
+            // Buscar en la tabla person_natual
+            $persona=\App\Models\PeopleNatural::where('nat_dni', $doc)->first();
+            $person=\App\Models\Person::where('nat_id',$persona->nat_id)->first();
+        } else {
+            // Buscar en la tabla person_juridic
+            $persona =\App\Models\PeopleJuridic::where('jur_ruc', $doc)->first();
+            $person=\App\Models\Person::where('jur_id',$persona->jur_id)->first();
+        }
+        $address=\App\Models\Address::where('per_id',$person->per_id)
+        ->with('district.province.departament')
+        ->first();
+        $history= \App\Models\History::where('per_id',$person->per_id)
+        ->with('exp')
+        ->get();
+        $pagos=\App\Models\Payment::where('per_id',$person->per_id)
+        ->with('exp')
+        ->get();;        
+    return response()->json(['data' => $persona,'direccion'=>$address,
+    'historial'=>$history,'pagos'=>$pagos], 200);
        
-        // Devuelve la respuesta JSON con los detalles del expediente
-        return response()->json(['data' => $data], 200);
     }
-
 }

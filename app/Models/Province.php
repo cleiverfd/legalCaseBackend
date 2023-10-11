@@ -16,4 +16,8 @@ class Province extends Model
         'dep_id'
     ];
     protected $dates = ['created_at', 'updated_at', 'deleted_at'];
+    public function departament()
+    {
+        return $this->belongsTo(Department::class, 'dep_id', 'dep_id');
+    }
 }

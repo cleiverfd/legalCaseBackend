@@ -1,24 +1,25 @@
 <?php
 
 namespace App\Models;
-
+ 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-class Address extends Model
-{ 
+class History extends Model
+{
     use HasFactory,SoftDeletes;
-    protected $primaryKey = 'dir_id';
+    protected $primaryKey = 'his_id';
     protected $fillable = [
-        'dir_calle_av',
-        'dis_id',
-        'prov_id',
-        'dep_id',
+        'his_fecha_hora',
+        'his_medio_comunicacion',
+        'his_detalle',
         'per_id',
+        'exp_id',
+        'abo_id'
     ];
     protected $dates = ['deleted_at'];
-    public function district()
+    public function exp()
     {
-        return $this->belongsTo(District::class, 'dis_id', 'dis_id');
+        return $this->belongsTo(Proceeding::class, 'exp_id', 'exp_id');
     }
 }
