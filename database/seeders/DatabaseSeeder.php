@@ -22,5 +22,6 @@ class DatabaseSeeder extends Seeder
         $this->call(DistricSeeder::class);
         $this->call(UsersPersonSeeder::class);
         $this->call(JudicialDistrictSeeder::class);
+        $this->call(InstanceSeeder::class);
     }
 }
