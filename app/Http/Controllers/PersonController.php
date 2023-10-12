@@ -15,6 +15,42 @@ class PersonController extends Controller
     {
         $this->middleware('auth');
     }
+    protected function traerexpedientes(Request $request)
+{
+    try {
+        \DB::beginTransaction();
+
+        $persona = null;
+        $person = null;
+
+        if (strlen($request->documento) === 8) {
+            $persona = \App\Models\PeopleNatural::where('nat_dni', $request->documento)->first();
+            if (!$persona) {
+                return response()->json(['state' => 1], 404);
+            }
+            $person = \App\Models\Person::where('nat_id', $persona->nat_id)->first();
+        } else {
+            $persona = \App\Models\PeopleJuridic::where('jur_ruc', $request->documento)->first();
+            if (!$persona) {
+                return response()->json(['state' => 1, 'message' => 'Persona no encontrada'], 404);
+            }
+            $person = \App\Models\Person::where('jur_id', $persona->jur_id)->first();
+        }
+
+        if (!$person) {
+            return response()->json(['state' => 1, 'message' => 'Persona no encontrada'], 404);
+        }
+
+        $exp = \App\Models\Proceeding::where('exp_demandante', $person->per_id)->get();
+
+        \DB::commit();
+
+        return response()->json(['state' => 0, 'data' => $person, 'persona' => $persona, 'exps' => $exp], 200);
+    } catch (Exception $e) {
+        \DB::rollback();
+        return ['state' => '1', 'exception' => (string) $e];
+    }
+}
     protected function detalledemandante($doc)
     {
         $persona=null;

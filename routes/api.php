@@ -53,8 +53,21 @@ Route::middleware(['auth:api'])->group(function () {
     });
     //demandantes
     Route::prefix('demandante')->group(function () {
-        Route::get('detalledemandante/{doc}', 'App\Http\Controllers\PersonController@detalledemandante')->
+        Route::get('/detalledemandante/{doc}', 'App\Http\Controllers\PersonController@detalledemandante')->
         name('demandante.detalledemandante');
+        Route::post('/expedientes', 'App\Http\Controllers\PersonController@traerexpedientes')->
+        name('demandante.traerexpedientes');
+
+    });
+     //historias  o visitas
+     Route::prefix('history')->group(function () {
+        Route::post('/registrar', 'App\Http\Controllers\HistoryController@registrar')->
+        name('history.registrar');
+
+    });
+    Route::prefix('payment')->group(function () {
+        Route::post('/registrar', 'App\Http\Controllers\PaymentController@registrar')->
+        name('payment.registrar');
 
     });
 });
