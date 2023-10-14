@@ -65,9 +65,17 @@ Route::middleware(['auth:api'])->group(function () {
         name('history.registrar');
 
     });
+    //pagos
     Route::prefix('payment')->group(function () {
         Route::post('/registrar', 'App\Http\Controllers\PaymentController@registrar')->
         name('payment.registrar');
 
+    });
+    //reportes
+    Route::prefix('reportes')->group(function () {
+        Route::post('/inicio', 'App\Http\Controllers\ReportController@inicio')->
+        name('reportes.inicio');
+        Route::post('/exprecientes', 'App\Http\Controllers\ReportController@exprecientes')->
+        name('reportes.exprecientes');
     });
 });
