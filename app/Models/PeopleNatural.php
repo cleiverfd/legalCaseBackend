@@ -18,4 +18,9 @@ class PeopleNatural extends Model
         'nat_correo'
     ];
     protected $dates = ['deleted_at'];
+
+    public function person()
+    {
+        return $this->morphOne(Person::class, 'personaable');
+    }
 }

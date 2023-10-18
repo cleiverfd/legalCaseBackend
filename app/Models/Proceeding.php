@@ -5,13 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Proceeding extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
     protected $primaryKey = 'exp_id';
     protected $fillable = [
         'exp_numero',
-        'exp_fecha_inicio' ,
+        'exp_fecha_inicio',
         'exp_pretencion',
         'exp_materia',
         'exp_especialidad',
@@ -30,5 +31,10 @@ class Proceeding extends Model
     public function specialty()
     {
         return $this->belongsTo(Specialty::class, 'exp_especialidad', 'esp_id');
+    }
+
+    public function audiencias()
+    {
+        return $this->hasMany(Audience::class, 'au_id');
     }
 }

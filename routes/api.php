@@ -78,8 +78,9 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/exprecientes', 'App\Http\Controllers\ReportController@exprecientes')->
         name('reportes.exprecientes');
     });
-     //pagos
+     //audiencias
      Route::prefix('audiences')->group(function () {
+        Route::get('/', 'App\Http\Controllers\AudienceController@index')->name('audiences.index');
         Route::post('/registrar', 'App\Http\Controllers\AudienceController@registrar')->
         name('audiences.registrar');
 
