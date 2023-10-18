@@ -21,6 +21,7 @@ Route::prefix('/user')->group(function () {
     Route::post('/login', 'App\Http\Controllers\LoginController@login');
     Route::post('/logout', 'App\Http\Controllers\LoginController@salir');
 });
+ 
 /*DEPARTAMENTOS*/
 Route::middleware(['auth:api'])->group(function () {
     Route::prefix('department')->group(function () {
@@ -77,6 +78,10 @@ Route::middleware(['auth:api'])->group(function () {
         name('reportes.inicio');
         Route::post('/exprecientes', 'App\Http\Controllers\ReportController@exprecientes')->
         name('reportes.exprecientes');
+        Route::get('/pdfabogados', 'App\Http\Controllers\ReportController@pdfabogados')->
+        name('reportes.pdfabogados');
+        Route::get('/pdfexptramite', 'App\Http\Controllers\ReportController@pdfexptramite')->
+        name('reportes.pdfexptramite');
     });
      //audiencias
      Route::prefix('audiences')->group(function () {
