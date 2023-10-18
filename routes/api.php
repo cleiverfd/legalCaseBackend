@@ -80,6 +80,8 @@ Route::middleware(['auth:api'])->group(function () {
         name('reportes.exprecientes');
         Route::get('/pdfabogados', 'App\Http\Controllers\ReportController@pdfabogados')->
         name('reportes.pdfabogados');
+        Route::get('/pdfexptramite', 'App\Http\Controllers\ReportController@pdfexptramite')->
+        name('reportes.pdfexptramite');
     });
      //pagos
      Route::prefix('audiences')->group(function () {
