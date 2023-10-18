@@ -15,6 +15,7 @@ class LawyerResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'nat_correo'=>$this->persona->nat_correo,
             'abo_id'=> $this->abo_id,
             'abo_carga_laboral' =>$this->abo_carga_laboral,
             'abo_disponibilidad'=>$this->abo_disponibilidad,
@@ -23,9 +24,7 @@ class LawyerResource extends JsonResource
             'nat_apellido_paterno'=>$this->persona->nat_apellido_paterno,
             'nat_apellido_materno'=>$this->persona->nat_apellido_materno,
             'nat_nombres'=>$this->persona->nat_nombres,
-            'nat_telefono'=>$this->persona->nat_telefono,
-            'nat_correo'=>$this->persona->nat_correo,
-           
+            'nat_telefono'=>$this->persona->nat_telefono,  
         ];
     }
 }

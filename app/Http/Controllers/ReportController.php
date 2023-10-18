@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Uuid;
-
+use PDF;
+use App\Http\Resources\{
+    LawyerResource
+};
 
 class ReportController extends Controller
 {
@@ -55,4 +58,12 @@ return response()->json(['data' => $data], 200);
 
     }
 
+    public function pdfabogados()
+    {
+        $abogados = \App\Models\Lawyer::orderBy('created_at', 'DESC')->with('persona')->get();
+        $pdf = PDF::loadView('vista_pdf_abo', ['data' => $abogados]);
+    //return $pdf->stream();
+     return $pdf->download('archivo.pdf');
+    }
+      
 }
