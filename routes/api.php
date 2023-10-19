@@ -88,6 +88,10 @@ Route::middleware(['auth:api'])->group(function () {
         name('reportes.pdfexps');
         Route::get('/pdfdemandantes', 'App\Http\Controllers\ReportController@pdfdemandantes')->
         name('reportes.pdfdemandantes');
+        Route::get('/pdffechaaño', 'App\Http\Controllers\ReportController@pdffechaaño')->
+        name('reportes.pdffechaaño');
+        Route::get('/pdfmateria', 'App\Http\Controllers\ReportController@pdfmateria')->
+        name('reportes.pdfmateria');
     });
      //audiencias
      Route::prefix('audiences')->group(function () {
