@@ -97,5 +97,97 @@ return response()->json(['data' => $data], 200);
         // return response()->json(['data' => $data], 200);
 
     }
-      
+    protected function pdfexpejecucion(Request $request)
+    {
+        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
+            ->where('exp_estado_proceso','EN EJECUCION')
+            ->with('person.address')
+            ->with('specialty.instance.judicialdistrict')
+            ->get();
+
+        $data = $proceedings->map(function ($proceeding) {
+            $person = $proceeding->person;
+            $personData = null;
+            $type = null;
+            if ($person) {
+                if ($person->nat_id !== null) {
+                    $personData = $person->persona;
+                    $type = 'natural';
+                } elseif ($person->jur_id !== null) {
+                    $personData = $person->juridica;
+                    $type = 'juridica';
+                }
+            }
+            return array_merge($proceeding->toArray(), [
+                'person_data' => $personData ? $personData->toArray() : null,
+                'type' => $type,
+            ]);
+        });
+        $pdf = PDF::loadView('vista_pdf_exp_ejc', ['data' => $data]);
+        //return $pdf->stream();
+         return $pdf->download('archivo.pdf');
+        // return response()->json(['data' => $data], 200);
+
+    }
+    protected function pdfexps(Request $request)
+    {
+        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
+            ->with('person.address')
+            ->with('specialty.instance.judicialdistrict')
+            ->get();
+
+        $data = $proceedings->map(function ($proceeding) {
+            $person = $proceeding->person;
+            $personData = null;
+            $type = null;
+            if ($person) {
+                if ($person->nat_id !== null) {
+                    $personData = $person->persona;
+                    $type = 'natural';
+                } elseif ($person->jur_id !== null) {
+                    $personData = $person->juridica;
+                    $type = 'juridica';
+                }
+            }
+            return array_merge($proceeding->toArray(), [
+                'person_data' => $personData ? $personData->toArray() : null,
+                'type' => $type,
+            ]);
+        });
+        $pdf = PDF::loadView('vista_pdf_exps', ['data' => $data]);
+        //return $pdf->stream();
+         return $pdf->download('archivo.pdf');
+        // return response()->json(['data' => $data], 200);
+
+    }
+    protected function pdfdemandantes(Request $request)
+    {
+        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
+        ->with('person.address')
+        ->get();
+
+    $data = $proceedings->map(function ($proceeding) {
+        $person = $proceeding->person;
+        $personData = null;
+        $type = null;
+        if ($person) {
+            if ($person->nat_id !== null) {
+                $personData = $person->persona;
+                $type = 'natural';
+            } elseif ($person->jur_id !== null) {
+                $personData = $person->juridica;
+                $type = 'juridica';
+            }
+        }
+        return array_merge($proceeding->toArray(), [
+            'person_data' => $personData ? $personData->toArray() : null,
+            'type' => $type,
+        ]);
+    });
+        $pdf = PDF::loadView('vista_pdf_de', ['data' => $data]);
+        //return $pdf->stream();
+         return $pdf->download('archivo.pdf');
+        // return response()->json(['data' => $data], 200);
+
+    }
 }

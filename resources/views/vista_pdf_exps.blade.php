@@ -14,21 +14,22 @@
         }
 
         table {
-            width: 100%;
+            width: 80%;
             border-collapse: collapse;
             margin-top: 20px;
         }
 
         th, td {
-            border: 1px solid #ddd;
+            border: 2px solid #ddd;
             padding: 8px;
             text-align: left;
+            font-size: 12px; /* Ajusta el tamaño de la letra según sea necesario */
         }
     </style>
 </head>
 <body>
 
-    <h1> Expedientes En Trámite</h1>
+    <h1> Expedientes</h1>
 
     @if(empty($data))
         <p>No hay datos disponibles</p>
@@ -41,6 +42,7 @@
                     <th>Demandante</th>
                     <th>Documento</th>
                     <th>Materia</th>
+                    <th>Estado</th>
                     <th>Especialidad / Instancia / Distrito Judicial</th>
                 </tr>
             </thead>
@@ -52,6 +54,7 @@
                         <td>{{ $expediente['type'] === 'natural' ? ($expediente['person_data']['nat_nombres'] ?? '') . ' ' . ($expediente['person_data']['nat_apellido_paterno'] ?? '') . ' ' . ($expediente['person_data']['nat_apellido_materno'] ?? '') : ($expediente['person_data']['jur_razon_social'] ?? '') }}</td>
                         <td>{{ $expediente['type'] === 'natural' ? ($expediente['person_data']['nat_dni'] ?? '') : 'RUC: ' . ($expediente['person_data']['jur_ruc'] ?? '') }}</td>
                         <td>{{ $expediente['exp_materia'] ?? ''}}</td>
+                        <td>{{ $expediente['exp_estado_proceso'] ?? ''}}</td>
                         <td>{{ $expediente['specialty']['esp_nombre']  ?? ''}} 
                             / {{ $expediente['specialty']['instance']['ins_nombre']  ?? ''}}
                             / {{ $expediente['specialty']['instance']['judicialdistrict']['judis_nombre'] ?? ''}}</td>
@@ -62,6 +65,4 @@
     @endif
 
 </body>
-
 </html>
-

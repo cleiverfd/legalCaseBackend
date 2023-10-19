@@ -28,7 +28,7 @@
 </head>
 <body>
 
-    <h1> Expedientes En Trámite</h1>
+    <h1> Expedientes En Ejecución</h1>
 
     @if(empty($data))
         <p>No hay datos disponibles</p>
