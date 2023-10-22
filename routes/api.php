@@ -100,4 +100,10 @@ Route::middleware(['auth:api'])->group(function () {
         name('audiences.registrar');
 
     });
+    Route::prefix('cargar')->group(function () {
+        Route::post('/principal', 'App\Http\Controllers\ArchivosController@pdfprincipal')->name('cargar.pdfprincipal');
+    });
+    Route::prefix('traer')->group(function () {
+    Route::get('/principal', 'App\Http\Controllers\ArchivosController@traerpdfprincipal')->name('traer.traerpdfprincipal');
+    });
 });
