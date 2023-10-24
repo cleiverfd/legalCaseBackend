@@ -17,11 +17,11 @@ class DatabaseSeeder extends Seeder
         // \App\Models\User::factory(10)->create();
         $this->call(AbogadoSeeder::class);
         $this->call(DepartmentSeeder::class);
-        $this->call(DepartmentSeeder::class);
         $this->call(ProvincesSeeder::class);
         $this->call(DistricSeeder::class);
         $this->call(UsersPersonSeeder::class);
         $this->call(JudicialDistrictSeeder::class);
         $this->call(InstanceSeeder::class);
+        $this->call(EspecialidadSeeder::class);
     }
 }

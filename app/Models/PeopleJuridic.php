@@ -19,8 +19,4 @@ class PeopleJuridic extends Model
     ];
     protected $dates = ['deleted_at'];
 
-    public function person()
-    {
-        return $this->morphOne(Person::class, 'personaable');
-    }
 }

@@ -2,6 +2,10 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\JudicialDistrictController;
+use App\Http\Controllers\ProceedingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,79 +25,80 @@ Route::prefix('/user')->group(function () {
     Route::post('/login', 'App\Http\Controllers\LoginController@login');
     Route::post('/logout', 'App\Http\Controllers\LoginController@salir');
 });
- 
-/*DEPARTAMENTOS*/
+
 Route::middleware(['auth:api'])->group(function () {
+
+    // Departamentos
     Route::prefix('department')->group(function () {
-        Route::get('/', 'App\Http\Controllers\DepartmentController@index')->name('department.index');
-        Route::get('/{id}/show', 'App\Http\Controllers\DepartmentController@show')->name('department.show');
-        Route::post('/provincias', 'App\Http\Controllers\DepartmentController@provincias')->name('department.provincias');
-        Route::post('/distritos', 'App\Http\Controllers\DepartmentController@distritos')->name('department.distritos');
+        Route::get('/', [DepartmentController::class, 'index'])->name('department.index');
+        Route::get('/{id}/show', [DepartmentController::class, 'show'])->name('department.show');
+        Route::post('/provincias', [DepartmentController::class, 'provincias'])->name('department.provincias');
+        Route::post('/distritos', [DepartmentController::class, 'distritos'])->name('department.distritos');
     });
-    /*ABOGRADOS*/
+
+    // Abogados
     Route::prefix('lawyer')->group(function () {
         Route::get('/', 'App\Http\Controllers\LawyerController@index')->name('lawyer.index');
         Route::get('/{id}/show', 'App\Http\Controllers\LawyerController@show')->name('lawyer.show');
         Route::post('/registrar', 'App\Http\Controllers\LawyerController@registrar')->name('lawyer.registrar');
     });
+
+    // Expedientes
     Route::prefix('proceeding')->group(function () {
         Route::get('/', 'App\Http\Controllers\ProceedingController@index')->name('proceeding.index');
-
-        Route::post('/registrarcaso', 'App\Http\Controllers\ProceedingController@registrarcaso')->name('proceeding.registrarcaso');
-        // Route::post('/parteprocesal', 'App\Http\Controllers\ProceedingController@parteprocesal')->name('proceeding.parteprocesal');
-        // Route::post('/asignarabogado', 'App\Http\Controllers\ProceedingController@asignarabogado')->name('proceeding.asignarabogado');
-
         Route::get('/{id}', 'App\Http\Controllers\ProceedingController@show')->name('proceeding.show');
-
+        Route::post('/registrarcaso', 'App\Http\Controllers\ProceedingController@registrarcaso')->name('proceeding.registrarcaso');
     });
-    //  DISTRITOS JUDICIALES
+
+    //  Distritos Judiciales
     Route::prefix('judicialdistrict')->group(function () {
-        Route::get('/', 'App\Http\Controllers\JudicialDistrictController@index')->name('judicialdistrict.index');
-        Route::post('/instancias', 'App\Http\Controllers\JudicialDistrictController@instancia')->name('judicialdistrict.instancia');
-        Route::post('/especialidades', 'App\Http\Controllers\JudicialDistrictController@especialidad')->name('judicialdistrict.especilidad');
+        Route::get('/', [JudicialDistrictController::class, 'index'])->name('judicialdistrict.index');
+
+        Route::post('/instancias', [JudicialDistrictController::class, 'instancia'])->name('judicialdistrict.instancia');
+
+        Route::post('/especialidades', [JudicialDistrictController::class, 'especialidad'])->name('judicialdistrict.especilidad');
     });
-    //demandantes
+
+    // Demandantes
     Route::prefix('demandante')->group(function () {
-        Route::get('/detalledemandante/{doc}', 'App\Http\Controllers\PersonController@detalledemandante')->
-        name('demandante.detalledemandante');
-        Route::post('/expedientes', 'App\Http\Controllers\PersonController@traerexpedientes')->
-        name('demandante.traerexpedientes');
+        Route::get('/', 'App\Http\Controllers\PersonController@index')->name('demandante.index');
+        Route::get('/detalledemandante/{doc}', 'App\Http\Controllers\PersonController@detalledemandante')->name('demandante.detalledemandante');
+        Route::post('/expedientes', 'App\Http\Controllers\PersonController@traerexpedientes')->name('demandante.traerexpedientes');
 
+        // Nuevas rutas para obtener información por documento
+        Route::get('/direccion/{doc}', 'App\Http\Controllers\PersonController@getAddressByDocument')->name('demandante.getaddressbydocument');
+        Route::get('/historial/{doc}', 'App\Http\Controllers\PersonController@getHistoryByDocument')->name('demandante.gethistorybydocument');
+        Route::get('/pagos/{doc}', 'App\Http\Controllers\PersonController@getPaymentsByDocument')->name('demandante.getpaymentsbydocument');
     });
-     //historias  o visitas
-     Route::prefix('history')->group(function () {
-        Route::post('/registrar', 'App\Http\Controllers\HistoryController@registrar')->
-        name('history.registrar');
 
+
+    // Historial de Comunicaciones
+    Route::prefix('history')->group(function () {
+        Route::get('/', 'App\Http\Controllers\HistoryController@index')->name('history.index');
+        Route::post('/store', 'App\Http\Controllers\HistoryController@store')->name('history.store');
+        Route::get('data/{doc}', 'App\Http\Controllers\HistoryController@data')->name('history.data');
     });
-    //pagos
+
+    // Historial de Pagos
     Route::prefix('payment')->group(function () {
-        Route::post('/registrar', 'App\Http\Controllers\PaymentController@registrar')->
-        name('payment.registrar');
-
+        Route::get('/', 'App\Http\Controllers\PaymentController@index')->name('payment.index');
+        Route::post('/store', 'App\Http\Controllers\PaymentController@store')->name('payment.store');
     });
-    //reportes
+
+    // Generacion de Reportes
     Route::prefix('reportes')->group(function () {
-        Route::post('/inicio', 'App\Http\Controllers\ReportController@inicio')->
-        name('reportes.inicio');
-        Route::post('/exprecientes', 'App\Http\Controllers\ReportController@exprecientes')->
-        name('reportes.exprecientes');
-        Route::get('/pdfabogados', 'App\Http\Controllers\ReportController@pdfabogados')->
-        name('reportes.pdfabogados');
-        Route::get('/pdfexptramite', 'App\Http\Controllers\ReportController@pdfexptramite')->
-        name('reportes.pdfexptramite');
-        Route::get('/pdfexpejecucion', 'App\Http\Controllers\ReportController@pdfexpejecucion')->
-        name('reportes.pdfexpejecucion');
-        Route::get('/pdfexps', 'App\Http\Controllers\ReportController@pdfexps')->
-        name('reportes.pdfexps');
-        Route::get('/pdfdemandantes', 'App\Http\Controllers\ReportController@pdfdemandantes')->
-        name('reportes.pdfdemandantes');
+        Route::post('/inicio', 'App\Http\Controllers\ReportController@inicio')->name('reportes.inicio');
+        Route::get('/exprecientes', 'App\Http\Controllers\ReportController@getRecentProceedings')->name('reportes.getRecentProceedings');
+        Route::get('/pdfabogados', 'App\Http\Controllers\ReportController@pdfabogados')->name('reportes.pdfabogados');
+        Route::get('/pdfexptramite', 'App\Http\Controllers\ReportController@pdfexptramite')->name('reportes.pdfexptramite');
+        Route::get('/pdfexpejecucion', 'App\Http\Controllers\ReportController@pdfexpejecucion')->name('reportes.pdfexpejecucion');
+        Route::get('/pdfexps', 'App\Http\Controllers\ReportController@pdfexps')->name('reportes.pdfexps');
+        Route::get('/pdfdemandantes', 'App\Http\Controllers\ReportController@pdfdemandantes')->name('reportes.pdfdemandantes');
     });
-     //audiencias
-     Route::prefix('audiences')->group(function () {
-        Route::get('/', 'App\Http\Controllers\AudienceController@index')->name('audiences.index');
-        Route::post('/registrar', 'App\Http\Controllers\AudienceController@registrar')->
-        name('audiences.registrar');
 
+    // Audiencias
+    Route::prefix('audiences')->group(function () {
+        Route::get('/', 'App\Http\Controllers\AudienceController@index')->name('audiences.index');
+        Route::post('/store', 'App\Http\Controllers\AudienceController@store')->name('audiences.store');
     });
 });

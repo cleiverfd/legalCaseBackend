@@ -19,8 +19,14 @@ class Payment extends Model
         'abo_id'
     ];
     protected $dates = ['deleted_at'];
-    public function exp()
+    
+    public function expediente()
     {
-        return $this->belongsTo(Proceeding::class, 'exp_id', 'exp_id');
+        return $this->belongsTo(Proceeding::class, 'exp_id');
+    }
+
+    public function person()
+    {
+        return $this->belongsTo(Person::class, 'per_id');
     }
 }

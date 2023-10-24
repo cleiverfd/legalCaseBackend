@@ -11,29 +11,59 @@ class ProceedingController extends Controller
     {
         $this->middleware('auth');
     }
+
     protected function index(Request $request)
     {
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-            ->with('person.address')
+            ->with('person.juridica', 'person.persona')
             ->get();
 
         $data = $proceedings->map(function ($proceeding) {
             $person = $proceeding->person;
-            $personData = null;
-            $type = null;
+            $tipo_persona = null;
+
+            $commonData = [
+                'exp_id' => $proceeding->exp_id,
+                'numero' => $proceeding->exp_numero,
+                'fecha_inicio' => $proceeding->exp_fecha_inicio,
+                'pretencion' => $proceeding->exp_pretencion,
+                'materia' => $proceeding->exp_materia,
+                'especialidad' => $proceeding->exp_especialidad,
+                'monto_pretencion' => $proceeding->exp_monto_pretencion,
+                'estado_proceso' => $proceeding->exp_estado_proceso,
+            ];
+
             if ($person) {
                 if ($person->nat_id !== null) {
                     $personData = $person->persona;
-                    $type = 'natural';
+                    $tipo_persona = 'natural';
                 } elseif ($person->jur_id !== null) {
                     $personData = $person->juridica;
-                    $type = 'juridica';
+                    $tipo_persona = 'juridica';
                 }
             }
-            return array_merge($proceeding->toArray(), [
-                'person_data' => $personData ? $personData->toArray() : null,
-                'type' => $type,
-            ]);
+
+            if ($tipo_persona === 'natural') {
+                $personDataArray = [
+                    'dni' => $personData->nat_dni,
+                    'apellido_paterno' => $personData->nat_apellido_paterno,
+                    'apellido_materno' => $personData->nat_apellido_materno,
+                    'nombres' => $personData->nat_nombres,
+                    'telefono' => $personData->nat_telefono,
+                    'correo' => $personData->nat_correo,
+                ];
+            } elseif ($tipo_persona === 'juridica') {
+                $personDataArray = [
+                    'ruc' => $personData->jur_ruc,
+                    'razon_social' => $personData->jur_razon_social,
+                    'telefono' => $personData->jur_telefono,
+                    'correo' => $personData->jur_correo,
+                ];
+            } else {
+                $personDataArray = [];
+            }
+
+            return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
         });
 
         return response()->json(['data' => $data], 200);
@@ -113,7 +143,7 @@ class ProceedingController extends Controller
             /*ACTULIZAR ESTADO DE ABOGADO */
             $abogado = \App\Models\Lawyer::find($request->abo_id);
             $abogado->abo_disponibilidad = 'OCUPADO';
-            $abogado->abo_carga_laboral = $abogado->abo_carga_laboral+ 1;
+            $abogado->abo_carga_laboral = $abogado->abo_carga_laboral + 1;
             $abogado->save();
             \DB::commit();
 
@@ -126,37 +156,78 @@ class ProceedingController extends Controller
 
     protected function show($id)
     {
-        // Buscar el expediente por su ID
         $proceeding = \App\Models\Proceeding::with('person')
-        ->with('specialty.instance.judicialdistrict')
+            ->with('specialty.instance.judicialdistrict')
             ->find($id);
-
+    
         if (!$proceeding) {
-            // Si no se encuentra el expediente, devuelve una respuesta de error
             return response()->json(['error' => 'Expediente no encontrado'], 404);
         }
-
-        // Realiza la misma transformación de datos que en el método 'index'
+    
         $person = $proceeding->person;
         $personData = null;
-        $type = null;
-
+        $tipo_persona = null;
+    
         if ($person) {
             if ($person->nat_id !== null) {
-                $personData = $person->persona;
-                $type = 'natural';
+                $personData = $this->getNaturalPersonData($person);
+                $tipo_persona = 'Natural';
             } elseif ($person->jur_id !== null) {
-                $personData = $person->juridica;
-                $type = 'juridica';
+                $personData = $this->getJuridicalPersonData($person);
+                $tipo_persona = 'Juridica';
             }
         }
-
-        $data = array_merge($proceeding->toArray(), [
-            'person_data' => $personData ? $personData->toArray() : null,
-            'type' => $type,
-        ]);
-
-        // Devuelve la respuesta JSON con los detalles del expediente
+    
+        
+        $data = $this->transformProceedingData($proceeding, $personData, $tipo_persona);
+        $data['per_id'] = $person ? $person->per_id : null;
+    
         return response()->json(['data' => $data], 200);
     }
+    
+    private function getNaturalPersonData($person)
+    {
+        return [
+            // 'nat_id' => $person->persona->nat_id,
+            'nat_dni' => $person->persona->nat_dni,
+            'nat_apellido_paterno' => $person->persona->nat_apellido_paterno,
+            'nat_apellido_materno' => $person->persona->nat_apellido_materno,
+            'nat_nombres' => $person->persona->nat_nombres,
+            'nat_telefono' => $person->persona->nat_telefono,
+            'nat_correo' => $person->persona->nat_correo,
+        ];
+    }
+    
+    private function getJuridicalPersonData($person)
+    {
+        return [
+            // 'jur_id' => $person->juridica->jur_id,
+            'jur_ruc' => $person->juridica->jur_ruc,
+            'jur_razon_social' => $person->juridica->jur_razon_social,
+            'jur_telefono' => $person->juridica->jur_telefono,
+            'jur_correo' => $person->juridica->jur_correo,
+        ];
+    }
+    
+    private function transformProceedingData($proceeding, $personData, $tipo_persona)
+    {
+        return array_merge(
+            $proceeding->only([
+                'exp_id',
+                'exp_numero',
+                'exp_fecha_inicio',
+                'exp_pretencion',
+                'exp_materia',
+                'exp_especialidad',
+                'exp_monto_pretencion',
+                'exp_estado_proceso',
+            ]),
+            $proceeding->specialty->instance->judicialdistrict->only(['judis_nombre']),
+            ['esp_nombre' => $proceeding->specialty->esp_nombre],
+            ['ins_nombre' => $proceeding->specialty->instance->ins_nombre],
+            ['tipo_persona' => $tipo_persona],
+            $personData // Aquí agregamos los datos de la persona
+        );
+    }
+    
 }

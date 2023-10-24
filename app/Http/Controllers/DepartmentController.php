@@ -3,45 +3,48 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
-use App\Http\Resources\{
-    DepartmentResource
-};
-use Uuid;
+use App\Models\Department;
+use App\Models\Province;
+use App\Models\District;
+use App\Http\Resources\DepartmentResource;
 
 class DepartmentController extends Controller
 {
-    //contructor
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    //Obtener todos los datos
-    protected function index(Request $request)
+    public function index()
     {
-        $department = \App\Models\Department::OrderBy('created_at', 'DESC')->get();
-        $data = DepartmentResource::collection($department);
+        $departments = Department::orderBy('created_at', 'DESC')->get();
+        $data = DepartmentResource::collection($departments);
 
-        return \response()->json(['data' => $data], 200);
+        return response()->json(['data' => $data], 200);
     }
-    protected function show($id)
+
+    public function show($id)
     {
-        $department = \App\Models\Department::select('dep_id', 'dep_nombre')->find($id);
+        $department = Department::select('dep_id', 'dep_nombre')->find($id);
+
         return $department;
     }
-    protected function provincias(Request $request)
+
+    public function provincias(Request $request)
     {
-        $provinces = \App\Models\Province::where('dep_id', $request->dep_id)
+        $provinces = Province::where('dep_id', $request->dep_id)
             ->orderBy('created_at', 'DESC')
-            ->get();
-        return \response()->json(['data' => $provinces], 200);
+            ->get(['pro_id','pro_nombre','dep_id']);
+
+        return response()->json(['data' => $provinces], 200);
     }
-    protected function distritos(Request $request)
+
+    public function distritos(Request $request)
     {
-        $districts = \App\Models\District::where('pro_id', $request->pro_id)
+        $districts = District::where('pro_id', $request->pro_id)
             ->orderBy('created_at', 'DESC')
-            ->get();
-        return \response()->json(['data' => $districts], 200);
+            ->get(['dis_id','dis_nombre','pro_id']);
+
+        return response()->json(['data' => $districts], 200);
     }
 }

@@ -25,6 +25,7 @@ class LawyerController extends Controller
 
         return \response()->json(['data' => $data], 200);
     }
+    
     protected function registrar(Request $request)
     {
         try {

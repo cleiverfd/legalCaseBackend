@@ -23,11 +23,14 @@ class Proceeding extends Model
         'exp_demandado',
         'abo_id',
     ];
+
     protected $dates = ['deleted_at'];
+
     public function person()
     {
         return $this->belongsTo(Person::class, 'exp_demandante', 'per_id');
     }
+
     public function specialty()
     {
         return $this->belongsTo(Specialty::class, 'exp_especialidad', 'esp_id');
@@ -37,4 +40,15 @@ class Proceeding extends Model
     {
         return $this->hasMany(Audience::class, 'au_id');
     }
+
+    // Relación con la persona (modelo Person)
+    // public function persona()
+    // {
+    //     return $this->belongsTo(Person::class, 'per_id', 'per_id');
+    // }
+    public function persona()
+    {
+        return $this->belongsTo(Person::class);
+    }
+
 }

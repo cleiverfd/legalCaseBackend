@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
-
-use Uuid;
+use App\Models\JudicialDistrict;
+use App\Models\Instance;
+use App\Models\Specialty;
+use Illuminate\Support\Facades\Log;
 
 class JudicialDistrictController extends Controller
 {
@@ -14,25 +15,44 @@ class JudicialDistrictController extends Controller
         $this->middleware('auth');
     }
 
-    protected function index(Request $request)
+    public function index(Request $request)
     {
-        $judicial = \App\Models\JudicialDistrict::OrderBy('created_at', 'DESC')->get();
-        
+        $judicialDistricts = JudicialDistrict::orderBy('created_at', 'DESC')
+            ->get(['judis_id', 'judis_nombre']);
 
-        return \response()->json(['data' => $judicial], 200);
+        return response()->json(['data' => $judicialDistricts], 200);
     }
-    protected function instancia(Request $request)
+
+
+    public function instancia(Request $request)
     {
-        $instances = \App\Models\Instance::where('judis_id', $request->judis_id)
-            ->orderBy('created_at', 'DESC')
-            ->get();
-        return \response()->json(['data' => $instances], 200);
+        try {
+            // $request->validate([
+            //     'judis_id' => 'required|exists:judicial_districts,judis_id',
+            // ]);
+
+            $instances = Instance::where('judis_id', $request->judis_id)
+                ->orderBy('created_at', 'DESC')
+                ->get(['ins_id','ins_nombre','judis_id']);
+
+            return response()->json(['data' => $instances], 200);
+        } catch (\Exception $e) {
+            Log::error('Error en JudicialDistrictController: ' . $e->getMessage());
+            return response()->json(['error' => 'Ha ocurrido un error en el servidor'], 500);
+        }
     }
-    protected function especialidad(Request $request)
+
+
+    public function especialidad(Request $request)
     {
-        $specialties = \App\Models\Specialty::where('ins_id', $request->ins_id)
+        // $request->validate([
+        //     'ins_id' => 'required|exists:instances,id',
+        // ]);
+
+        $specialties = Specialty::where('ins_id', $request->ins_id)
             ->orderBy('created_at', 'DESC')
-            ->get();
-        return \response()->json(['data' => $specialties], 200);
+            ->get(['esp_id','esp_nombre','ins_id']);
+
+        return response()->json(['data' => $specialties], 200);
     }
 }

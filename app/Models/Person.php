@@ -21,10 +21,17 @@ class Person extends Model
     {
         return $this->belongsTo(PeopleNatural::class, 'nat_id', 'nat_id');
     }
+
+    public function natural()
+    {
+        return $this->belongsTo(PeopleNatural::class, 'nat_id', 'nat_id');
+    }
+
     public function juridica()
     {
         return $this->belongsTo(PeopleJuridic::class, 'jur_id', 'jur_id');
     }
+
     public function address()
     {
         return $this->belongsTo(Address::class, 'per_id', 'per_id');
@@ -35,9 +42,18 @@ class Person extends Model
         return $this->belongsTo(Audience::class, 'au_id');
     }
 
-    public function personaable()
+    public function historial()
     {
-        return $this->morphTo();
+        return $this->belongsTo(History::class, 'his_id');
     }
 
+    public function expedientes()
+    {
+        return $this->belongsTo(Proceeding::class, 'exp_id');
+    }
+
+    public function pagos()
+    {
+        return $this->belongsTo(Payment::class, 'pa_id');
+    }
 }
