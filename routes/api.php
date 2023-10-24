@@ -87,18 +87,35 @@ Route::middleware(['auth:api'])->group(function () {
 
     // Generacion de Reportes
     Route::prefix('reportes')->group(function () {
-        Route::post('/inicio', 'App\Http\Controllers\ReportController@inicio')->name('reportes.inicio');
-        Route::get('/exprecientes', 'App\Http\Controllers\ReportController@getRecentProceedings')->name('reportes.getRecentProceedings');
-        Route::get('/pdfabogados', 'App\Http\Controllers\ReportController@pdfabogados')->name('reportes.pdfabogados');
-        Route::get('/pdfexptramite', 'App\Http\Controllers\ReportController@pdfexptramite')->name('reportes.pdfexptramite');
-        Route::get('/pdfexpejecucion', 'App\Http\Controllers\ReportController@pdfexpejecucion')->name('reportes.pdfexpejecucion');
-        Route::get('/pdfexps', 'App\Http\Controllers\ReportController@pdfexps')->name('reportes.pdfexps');
-        Route::get('/pdfdemandantes', 'App\Http\Controllers\ReportController@pdfdemandantes')->name('reportes.pdfdemandantes');
+        Route::post('/inicio', 'App\Http\Controllers\ReportController@inicio')->
+        name('reportes.inicio');
+        Route::post('/exprecientes', 'App\Http\Controllers\ReportController@exprecientes')->
+        name('reportes.exprecientes');
+        Route::get('/pdfabogados', 'App\Http\Controllers\ReportController@pdfabogados')->
+        name('reportes.pdfabogados');
+        Route::get('/pdfexptramite', 'App\Http\Controllers\ReportController@pdfexptramite')->
+        name('reportes.pdfexptramite');
+        Route::get('/pdfexpejecucion', 'App\Http\Controllers\ReportController@pdfexpejecucion')->
+        name('reportes.pdfexpejecucion');
+        Route::get('/pdfexps', 'App\Http\Controllers\ReportController@pdfexps')->
+        name('reportes.pdfexps');
+        Route::get('/pdfdemandantes', 'App\Http\Controllers\ReportController@pdfdemandantes')->
+        name('reportes.pdfdemandantes');
+        Route::get('/pdffechaaño', 'App\Http\Controllers\ReportController@pdffechaaño')->
+        name('reportes.pdffechaaño');
+        Route::get('/pdfmateria', 'App\Http\Controllers\ReportController@pdfmateria')->
+        name('reportes.pdfmateria');
     });
 
     // Audiencias
     Route::prefix('audiences')->group(function () {
         Route::get('/', 'App\Http\Controllers\AudienceController@index')->name('audiences.index');
         Route::post('/store', 'App\Http\Controllers\AudienceController@store')->name('audiences.store');
+    });
+    Route::prefix('cargar')->group(function () {
+        Route::post('/principal', 'App\Http\Controllers\ArchivosController@pdfprincipal')->name('cargar.pdfprincipal');
+    });
+    Route::prefix('traer')->group(function () {
+    Route::get('/principal', 'App\Http\Controllers\ArchivosController@traerpdfprincipal')->name('traer.traerpdfprincipal');
     });
 });
