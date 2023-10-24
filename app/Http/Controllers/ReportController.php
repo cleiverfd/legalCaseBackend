@@ -34,7 +34,7 @@ class ReportController extends Controller
         ], 200);
     }
 
-    protected function getRecentProceedings(Request $request)
+    protected function exprecientes(Request $request)
     {
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->with('person.address')
@@ -256,9 +256,9 @@ $fechaBuscada = $año . '-' . $mesFormateado;
         ]);
     });
      $pdf = PDF::loadView('vista_pdf_exps', ['data' => $data]);
-    //return $pdf->stream();
+    
      return $pdf->download('archivo.pdf');
-   // return response()->json(['data' => $data,'fecha'=>$fechaBuscada], 200);
+  
     }
     protected function pdfmateria(Request $request)
     {
