@@ -121,6 +121,6 @@ Route::middleware(['auth:api'])->group(function () {
     });
     //mandar mensajes  a celular
     Route::prefix('mensajes')->group(function () {
-    Route::get('/', 'App\Http\Controllers\WhatsappControllerr@index')->name('mensajes.index');
+    Route::get('/', 'App\Http\Controllers\WhatsappController@index')->name('mensajes.index');
         });
 });

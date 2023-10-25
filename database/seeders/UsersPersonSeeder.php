@@ -42,12 +42,12 @@ class UsersPersonSeeder extends Seeder
 
         // Inserta la segunda persona natural manualmente
         DB::table('people_naturals')->insert([
-            'nat_dni' => 65432190,
+            'nat_dni' => 74864514,
             'nat_nombres' => 'Jonatan',
             'nat_apellido_paterno' => 'Mayanga',
             'nat_apellido_materno' => 'Muñoz',
             'nat_telefono' => '+51 956342789', // Asegúrate de incluir el prefijo internacional para Perú
-            'nat_correo' => 'jonatanm@gmail.com',
+            'nat_correo' => 'jonatanmayanga@gmail.com',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
@@ -55,10 +55,10 @@ class UsersPersonSeeder extends Seeder
         // Inserta un registro en la tabla users relacionado con la segunda persona natural
         DB::table('users')->insert([
             'name' => 'Jonatan',
-            'email' => 'jonatanm@gmail.com',
+            'email' => 'jonatanmayanga@gmail.com',
             'usu_rol' => 'ADMIN', // Cambia esto si el rol es diferente
             'per_id' => 2, // El ID de la segunda persona natural manualmente ingresada
-            'password' => Hash::make('65432190'), // Usando el DNI como contraseña
+            'password' => Hash::make('74864514'), // Usando el DNI como contraseña
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
