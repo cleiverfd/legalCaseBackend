@@ -114,10 +114,10 @@ Route::middleware(['auth:api'])->group(function () {
     });
     //guardar archivos
     Route::prefix('cargar')->group(function () {
-        Route::post('/principal', 'App\Http\Controllers\ArchivosController@pdfprincipal')->name('cargar.pdfprincipal');
+        Route::post('/archivo', 'App\Http\Controllers\ArchivosController@pdfprincipal')->name('cargar.pdfprincipal');
     });
     Route::prefix('traer')->group(function () {
-    Route::get('/principal', 'App\Http\Controllers\ArchivosController@traerpdfprincipal')->name('traer.traerpdfprincipal');
+    Route::get('/archivo', 'App\Http\Controllers\ArchivosController@traerpdfprincipal')->name('traer.traerpdfprincipal');
     });
     //mandar mensajes  a celular
     Route::prefix('mensajes')->group(function () {
