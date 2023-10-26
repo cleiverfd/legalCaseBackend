@@ -25,7 +25,10 @@ class Proceeding extends Model
     ];
 
     protected $dates = ['deleted_at'];
-
+    // public function archivos()
+    // {
+    //     return $this->belongsTo(LegalDocument::class, 'exp_id', 'exp_id');
+    // }
     public function person()
     {
         return $this->belongsTo(Person::class, 'exp_demandante', 'per_id');

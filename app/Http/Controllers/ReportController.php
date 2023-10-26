@@ -34,7 +34,7 @@ class ReportController extends Controller
         ], 200);
     }
 
-    protected function getRecentProceedings(Request $request)
+    protected function exprecientes(Request $request)
     {
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->with('person.address')
@@ -87,16 +87,24 @@ class ReportController extends Controller
         return response()->json(['data' => $data], 200);
     }
 
-    public function pdfabogados()
+    public function pdfabogados( Request $request)
     {
-        $abogados = \App\Models\Lawyer::orderBy('created_at', 'DESC')->with('persona')->get();
-        $pdf = PDF::loadView('vista_pdf_abo', ['data' => $abogados]);
-        //return $pdf->stream();
-        return $pdf->download('archivo.pdf');
+            $report = \App\Models\Report::create([
+                'rep_fecha_generacion' => now()->setTimezone('America/Lima'),
+                'rep_tipo' => 'REPORTE ABOGADO/AUTOMATIZADO',
+                'usu_id' => $request->usu_id,
+            ]);            
+            $abogados = \App\Models\Lawyer::orderBy('created_at', 'DESC')->with('persona')->get();
+            $pdf = PDF::loadView('vista_pdf_abo', ['data' => $abogados]);
+            return $pdf->download('archivo.pdf');
     }
     
     protected function pdfexptramite(Request $request)
-    {
+    {    $report = \App\Models\Report::create([
+         'rep_fecha_generacion' => now()->setTimezone('America/Lima'),
+         'rep_tipo' => 'REPORTE EXPEDIENTE EN TRAMITE/AUTOMATIZADO',
+         'usu_id' => $request->usu_id,
+          ]);
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->where('exp_estado_proceso', 'EN TRAMITE')
             ->with('person.address')
@@ -124,11 +132,13 @@ class ReportController extends Controller
         $pdf = PDF::loadView('pdfExpedienteTramite', ['data' => $data]);
         //return $pdf->stream();
         return $pdf->download('archivo.pdf');
-        // return response()->json(['data' => $data], 200);
-
     }
     protected function pdfexpejecucion(Request $request)
-    {
+    {    $report = \App\Models\Report::create([
+        'rep_fecha_generacion' => now()->setTimezone('America/Lima'),
+        'rep_tipo' => 'REPORTE EXPEDIENTE EN EJECUCION/AUTOMATIZADO',
+        'usu_id' => $request->usu_id,
+    ]);
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->where('exp_estado_proceso', 'EN EJECUCION')
             ->with('person.address')
@@ -154,13 +164,15 @@ class ReportController extends Controller
             ]);
         });
         $pdf = PDF::loadView('vista_pdf_exp_ejc', ['data' => $data]);
-        //return $pdf->stream();
         return $pdf->download('archivo.pdf');
-        // return response()->json(['data' => $data], 200);
 
     }
     protected function pdfexps(Request $request)
-    {
+    {     $report = \App\Models\Report::create([
+        'rep_fecha_generacion' => now()->setTimezone('America/Lima'),
+        'rep_tipo' => 'REPORTE EXPEDIENTES /AUTOMATIZADO',
+        'usu_id' => $request->usu_id,
+    ]);
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->with('person.address')
             ->with('specialty.instance.judicialdistrict')
@@ -191,7 +203,11 @@ class ReportController extends Controller
 
     }
     protected function pdfdemandantes(Request $request)
-    {
+    {    $report = \App\Models\Report::create([
+        'rep_fecha_generacion' => now()->setTimezone('America/Lima'),
+        'rep_tipo' => 'REPORTE DEMANDANTES/AUTOMATIZADO',
+        'usu_id' => $request->usu_id,
+    ]);
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->with('person.address')
             ->get();
@@ -222,7 +238,11 @@ class ReportController extends Controller
     }
     protected function pdffechaaño(Request $request)
 
-    {
+    {    $report = \App\Models\Report::create([
+        'rep_fecha_generacion' => now()->setTimezone('America/Lima'),
+        'rep_tipo' => 'REPORTE EXPEDIENTE  MES Y AÑO /PERSONALIZADO',
+        'usu_id' => $request->usu_id,
+    ]);
         $mes = $request->mes;
         $año = $request->año;
         $mes = intval($mes);
@@ -257,14 +277,19 @@ $fechaBuscada = $año . '-' . $mesFormateado;
         ]);
     });
      $pdf = PDF::loadView('vista_pdf_exps', ['data' => $data]);
-    //return $pdf->stream();
+    
      return $pdf->download('archivo.pdf');
-   // return response()->json(['data' => $data,'fecha'=>$fechaBuscada], 200);
+  
     }
     protected function pdfmateria(Request $request)
-    {
+    {   $report = \App\Models\Report::create([
+        'rep_fecha_generacion' => now()->setTimezone('America/Lima'),
+        'rep_tipo' => 'REPORTE EXPEDIENTE  MATERIA /PERSONALIZADO',
+        'usu_id' => $request->usu_id,
+    ]);
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
         ->with('person.address')
+        ->with('specialty.instance.judicialdistrict')
         ->where('exp_materia',$request->exp_materia)
         ->get();
 
@@ -286,10 +311,7 @@ $fechaBuscada = $año . '-' . $mesFormateado;
             'type' => $type,
         ]);
     });
-        $pdf = PDF::loadView('vista_pdf_de', ['data' => $data]);
-        //return $pdf->stream();
+        $pdf = PDF::loadView('vista_pdf_exps', ['data' => $data]);
          return $pdf->download('archivo.pdf');
-        // return response()->json(['data' => $data], 200);
-
     }
 }

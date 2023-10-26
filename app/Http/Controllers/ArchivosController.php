@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Twilio\Rest\Client;
 use Uuid;
+use Twilio\TwiML\MessagingResponse;
 class ArchivosController extends Controller
 {   public function __construct()
     {
@@ -12,12 +14,26 @@ class ArchivosController extends Controller
     public function pdfprincipal(Request $request) {
         $file = $request->file('file');
         $fileName = time() . '_' . $file->getClientOriginalName();
-        $filePath = $file->storeAs('/public/files/', $fileName);
     
-        return response()->json(['message' => 'Archivo cargado con éxito','file'=>$fileName]);
+        if ($request->doc_tipo == 'EJE') {
+            $filePath = $file->storeAs('public/files/ejes', $fileName);
+        } else {
+            $filePath = $file->storeAs('public/files/escritos', $fileName);
+        }
+    
+        // Guardar datos en la base de datos
+        $document = \App\Models\LegalDocument::create([
+            'doc_nombre' => $fileName,
+            'doc_tipo' => $request->doc_tipo,
+            'doc_desciprcion' => $file->getClientOriginalName(),
+            'doc_ruta_archivo' => ($request->doc_tipo == 'EJE') ? 'public/files/ejes/' . $fileName : 'public/files/escritos/' . $fileName,
+            'exp_id' => $request->exp_id
+        ]);
+    
+        return response()->json(['message' => 'Archivo cargado con éxito', 'file' => $fileName]);
     }
     public function traerpdfprincipal(Request $request) {
-        $rutaArchivo = storage_path('app/public/files/' . $request->nombre);
+        $rutaArchivo = storage_path('app/'.$request->nombre);
         return response()->download($rutaArchivo);
     }
 }

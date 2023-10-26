@@ -113,10 +113,15 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/', 'App\Http\Controllers\AudienceController@index')->name('audiences.index');
         Route::post('/store', 'App\Http\Controllers\AudienceController@store')->name('audiences.store');
     });
+    //guardar archivos
     Route::prefix('cargar')->group(function () {
-        Route::post('/principal', 'App\Http\Controllers\ArchivosController@pdfprincipal')->name('cargar.pdfprincipal');
+        Route::post('/archivo', 'App\Http\Controllers\ArchivosController@pdfprincipal')->name('cargar.pdfprincipal');
     });
     Route::prefix('traer')->group(function () {
-    Route::get('/principal', 'App\Http\Controllers\ArchivosController@traerpdfprincipal')->name('traer.traerpdfprincipal');
+    Route::get('/archivo', 'App\Http\Controllers\ArchivosController@traerpdfprincipal')->name('traer.traerpdfprincipal');
     });
+    //mandar mensajes  a celular
+    Route::prefix('mensajes')->group(function () {
+    Route::get('/', 'App\Http\Controllers\WhatsappController@index')->name('mensajes.index');
+        });
 });

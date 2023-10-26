@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id('rep_id');
             $table->timestamp('rep_fecha_generacion');
             $table->string('rep_tipo', 255)->comment('excel, pdf, etc');
-            $table->unsignedBigInteger('usu_id');
-            $table->unsignedBigInteger('exp_id');
+            $table->unsignedBigInteger('usu_id')->nullable()->comment('usuario reporte');
             $table->timestamps();
             $table->softDeletes();
 
@@ -25,11 +24,7 @@ return new class extends Migration
                 ->on('users')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
-            $table->foreign('exp_id')
-                ->references('exp_id')
-                ->on('proceedings')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
+           
         });
     }
 

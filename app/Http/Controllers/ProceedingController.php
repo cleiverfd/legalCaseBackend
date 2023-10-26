@@ -159,7 +159,7 @@ class ProceedingController extends Controller
         $proceeding = \App\Models\Proceeding::with('person')
             ->with('specialty.instance.judicialdistrict')
             ->find($id);
-    
+        
         if (!$proceeding) {
             return response()->json(['error' => 'Expediente no encontrado'], 404);
         }
@@ -181,8 +181,16 @@ class ProceedingController extends Controller
         
         $data = $this->transformProceedingData($proceeding, $personData, $tipo_persona);
         $data['per_id'] = $person ? $person->per_id : null;
-    
-        return response()->json(['data' => $data], 200);
+      //traer archivos
+         $eje=\App\Models\LegalDocument::where('exp_id',$id)
+         ->where('doc_tipo','EJE')
+         ->get()
+         ;
+         $escritos=\App\Models\LegalDocument::where('exp_id',$id)
+         ->where('doc_tipo','ESCRITO')
+         ->get()
+         ;
+        return response()->json(['data' => $data,'eje'=>$eje,'escritos'=>$escritos], 200);
     }
     
     private function getNaturalPersonData($person)
