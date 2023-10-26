@@ -17,19 +17,11 @@ return new class extends Migration
             $table->text('ale_descripcion')->nullable();
             $table->text('ale_dias_faltantes')->nullable();
             $table->unsignedBigInteger('exp_id');
-            $table->unsignedBigInteger('cal_id')->nullable();
-
             $table->foreign('exp_id')
                 ->references('exp_id')
                 ->on('proceedings')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
-            $table->foreign('cal_id')
-                ->references('cal_id')
-                ->on('calendars')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-
             $table->timestamps();
             $table->softDeletes();
         });

@@ -20,9 +20,9 @@ class ArchivosController extends Controller
     
         // Guardar datos en la base de datos
         $document = \App\Models\LegalDocument::create([
-            'doc_nombre' => $fileName,
+            'doc_nombre' => $file->getClientOriginalName(),
             'doc_tipo' => $request->doc_tipo,
-            'doc_desciprcion' => $file->getClientOriginalName(),
+            'doc_desciprcion' => $request->descripcion,
             'doc_ruta_archivo' => ($request->doc_tipo == 'EJE') ? 'public/files/ejes/' . $fileName : 'public/files/escritos/' . $fileName,
             'exp_id' => $request->exp_id
         ]);
