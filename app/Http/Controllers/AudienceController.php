@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use App\Models\Audience;
 use Exception;
+use DateTime;
 
 class AudienceController extends Controller
 {
@@ -66,14 +67,25 @@ class AudienceController extends Controller
         try {
             DB::beginTransaction(); 
 
+            $au_fecha = strtoupper(trim($request->au_fecha));
+            $hoy = date('Y-m-d'); // Obtiene la fecha actual en el formato 'Año-Mes-Día'
+            $au_fecha_obj = new DateTime($au_fecha);
+            $hoy_obj = new DateTime($hoy);
+
+            // Calcula la diferencia de días
+            $interval = $au_fecha_obj->diff($hoy_obj);
+            $dias_faltantes = $interval->days;
+
             $audience = Audience::create([
                 'per_id' => trim($request->per_id),
                 'exp_id' => strtoupper(trim($request->exp_id)),
-                'au_fecha' => strtoupper(trim($request->au_fecha)),
+                'au_fecha' => $au_fecha,
                 'au_hora' => $request->au_hora,
                 'au_lugar' => $request->au_lugar,
                 'au_detalles' => $request->au_detalles,
+                'au_dias_faltantes' => $dias_faltantes, // Guarda la cantidad de días faltantes
             ]);
+
 
             DB::commit();
 

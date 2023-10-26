@@ -1,11 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
-use Twilio\Rest\Client;
 use Uuid;
-use Twilio\TwiML\MessagingResponse;
 class ArchivosController extends Controller
 {   public function __construct()
     {

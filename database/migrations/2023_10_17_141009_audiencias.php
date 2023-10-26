@@ -17,6 +17,7 @@ class Audiencias extends Migration
             $table->string('au_hora', 255)->nullable();
             $table->text('au_lugar', 255)->nullable();
             $table->text('au_detalles', 255)->nullable();
+            $table->text('au_dias_faltantes')->nullable();
             $table->unsignedBigInteger('per_id')->nullable();
             $table->unsignedBigInteger('exp_id')->nullable();
             $table->unsignedBigInteger('abo_id')->nullable();

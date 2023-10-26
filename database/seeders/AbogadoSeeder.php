@@ -18,7 +18,7 @@ class AbogadoSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 4; $i++) {
             // Datos ficticios para el abogado
             $apellidoPaterno = $faker->lastName;
             $datosAbogado = [

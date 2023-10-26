@@ -15,6 +15,7 @@ class Audience extends Model
         'au_hora',
         'au_lugar',
         'au_detalles',
+        'au_dias_faltantes',
         'per_id',
         'exp_id',
         'abo_id'
