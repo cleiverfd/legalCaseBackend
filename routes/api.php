@@ -88,24 +88,15 @@ Route::middleware(['auth:api'])->group(function () {
 
     // Generacion de Reportes
     Route::prefix('reportes')->group(function () {
-        Route::post('/inicio', 'App\Http\Controllers\ReportController@inicio')->
-        name('reportes.inicio');
-        Route::post('/exprecientes', 'App\Http\Controllers\ReportController@exprecientes')->
-        name('reportes.exprecientes');
-        Route::get('/pdfabogados', 'App\Http\Controllers\ReportController@pdfabogados')->
-        name('reportes.pdfabogados');
-        Route::get('/pdfexptramite', 'App\Http\Controllers\ReportController@pdfexptramite')->
-        name('reportes.pdfexptramite');
-        Route::get('/pdfexpejecucion', 'App\Http\Controllers\ReportController@pdfexpejecucion')->
-        name('reportes.pdfexpejecucion');
-        Route::get('/pdfexps', 'App\Http\Controllers\ReportController@pdfexps')->
-        name('reportes.pdfexps');
-        Route::get('/pdfdemandantes', 'App\Http\Controllers\ReportController@pdfdemandantes')->
-        name('reportes.pdfdemandantes');
-        Route::get('/pdffechaaño', 'App\Http\Controllers\ReportController@pdffechaaño')->
-        name('reportes.pdffechaaño');
-        Route::get('/pdfmateria', 'App\Http\Controllers\ReportController@pdfmateria')->
-        name('reportes.pdfmateria');
+        Route::post('/inicio', 'App\Http\Controllers\ReportController@inicio')->name('reportes.inicio');
+        Route::post('/exprecientes', 'App\Http\Controllers\ReportController@exprecientes')->name('reportes.exprecientes');
+        Route::get('/pdfabogados', 'App\Http\Controllers\ReportController@pdfabogados')->name('reportes.pdfabogados');
+        Route::get('/pdfexptramite', 'App\Http\Controllers\ReportController@pdfexptramite')->name('reportes.pdfexptramite');
+        Route::get('/pdfexpejecucion', 'App\Http\Controllers\ReportController@pdfexpejecucion')->name('reportes.pdfexpejecucion');
+        Route::get('/pdfexps', 'App\Http\Controllers\ReportController@pdfexps')->name('reportes.pdfexps');
+        Route::get('/pdfdemandantes', 'App\Http\Controllers\ReportController@pdfdemandantes')->name('reportes.pdfdemandantes');
+        Route::get('/pdffechaaño', 'App\Http\Controllers\ReportController@pdffechaaño')->name('reportes.pdffechaaño');
+        Route::get('/pdfmateria', 'App\Http\Controllers\ReportController@pdfmateria')->name('reportes.pdfmateria');
     });
 
     // Audiencias
@@ -118,10 +109,17 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/archivo', 'App\Http\Controllers\ArchivosController@pdfprincipal')->name('cargar.pdfprincipal');
     });
     Route::prefix('traer')->group(function () {
-    Route::get('/archivo', 'App\Http\Controllers\ArchivosController@traerpdfprincipal')->name('traer.traerpdfprincipal');
+        Route::get('/archivo', 'App\Http\Controllers\ArchivosController@traerpdfprincipal')->name('traer.traerpdfprincipal');
     });
+
     //mandar mensajes  a celular
     Route::prefix('mensajes')->group(function () {
-    Route::get('/', 'App\Http\Controllers\WhatsappController@index')->name('mensajes.index');
-        });
+        Route::get('/', 'App\Http\Controllers\WhatsappController@index')->name('mensajes.index');
+    });
+
+    //Alertas
+    Route::prefix('alerta')->group(function(){
+        Route::get('/', 'App\Http\Controllers\AlertController@index')->name('alerta.index');
+        Route::post('/store', 'App\Http\Controllers\AlertController@store')->name('mensajes.store');
+    });
 });

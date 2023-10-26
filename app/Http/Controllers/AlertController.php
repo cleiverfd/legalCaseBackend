@@ -2,41 +2,58 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use DateTime;
 use Uuid;
+
 class AlertController extends Controller
-{     public function __construct()
+{
+    public function __construct()
     {
         $this->middleware('auth');
     }
-    protected function store(Request $request)
-    { 
+
+    protected function index()
+    {
         try {
-            DB::beginTransaction(); 
+            $alerts = \App\Models\Alert::all();
+            return response()->json(['state' => 0, 'data' => $alerts], 200);
+        } catch (\Exception $e) {
+            return response()->json(['state' => 1, 'error' => $e->getMessage()], 500);
+        }
+    }
 
-            $au_fecha = strtoupper(trim($request->ale_fecha_vencimiento));
+
+    protected function store(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+    
+            $fechaVencimiento = $request->ale_fecha_vencimiento;
+            $descripcion = $request->ale_descripcion;
+            $expId = $request->exp_id;
+    
+            $auFecha = strtoupper(trim($fechaVencimiento));
             $hoy = date('Y-m-d');
-            $au_fecha_obj = new DateTime($au_fecha);
-            $hoy_obj = new DateTime($hoy);
-
-            // Calcula la diferencia de días
-            $interval = $au_fecha_obj->diff($hoy_obj);
-            $dias_faltantes = $interval->days;
-
+    
+            $diasFaltantes = (new DateTime($auFecha))->diff(new DateTime($hoy))->days;
+    
             $alert = \App\Models\Alert::create([
-                'ale_fecha_vencimiento'=>$request->ale_fecha_vencimiento,
-                'ale_descripcion'=>$request->ale_descripcion,
-                'exp_id'=>$request->exp_id,
-                'ale_dias_faltantes'=> $dias_faltantes,
+                'ale_fecha_vencimiento' => $fechaVencimiento,
+                'ale_descripcion' => $descripcion,
+                'exp_id' => $expId,
+                'ale_dias_faltantes' => $diasFaltantes,
             ]);
-
-
+    
             DB::commit();
-
+    
             return response()->json(['state' => 0, 'data' => $alert], 201);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json(['state' => 1, 'error' => $e->getMessage()], 500);
         }
     }
+    
 }
