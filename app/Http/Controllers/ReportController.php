@@ -94,6 +94,7 @@ class ReportController extends Controller
         //return $pdf->stream();
         return $pdf->download('archivo.pdf');
     }
+    
     protected function pdfexptramite(Request $request)
     {
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
@@ -120,7 +121,7 @@ class ReportController extends Controller
                 'type' => $type,
             ]);
         });
-        $pdf = PDF::loadView('vista_pdf_exp_tra', ['data' => $data]);
+        $pdf = PDF::loadView('pdfExpedienteTramite', ['data' => $data]);
         //return $pdf->stream();
         return $pdf->download('archivo.pdf');
         // return response()->json(['data' => $data], 200);

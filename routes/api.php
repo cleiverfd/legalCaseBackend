@@ -41,6 +41,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/', 'App\Http\Controllers\LawyerController@index')->name('lawyer.index');
         Route::get('/{id}/show', 'App\Http\Controllers\LawyerController@show')->name('lawyer.show');
         Route::post('/registrar', 'App\Http\Controllers\LawyerController@registrar')->name('lawyer.registrar');
+        Route::post('eliminar/{id}', 'App\Http\Controllers\LawyerController@eliminar')->name('lawyer.eliminar');
     });
 
     // Expedientes

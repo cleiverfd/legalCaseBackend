@@ -62,4 +62,32 @@ class LawyerController extends Controller
             return ['state' => '1', 'exception' => (string) $e];
         }
     }
+
+    protected function eliminar($id)
+    {
+        try {
+            \DB::beginTransaction();
+
+            // Buscar el abogado por ID
+            $abogado = \App\Models\Lawyer::find($id);
+
+            if (!$abogado) {
+                return \response()->json(['message' => 'Abogado no encontrado'], 404);
+            }
+
+            // Eliminar el registro de abogado
+            $abogado->delete();
+
+            // También puedes eliminar la persona natural y el usuario si es necesario
+            // $abogado->persona->delete();
+            // $abogado->user->delete();
+
+            \DB::commit();
+
+            return \response()->json(['message' => 'Abogado eliminado'], 200);
+        } catch (Exception $e) {
+            \DB::rollback();
+            return \response()->json(['message' => 'Error al eliminar el abogado', 'exception' => $e->getMessage()], 500);
+        }
+    }
 }
