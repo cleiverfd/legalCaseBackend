@@ -129,6 +129,7 @@ class ReportController extends Controller
                 'type' => $type,
             ]);
         });
+        
         $pdf = PDF::loadView('pdfExpedienteTramite', ['data' => $data]);
         //return $pdf->stream();
         return $pdf->download('archivo.pdf');
