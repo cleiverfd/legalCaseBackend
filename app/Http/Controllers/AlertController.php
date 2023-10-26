@@ -27,8 +27,7 @@ class AlertController extends Controller
                 'ale_fecha_vencimiento'=>$request->ale_fecha_vencimiento,
                 'ale_descripcion'=>$request->ale_descripcion,
                 'exp_id'=>$request->exp_id,
-                'cal_id'=>$request->cal_id,
-               'ale_dias_faltantes'=> $dias_faltantes,
+                'ale_dias_faltantes'=> $dias_faltantes,
             ]);
 
 

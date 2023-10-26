@@ -15,7 +15,6 @@ class Alert extends Model
         'ale_fecha_vencimiento',
         'ale_descripcion',
         'exp_id',
-        'cal_id',
         'ale_dias_faltantes',
     ];
     protected $dates = ['created_at', 'updated_at', 'deleted_at'];
