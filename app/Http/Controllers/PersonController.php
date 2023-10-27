@@ -51,19 +51,19 @@ class PersonController extends Controller
             if ($tipo_persona === 'natural') {
                 $personDataArray = [
                     'nat_dni' => $personData->nat_dni,
-                    'nat_apellido_paterno' => $personData->nat_apellido_paterno,
-                    'nat_apellido_materno' => $personData->nat_apellido_materno,
-                    'nat_nombres' => $personData->nat_nombres,
+                    'nat_apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
+                    'nat_apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
+                    'nat_nombres' => ucwords(strtolower($personData->nat_nombres)),
                     'nat_telefono' => $personData->nat_telefono,
-                    'nat_correo' => $personData->nat_correo,
-                    'dir_calle_av' => $proceeding->person->address->dir_calle_av,
+                    'nat_correo' => strtolower($personData->nat_correo),
+                    'dir_calle_av' => ucwords(strtolower($proceeding->person->address->dir_calle_av)),
                 ];
             } elseif ($tipo_persona === 'juridica') {
                 $personDataArray = [
                     'jur_ruc' => $personData->jur_ruc,
-                    'jur_razon_social' => $personData->jur_razon_social,
+                    'jur_razon_social' => ucwords(strtolower($personData->jur_razon_social)),
                     'jur_telefono' => $personData->jur_telefono,
-                    'jur_correo' => $personData->jur_correo,
+                    'jur_correo' => strtolower($personData->jur_correo),
                     'dir_calle_av' => $proceeding->person->address->dir_calle_av,
                 ];
             } else {
@@ -222,27 +222,27 @@ class PersonController extends Controller
             if ($tipo_persona === 'natural') {
                 $personDataArray = [
                     'nat_dni' => $personData->nat_dni,
-                    'nat_apellido_paterno' => $personData->nat_apellido_paterno,
-                    'nat_apellido_materno' => $personData->nat_apellido_materno,
-                    'nat_nombres' => $personData->nat_nombres,
+                    'nat_apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
+                    'nat_apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
+                    'nat_nombres' => ucwords(strtolower($personData->nat_nombres)),
                     'nat_telefono' => $personData->nat_telefono,
-                    'nat_correo' => $personData->nat_correo,
+                    'nat_correo' => strtolower($personData->nat_correo),
                 ];
             } elseif ($tipo_persona === 'juridica') {
                 $personDataArray = [
                     'jur_ruc' => $personData->jur_ruc,
-                    'jur_azon_social' => $personData->jur_razon_social,
+                    'jur_azon_social' => ucwords(strtolower($personData->jur_razon_social)),
                     'jur_telefono' => $personData->jur_telefono,
-                    'jur_correo' => $personData->jur_correo,
+                    'jur_correo' => strtolower($personData->jur_correo),
                 ];
             }
 
             if ($address) {
                 $addressDataArray = [
-                    'dir_calle_av' => $address->dir_calle_av,
-                    'dis_nombre' => $address->district->dis_nombre,
-                    'pro_nombre' => $address->district->province->pro_nombre,
-                    'dep_nombre' => $address->district->province->departament->dep_nombre,
+                    'dir_calle_av' => ucwords(strtolower($address->dir_calle_av)),
+                    'dis_nombre' => ucwords(strtolower($address->district->dis_nombre)),
+                    'pro_nombre' => ucwords(strtolower($address->district->province->pro_nombre)),
+                    'dep_nombre' => ucwords(strtolower($address->district->province->departament->dep_nombre)),
                 ];
             }
 
@@ -266,12 +266,39 @@ class PersonController extends Controller
     }
 
     protected function getHistoryByDocument($doc)
-    {
+{
+    try {
         $person = $this->getPersonByDocument($doc);
-        return $person ? History::where('per_id', $person->per_id)
-            ->with('expediente')
-            ->get() : collect([]);
+
+        if ($person) {
+            $history = History::where('per_id', $person->per_id)
+                ->with('expediente')
+                ->orderBy('created_at', 'DESC')
+                ->get();
+
+            // Filtrar los campos que deseas
+            $filteredHistory = $history->map(function ($item) {
+                return [
+                    'his_id' => $item->his_id,
+                    'his_fecha_hora' => $item->his_fecha_hora,
+                    'his_medio_comuniacion' => $item->his_medio_comuniacion,
+                    'his_detalle' => $item->his_detalle,
+                    'exp_id' => $item->expediente->exp_id,
+                    'exp_numero' => $item->expediente->exp_numero,
+                ];
+            });
+
+            return response()->json(['data' => $filteredHistory]);
+        } else {
+            return response()->json(['data' => []]); // Retorna un arreglo vacío si no hay datos
+        }
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
     }
+}
+
+    
+    
 
     protected function getPaymentsByDocument($doc)
     {

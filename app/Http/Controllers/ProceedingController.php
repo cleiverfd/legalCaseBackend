@@ -12,27 +12,28 @@ class ProceedingController extends Controller
         $this->middleware('auth');
     }
 
-    protected function index(Request $request)
+    protected function index()
     {
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->with('person.juridica', 'person.persona')
             ->get();
-
+    
         $data = $proceedings->map(function ($proceeding) {
             $person = $proceeding->person;
             $tipo_persona = null;
-
+    
             $commonData = [
                 'exp_id' => $proceeding->exp_id,
                 'numero' => $proceeding->exp_numero,
                 'fecha_inicio' => $proceeding->exp_fecha_inicio,
-                'pretencion' => $proceeding->exp_pretencion,
-                'materia' => $proceeding->exp_materia,
-                'especialidad' => $proceeding->exp_especialidad,
+                'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
+                'materia' => ucwords(strtolower($proceeding->exp_materia)),
+                'especialidad' => ucwords(strtolower($proceeding->exp_especialidad)),
                 'monto_pretencion' => $proceeding->exp_monto_pretencion,
-                'estado_proceso' => $proceeding->exp_estado_proceso,
+                'estado_proceso' =>ucwords(strtolower( $proceeding->exp_estado_proceso)),
             ];
-
+            
+    
             if ($person) {
                 if ($person->nat_id !== null) {
                     $personData = $person->persona;
@@ -42,32 +43,33 @@ class ProceedingController extends Controller
                     $tipo_persona = 'juridica';
                 }
             }
-
+    
             if ($tipo_persona === 'natural') {
                 $personDataArray = [
                     'dni' => $personData->nat_dni,
-                    'apellido_paterno' => $personData->nat_apellido_paterno,
-                    'apellido_materno' => $personData->nat_apellido_materno,
-                    'nombres' => $personData->nat_nombres,
+                    'apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
+                    'apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
+                    'nombres' => ucwords(strtolower($personData->nat_nombres)),
                     'telefono' => $personData->nat_telefono,
-                    'correo' => $personData->nat_correo,
+                    'correo' => strtolower($personData->nat_correo),
                 ];
             } elseif ($tipo_persona === 'juridica') {
                 $personDataArray = [
-                    'ruc' => $personData->jur_ruc,
-                    'razon_social' => $personData->jur_razon_social,
+                    'ruc' => ucwords(strtolower($personData->jur_ruc)),
+                    'razon_social' => ucwords(strtolower($personData->jur_razon_social)),
                     'telefono' => $personData->jur_telefono,
-                    'correo' => $personData->jur_correo,
+                    'correo' => strtolower($personData->jur_correo),
                 ];
             } else {
                 $personDataArray = [];
             }
-
+    
             return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
         });
-
+    
         return response()->json(['data' => $data], 200);
     }
+    
 
     protected function registrarcaso(Request $request)
     {
