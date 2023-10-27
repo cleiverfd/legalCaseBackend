@@ -122,4 +122,8 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/', 'App\Http\Controllers\AlertController@index')->name('alerta.index');
         Route::post('/store', 'App\Http\Controllers\AlertController@store')->name('mensajes.store');
     });
+     //calendario
+     Route::prefix('calendario')->group(function(){
+        Route::get('/', 'App\Http\Controllers\CalendarioController@index')->name('calendario.index');
+    });
 });
