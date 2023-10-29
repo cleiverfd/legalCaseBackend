@@ -273,7 +273,7 @@ class PersonController extends Controller
         if ($person) {
             $history = History::where('per_id', $person->per_id)
                 ->with('expediente')
-                ->orderBy('created_at', 'DESC')
+                ->orderBy('created_at', 'ASC')
                 ->get();
 
             // Filtrar los campos que deseas
