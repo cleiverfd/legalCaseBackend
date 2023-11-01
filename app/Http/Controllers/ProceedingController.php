@@ -17,11 +17,20 @@ class ProceedingController extends Controller
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->with('person.juridica', 'person.persona')
             ->get();
+            
     
         $data = $proceedings->map(function ($proceeding) {
-            $person = $proceeding->person;
+            $procesal = null;
             $tipo_persona = null;
-    
+            if ($proceeding) {
+                if ($proceeding->exp_demandante !== null) {
+                    $person = $proceeding->demandante;
+                    $procesal='demandante';
+                } elseif ($proceeding->exp_demandado !== null) {
+                    $person = $proceeding->demandado;
+                    $procesal='demandado';
+                }
+            }
             $commonData = [
                 'exp_id' => $proceeding->exp_id,
                 'numero' => $proceeding->exp_numero,
@@ -31,9 +40,8 @@ class ProceedingController extends Controller
                 'especialidad' => ucwords(strtolower($proceeding->exp_especialidad)),
                 'monto_pretencion' => $proceeding->exp_monto_pretencion,
                 'estado_proceso' =>ucwords(strtolower( $proceeding->exp_estado_proceso)),
+                'procesal'=>$procesal
             ];
-            
-    
             if ($person) {
                 if ($person->nat_id !== null) {
                     $personData = $person->persona;
