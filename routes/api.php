@@ -49,6 +49,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/', 'App\Http\Controllers\ProceedingController@index')->name('proceeding.index');
         Route::get('/{id}', 'App\Http\Controllers\ProceedingController@show')->name('proceeding.show');
         Route::post('/registrarcaso', 'App\Http\Controllers\ProceedingController@registrarcaso')->name('proceeding.registrarcaso');
+      
     });
 
     //  Distritos Judiciales
