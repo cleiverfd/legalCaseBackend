@@ -187,8 +187,6 @@ class ProceedingController extends Controller
         }
     
      //   $person = $proceeding->person;
-
-        $person = $proceeding->person;
         $personData = null;
         $tipo_persona = null;
 
