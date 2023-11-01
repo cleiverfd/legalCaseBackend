@@ -33,6 +33,14 @@ class Proceeding extends Model
     {
         return $this->belongsTo(Person::class, 'exp_demandante', 'per_id');
     }
+    public function demandante()
+    {
+        return $this->belongsTo(Person::class, 'exp_demandante', 'per_id');
+    }
+    public function demandado()
+    {
+        return $this->belongsTo(Person::class, 'exp_demandado', 'per_id');
+    }
 
     public function specialty()
     {

@@ -139,7 +139,11 @@ class ProceedingController extends Controller
 
             /*Actulizar el expediente  asignando laersona y el abogado*/
             $EX = \App\Models\Proceeding::find($exp->exp_id);
-            $EX->exp_demandante = strtoupper(trim($perId));
+            if($request->procesal=='DEMANDANTE'){
+            $EX->exp_demandante = strtoupper(trim($perId));}
+            else{
+            $EX->exp_demandado=strtoupper(trim($perId));
+            }
             $EX->abo_id = $request->abo_id;
             $EX->save();
             /*ACTULIZAR ESTADO DE ABOGADO */
@@ -157,14 +161,26 @@ class ProceedingController extends Controller
     }
 
     protected function show($id)
-    {
-        $proceeding = \App\Models\Proceeding::with('person')
-            ->with('specialty.instance.judicialdistrict')
+    {    $person =null;
+         $procesal=null;
+        $proceeding = \App\Models\Proceeding::with('specialty.instance.judicialdistrict')
             ->find($id);
 
         if (!$proceeding) {
             return response()->json(['error' => 'Expediente no encontrado'], 404);
         }
+        if ($proceeding) {
+            if ($proceeding->exp_demandante !== null) {
+                $person = $proceeding->demandante;
+                $procesal='demandante';
+              
+            } elseif ($proceeding->exp_demandado !== null) {
+                $person = $proceeding->demandado;
+                $procesal='demandado';
+            }
+        }
+    
+     //   $person = $proceeding->person;
 
         $person = $proceeding->person;
         $personData = null;
@@ -183,14 +199,17 @@ class ProceedingController extends Controller
 
         $data = $this->transformProceedingData($proceeding, $personData, $tipo_persona);
         $data['per_id'] = $person ? $person->per_id : null;
-        //traer archivos
-        $eje = \App\Models\LegalDocument::where('exp_id', $id)
-            ->where('doc_tipo', 'EJE')
-            ->get();
-        $escritos = \App\Models\LegalDocument::where('exp_id', $id)
-            ->where('doc_tipo', 'ESCRITO')
-            ->get();
-        return response()->json(['data' => $data, 'eje' => $eje, 'escritos' => $escritos], 200);
+      //traer archivos
+         $eje=\App\Models\LegalDocument::where('exp_id',$id)
+         ->where('doc_tipo','EJE')
+         ->get()
+         ;
+         $escritos=\App\Models\LegalDocument::where('exp_id',$id)
+         ->where('doc_tipo','ESCRITO')
+         ->get()
+         ;
+        return response()->json(['data' => $data,'eje'=>$eje,
+        'escritos'=>$escritos,'procesal'=>$procesal], 200);
     }
 
     private function getNaturalPersonData($person)
