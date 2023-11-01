@@ -48,6 +48,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::prefix('proceeding')->group(function () {
         Route::get('/', 'App\Http\Controllers\ProceedingController@index')->name('proceeding.index');
         Route::get('/{id}', 'App\Http\Controllers\ProceedingController@show')->name('proceeding.show');
+        Route::post('/update', 'App\Http\Controllers\ProceedingController@update')->name('proceeding.update');
         Route::post('/registrarcaso', 'App\Http\Controllers\ProceedingController@registrarcaso')->name('proceeding.registrarcaso');
     });
 

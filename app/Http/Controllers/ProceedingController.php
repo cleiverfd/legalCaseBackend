@@ -139,7 +139,11 @@ class ProceedingController extends Controller
 
             /*Actulizar el expediente  asignando laersona y el abogado*/
             $EX = \App\Models\Proceeding::find($exp->exp_id);
-            $EX->exp_demandante = strtoupper(trim($perId));
+            if($request->procesal=='DEMANDANTE'){
+            $EX->exp_demandante = strtoupper(trim($perId));}
+            else{
+            $EX->exp_demandado=strtoupper(trim($perId));
+            }
             $EX->abo_id = $request->abo_id;
             $EX->save();
             /*ACTULIZAR ESTADO DE ABOGADO */
@@ -157,16 +161,26 @@ class ProceedingController extends Controller
     }
 
     protected function show($id)
-    {
-        $proceeding = \App\Models\Proceeding::with('person')
-            ->with('specialty.instance.judicialdistrict')
+    {    $person =null;
+         $procesal=null;
+        $proceeding = \App\Models\Proceeding::with('specialty.instance.judicialdistrict')
             ->find($id);
         
         if (!$proceeding) {
             return response()->json(['error' => 'Expediente no encontrado'], 404);
         }
+        if ($proceeding) {
+            if ($proceeding->exp_demandante !== null) {
+                $person = $proceeding->demandante;
+                $procesal='demandante';
+              
+            } elseif ($proceeding->exp_demandado !== null) {
+                $person = $proceeding->demandado;
+                $procesal='demandado';
+            }
+        }
     
-        $person = $proceeding->person;
+     //   $person = $proceeding->person;
         $personData = null;
         $tipo_persona = null;
     
@@ -192,7 +206,8 @@ class ProceedingController extends Controller
          ->where('doc_tipo','ESCRITO')
          ->get()
          ;
-        return response()->json(['data' => $data,'eje'=>$eje,'escritos'=>$escritos], 200);
+        return response()->json(['data' => $data,'eje'=>$eje,
+        'escritos'=>$escritos,'procesal'=>$procesal], 200);
     }
     
     private function getNaturalPersonData($person)
