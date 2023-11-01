@@ -17,8 +17,6 @@ class ProceedingController extends Controller
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->with('person.juridica', 'person.persona')
             ->get();
-            
-    
         $data = $proceedings->map(function ($proceeding) {
             $procesal = null;
             $tipo_persona = null;
@@ -51,7 +49,7 @@ class ProceedingController extends Controller
                     $tipo_persona = 'juridica';
                 }
             }
-    
+
             if ($tipo_persona === 'natural') {
                 $personDataArray = [
                     'dni' => $personData->nat_dni,
@@ -71,13 +69,13 @@ class ProceedingController extends Controller
             } else {
                 $personDataArray = [];
             }
-    
+
             return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
         });
-    
+
         return response()->json(['data' => $data], 200);
     }
-    
+
 
     protected function registrarcaso(Request $request)
     {
@@ -173,7 +171,7 @@ class ProceedingController extends Controller
          $procesal=null;
         $proceeding = \App\Models\Proceeding::with('specialty.instance.judicialdistrict')
             ->find($id);
-        
+
         if (!$proceeding) {
             return response()->json(['error' => 'Expediente no encontrado'], 404);
         }
@@ -189,9 +187,11 @@ class ProceedingController extends Controller
         }
     
      //   $person = $proceeding->person;
+
+        $person = $proceeding->person;
         $personData = null;
         $tipo_persona = null;
-    
+
         if ($person) {
             if ($person->nat_id !== null) {
                 $personData = $this->getNaturalPersonData($person);
@@ -201,8 +201,8 @@ class ProceedingController extends Controller
                 $tipo_persona = 'Juridica';
             }
         }
-    
-        
+
+
         $data = $this->transformProceedingData($proceeding, $personData, $tipo_persona);
         $data['per_id'] = $person ? $person->per_id : null;
       //traer archivos
@@ -217,7 +217,7 @@ class ProceedingController extends Controller
         return response()->json(['data' => $data,'eje'=>$eje,
         'escritos'=>$escritos,'procesal'=>$procesal], 200);
     }
-    
+
     private function getNaturalPersonData($person)
     {
         return [
@@ -230,7 +230,7 @@ class ProceedingController extends Controller
             'nat_correo' => $person->persona->nat_correo,
         ];
     }
-    
+
     private function getJuridicalPersonData($person)
     {
         return [
@@ -241,7 +241,7 @@ class ProceedingController extends Controller
             'jur_correo' => $person->juridica->jur_correo,
         ];
     }
-    
+
     private function transformProceedingData($proceeding, $personData, $tipo_persona)
     {
         return array_merge(
@@ -262,5 +262,5 @@ class ProceedingController extends Controller
             $personData // Aquí agregamos los datos de la persona
         );
     }
-    
+
 }
