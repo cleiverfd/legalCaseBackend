@@ -66,13 +66,14 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/', 'App\Http\Controllers\PersonController@index')->name('demandante.index');
         Route::get('/detalledemandante/{doc}', 'App\Http\Controllers\PersonController@detalledemandante')->name('demandante.detalledemandante');
         Route::post('/expedientes', 'App\Http\Controllers\PersonController@traerexpedientes')->name('demandante.traerexpedientes');
-
-        // Nuevas rutas para obtener información por documento
+    // Nuevas rutas para obtener información por documento
         Route::get('/direccion/{doc}', 'App\Http\Controllers\PersonController@getAddressByDocument')->name('demandante.getaddressbydocument');
         Route::get('/historial/{doc}', 'App\Http\Controllers\PersonController@getHistoryByDocument')->name('demandante.gethistorybydocument');
         Route::get('/pagos/{doc}', 'App\Http\Controllers\PersonController@getPaymentsByDocument')->name('demandante.getpaymentsbydocument');
     });
-
+    Route::prefix('demandado')->group(function () {
+        Route::get('/', 'App\Http\Controllers\PersonController@indexdemandados')->name('demandante.indexdemandados');
+    });
 
     // Historial de Comunicaciones
     Route::prefix('history')->group(function () {
