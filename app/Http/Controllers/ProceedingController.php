@@ -159,7 +159,7 @@ class ProceedingController extends Controller
             $abogado->save();
             \DB::commit();
 
-            return \response()->json(['state' => 0, 'data' => $EX], 200);
+            return \response()->json(['state' => 0, 'data' => $EX,'dir'=>$request->dir], 200);
         } catch (Exception $e) {
             \DB::rollback();
             return ['state' => '1', 'exception' => (string) $e];
@@ -215,6 +215,52 @@ class ProceedingController extends Controller
         return response()->json(['data' => $data,'eje'=>$eje,
         'escritos'=>$escritos,'procesal'=>$procesal], 200);
     }
+    protected function showupdate($id)
+    {
+        $person = null;
+        $procesal = null;
+        $personData = null;
+        $tipo_persona = null;
+    
+        $proceeding = \App\Models\Proceeding::with('specialty.instance.judicialdistrict')
+            ->with('abogado.persona')
+            ->find($id);
+    
+        if (!$proceeding) {
+            return response()->json(['error' => 'Expediente no encontrado'], 404);
+        }
+    
+        if ($proceeding->exp_demandante !== null) {
+            $person = \App\Models\Person::with('address.district.province.departament')
+                ->where('per_id', $proceeding->exp_demandante)
+                ->first();
+            $procesal = 'demandante';
+        } elseif ($proceeding->exp_demandado !== null) {
+            $person = \App\Models\Person::with('address.district.province.departament')
+                ->where('per_id', $proceeding->exp_demandado)
+                ->first();
+            $procesal = 'demandado';
+        }
+    
+        if ($person) {
+            if ($person->nat_id !== null) {
+                $personData = $person->natural;
+                $tipo_persona = 'natural';
+            } elseif ($person->jur_id !== null) {
+                $personData = $person->juridica;
+                $tipo_persona = 'juridica';
+            }
+        }
+    
+        return response()->json([
+            'proceeding' => $proceeding,
+            'person' => $person,
+            'tipo_persona' => $tipo_persona,
+            'personData' => $personData,
+            'procesal' => $procesal,
+        ], 200);
+    }
+    
 
     private function getNaturalPersonData($person)
     {

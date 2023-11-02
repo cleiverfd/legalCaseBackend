@@ -25,10 +25,6 @@ class Proceeding extends Model
     ];
 
     protected $dates = ['deleted_at'];
-    // public function archivos()
-    // {
-    //     return $this->belongsTo(LegalDocument::class, 'exp_id', 'exp_id');
-    // }
     public function person()
     {
         return $this->belongsTo(Person::class, 'exp_demandante', 'per_id');
@@ -51,15 +47,12 @@ class Proceeding extends Model
     {
         return $this->hasMany(Audience::class, 'au_id');
     }
-
-    // Relación con la persona (modelo Person)
-    // public function persona()
-    // {
-    //     return $this->belongsTo(Person::class, 'per_id', 'per_id');
-    // }
     public function persona()
     {
         return $this->belongsTo(Person::class);
     }
-
+    public function abogado()
+    {
+        return $this->belongsTo(Lawyer::class,'abo_id','abo_id');
+    }
 }
