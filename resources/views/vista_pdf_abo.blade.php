@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte PDF</title>
+    <title>Reporte de Abogados</title>
     <style>
         /* body {
             font-family: Arial, sans-serif;
@@ -133,16 +133,22 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($data as $item)
+        <tbody>
+            @foreach ($data as $item)
+            @php
+            $nombres = ucwords(strtolower($item['persona']['nat_nombres'] ?? '')) . ' ' . ($item['persona']['nat_apellido_paterno'] ? ucwords(strtolower($item['persona']['nat_apellido_paterno'])) : '') . ' ' . ($item['persona']['nat_apellido_materno'] ? ucwords(strtolower($item['persona']['nat_apellido_materno'])) : '');
+            $correo = strtolower($item['persona']['nat_correo'] ?? '');
+            @endphp
+
             <tr>
-                <td>{{ $item['persona']['nat_dni'] ?? '' }}</td>
-                <td>{{ $item['persona']['nat_nombres'] ?? '' }} {{ $item['persona']['nat_apellido_paterno'] ?? '' }} {{ $item['persona']['nat_apellido_materno'] ?? '' }}</td>
+                <td>{{ ucwords(strtolower($item['persona']['nat_dni'] ?? '')) }}</td>
+                <td>{{ $nombres }}</td>
                 <td>{{ $item['persona']['nat_telefono'] ?? '' }}</td>
-                <td class="correo">{{ $item['persona']['nat_correo'] ?? '' }}</td>
-                <!-- <td>{{ $item['abo_carga_laboral'] ?? '' }}</td> -->
-                <!-- <td>{{ $item['abo_disponibilidad'] ?? '' }}</td> -->
+                <td class="correo">{{ $correo }}</td>
             </tr>
             @endforeach
+        </tbody>
+
         </tbody>
     </table>
 

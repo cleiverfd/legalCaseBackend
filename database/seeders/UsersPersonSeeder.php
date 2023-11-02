@@ -63,6 +63,29 @@ class UsersPersonSeeder extends Seeder
             'updated_at' => Carbon::now(),
         ]);
 
+         // Inserta la tercera persona natural manualmente
+        DB::table('people_naturals')->insert([
+            'nat_dni' => 18189207,
+            'nat_nombres' => 'Carlos Andres',
+            'nat_apellido_paterno' => 'Palomino',
+            'nat_apellido_materno' => 'Guerra',
+            'nat_telefono' => '+51 979945594', 
+            'nat_correo' => ' cpalominog@unprg.edu.pe',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // Inserta un registro en la tabla users relacionado con la segunda persona natural
+        DB::table('users')->insert([
+            'name' => 'Carlos Palomino',
+            'email' => ' cpalominog@unprg.edu.pe',
+            'usu_rol' => 'ADMIN', // Cambia esto si el rol es diferente
+            'per_id' => 3, // El ID de la segunda persona natural manualmente ingresada
+            'password' => Hash::make('18189207'), // Usando el DNI como contraseña
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
         // // Genera registros faker para usuarios adicionales
         // $faker = \Faker\Factory::create();
         // foreach (range(1, 5) as $index) {

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Generación de Reportes en PDF</title>
+    <title>Reporte de Expedientes en Tramite</title>
     <style>
         body {
             font-family: Arial, sans-serif;
