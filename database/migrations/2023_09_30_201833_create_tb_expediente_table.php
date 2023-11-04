@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('exp_estado_proceso', 255)->nullable();
             $table->unsignedBigInteger('exp_demandante')->nullable()->comment('parte_procesal_demandante');
             $table->unsignedBigInteger('exp_demandado')->nullable()->comment('parte_procesal_demandado');
+            $table->string('exp_juzgado')->nullable()->comment('juzgado_donde_se_lleva_el_proceso');
             $table->unsignedBigInteger('abo_id')->nullable();
             $table->foreign('exp_especialidad')
                 ->references('esp_id')

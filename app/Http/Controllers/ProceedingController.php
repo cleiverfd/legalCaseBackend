@@ -90,6 +90,7 @@ class ProceedingController extends Controller
                 'exp_especialidad' => trim($request->exp['exp_especialidad']),
                 'exp_monto_pretencion' => trim($request->exp['exp_monto_pretencion']),
                 'exp_estado_proceso' => 'EN TRAMITE',
+                'exp_juzgado' => strtoupper(trim($request->exp['exp_juzgado'])),
             ]);
             // Inicializar variables
             $persona = null;
@@ -105,7 +106,7 @@ class ProceedingController extends Controller
                         'nat_apellido_materno' => strtoupper(trim($request->pn['nat_apellido_materno'])),
                         'nat_nombres' => strtoupper(trim($request->pn['nat_nombres'])),
                         'nat_telefono' => strtoupper(trim($request->pn['nat_telefono'])),
-                        'nat_correo' => strtoupper(trim($request->pn['nat_correo']))
+                        'nat_correo' => trim($request->pn['nat_correo'])
                     ]
                 );
 
@@ -119,7 +120,7 @@ class ProceedingController extends Controller
                     [
                         'jur_razon_social' => strtoupper(trim($request->pj['jur_razon_social'])),
                         'jur_telefono' => strtoupper(trim($request->pj['jur_telefono'])),
-                        'jur_correo' => strtoupper(trim($request->pj['jur_correo'])),
+                        'jur_correo' => trim($request->pj['jur_correo']),
                         'jur_rep_legal' => strtoupper(trim($request->pj['jur_rep_legal'])),
                     ]
                 );

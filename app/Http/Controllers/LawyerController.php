@@ -37,7 +37,7 @@ class LawyerController extends Controller
                 'nat_apellido_materno' => strtoupper(trim($request->nat_apellido_materno)),
                 'nat_nombres' => strtoupper(trim($request->nat_nombres)),
                 'nat_telefono' => strtoupper(trim($request->nat_telefono)),
-                'nat_correo' => strtoupper(trim($request->nat_correo))
+                'nat_correo' => trim($request->nat_correo)
             ]);
 
             $user = \App\Models\User::create([

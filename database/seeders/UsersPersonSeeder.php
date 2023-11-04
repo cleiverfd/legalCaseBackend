@@ -85,45 +85,5 @@ class UsersPersonSeeder extends Seeder
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
-
-        // // Genera registros faker para usuarios adicionales
-        // $faker = \Faker\Factory::create();
-        // foreach (range(1, 5) as $index) {
-        //     $dni = $faker->unique()->numberBetween(10000000, 99999999);
-        //     $nombres = $faker->firstName;
-        //     $apPaterno = $faker->lastName;
-        //     $apMaterno = $faker->lastName;
-
-        //     // Genera un correo electrónico con el formato [apellido_paterno]@gmail.com
-        //     $correo = strtolower($apPaterno) . '@gmail.com';
-
-        //     // Genera un número de teléfono válido de Perú
-        //     $telefono = '+51 ' . $faker->numberBetween(900000000, 999999999);
-
-        //     $password = Hash::make($dni);
-
-        //     // Inserta un registro en la tabla people_naturals
-        //     DB::table('people_naturals')->insert([
-        //         'nat_dni' => $dni,
-        //         'nat_nombres' => $nombres,
-        //         'nat_apellido_paterno' => $apPaterno,
-        //         'nat_apellido_materno' => $apMaterno,
-        //         'nat_telefono' => $telefono,
-        //         'nat_correo' => $correo,
-        //         'created_at' => Carbon::now(),
-        //         'updated_at' => Carbon::now(),
-        //     ]);
-
-        //     // Inserta un registro en la tabla users relacionado con la people_naturals
-        //     DB::table('users')->insert([
-        //         'name' => $nombres,
-        //         'email' => $correo,
-        //         'usu_rol' => 'ABOGADO', // Cambia esto si el rol es diferente
-        //         'per_id' => $index + 2, // Suponiendo que per_id es autoincremental y hemos agregado dos registros manualmente
-        //         'password' => $password,
-        //         'created_at' => Carbon::now(),
-        //         'updated_at' => Carbon::now(),
-        //     ]);
-        // }
     }
 }

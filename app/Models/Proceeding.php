@@ -21,6 +21,7 @@ class Proceeding extends Model
         'exp_estado_proceso',
         'exp_demandante',
         'exp_demandado',
+        'exp_juzgado',
         'abo_id',
     ];
 

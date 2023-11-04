@@ -80,107 +80,56 @@ class PersonController extends Controller
     protected function indexdemandados(Request $request)
     {
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-            ->with('person.juridica', 'person.persona', 'person.address')
-            ->whereNotNull('exp_demandado')
-            ->get();
+        ->with('demandado.juridica', 'demandado.persona', 'demandado.address')
+        ->whereNotNull('exp_demandado')
+        ->get();
 
-        $data = $proceedings->map(function ($proceeding) {
-            $person = $proceeding->person;
-            $tipo_persona = null;
+    $data = $proceedings->map(function ($proceeding) {
+        $person = $proceeding->demandado;
+        $tipo_persona = null;
 
-            $commonData = [
-                'exp_id' => $proceeding->exp_id,
-                'exp_numero' => $proceeding->exp_numero,
+        $commonData = [
+            'exp_id' => $proceeding->exp_id,
+            'exp_numero' => $proceeding->exp_numero,
+        ];
+        
+        if ($person) {
+            if ($person->nat_id !== null) {
+                $personData = $person->persona;
+                $tipo_persona = 'natural';
+            } elseif ($person->jur_id !== null) {
+                $personData = $person->juridica;
+                $tipo_persona = 'juridica';
+            }
+        }
+
+        if ($tipo_persona === 'natural') {
+            $personDataArray = [
+                'nat_dni' => $personData->nat_dni,
+                'nat_apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
+                'nat_apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
+                'nat_nombres' => ucwords(strtolower($personData->nat_nombres)),
+                'nat_telefono' => $personData->nat_telefono,
+                'nat_correo' => strtolower($personData->nat_correo),
+                'dir_calle_av' => ucwords(strtolower($proceeding->demandado->address->dir_calle_av)),
             ];
-            
-            if ($person) {
-                if ($person->nat_id !== null) {
-                    $personData = $person->persona;
-                    $tipo_persona = 'natural';
-                } elseif ($person->jur_id !== null) {
-                    $personData = $person->juridica;
-                    $tipo_persona = 'juridica';
-                }
-            }
+        } elseif ($tipo_persona === 'juridica') {
+            $personDataArray = [
+                'jur_ruc' => $personData->jur_ruc,
+                'jur_razon_social' => ucwords(strtolower($personData->jur_razon_social)),
+                'jur_telefono' => $personData->jur_telefono,
+                'jur_correo' => strtolower($personData->jur_correo),
+                'dir_calle_av' => $proceeding->demandado->address->dir_calle_av,
+            ];
+        } else {
+            $personDataArray = [];
+        }
 
-            if ($tipo_persona === 'natural') {
-                $personDataArray = [
-                    'nat_dni' => $personData->nat_dni,
-                    'nat_apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
-                    'nat_apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
-                    'nat_nombres' => ucwords(strtolower($personData->nat_nombres)),
-                    'nat_telefono' => $personData->nat_telefono,
-                    'nat_correo' => strtolower($personData->nat_correo),
-                    'dir_calle_av' => ucwords(strtolower($proceeding->person->address->dir_calle_av)),
-                ];
-            } elseif ($tipo_persona === 'juridica') {
-                $personDataArray = [
-                    'jur_ruc' => $personData->jur_ruc,
-                    'jur_razon_social' => ucwords(strtolower($personData->jur_razon_social)),
-                    'jur_telefono' => $personData->jur_telefono,
-                    'jur_correo' => strtolower($personData->jur_correo),
-                    'dir_calle_av' => $proceeding->person->address->dir_calle_av,
-                ];
-            } else {
-                $personDataArray = [];
-            }
+        return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
+    });
 
-            return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
-        });
-
-        return response()->json(['data' => $data], 200);
+    return response()->json(['data' => $data], 200);
     }
-    // protected function index(Request $request)
-    // {
-    //     $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-    //         ->with('person.address')
-    //         ->get();
-
-    //     $data = $proceedings->map(function ($proceeding) {
-    //         $person = $proceeding->person;
-    //         $personData = null;
-    //         $type = null;
-    //         if ($person) {
-    //             if ($person->nat_id !== null) {
-    //                 $personData = $person->persona;
-    //                 $type = 'natural';
-    //             } elseif ($person->jur_id !== null) {
-    //                 $personData = $person->juridica;
-    //                 $type = 'juridica';
-    //             }
-    //         }
-    //         return array_merge($proceeding->toArray(), [
-    //             'person_data' => $personData ? $personData->toArray() : null,
-    //             'type' => $type,
-    //         ]);
-    //     });
-
-    //     return response()->json(['data' => $data], 200);
-    // }
-
-
-    // protected function traerExpedientes(Request $request)
-    // {
-    //     try {
-    //         DB::beginTransaction();
-
-    //         $documento = $request->documento;
-    //         $person = $this->getPersonByDocument($documento);
-
-    //         if (!$person) {
-    //             return response()->json(['state' => 1, 'message' => 'Persona no encontrada'], 404);
-    //         }
-
-    //         $expedientes = Proceeding::where('exp_demandante', $person->per_id)->get();
-
-    //         DB::commit();
-
-    //         return response()->json(['state' => 0, 'data' => $person, 'exps' => $expedientes], 200);
-    //     } catch (Exception $e) {
-    //         DB::rollback();
-    //         return ['state' => '1', 'exception' => (string) $e];
-    //     }
-    // }
 
     protected function traerExpedientes(Request $request)
     {
