@@ -112,6 +112,10 @@ Route::middleware(['auth:api'])->group(function () {
     Route::prefix('cargar')->group(function () {
         Route::post('/archivo', 'App\Http\Controllers\ArchivosController@pdfprincipal')->name('cargar.pdfprincipal');
     });
+    //llevar excel a la Bd
+    Route::prefix('excel')->group(function () {
+        Route::post('/cargar', 'App\Http\Controllers\ExcelController@index')->name('excel.index');
+    });
     Route::prefix('traer')->group(function () {
         Route::get('/archivo', 'App\Http\Controllers\ArchivosController@traerpdfprincipal')->name('traer.traerpdfprincipal');
     });
