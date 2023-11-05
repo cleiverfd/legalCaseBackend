@@ -12,7 +12,7 @@ class Address extends Model
     protected $fillable = [
         'dir_calle_av',
         'dis_id',
-        'prov_id',
+        'pro_id',
         'dep_id',
         'per_id',
     ];
