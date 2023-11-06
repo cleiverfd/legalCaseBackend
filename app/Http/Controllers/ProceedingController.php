@@ -24,22 +24,24 @@ class ProceedingController extends Controller
             if ($proceeding) {
                 if ($proceeding->exp_demandante !== null) {
                     $person = $proceeding->demandante;
-                    $procesal='demandante';
+                    $procesal = 'demandante';
                 } elseif ($proceeding->exp_demandado !== null) {
                     $person = $proceeding->demandado;
-                    $procesal='demandado';
+                    $procesal = 'demandado';
                 }
             }
+            $fecha_inicio = $proceeding->exp_fecha_inicio;
+            $fecha_formateada = date('d-m-Y', strtotime($fecha_inicio));
             $commonData = [
                 'exp_id' => $proceeding->exp_id,
                 'numero' => $proceeding->exp_numero,
-                'fecha_inicio' => $proceeding->exp_fecha_inicio,
+                'fecha_inicio' => $fecha_formateada,
                 'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
                 'materia' => ucwords(strtolower($proceeding->exp_materia)),
                 'especialidad' => ucwords(strtolower($proceeding->exp_especialidad)),
                 'monto_pretencion' => $proceeding->exp_monto_pretencion,
-                'estado_proceso' =>ucwords(strtolower( $proceeding->exp_estado_proceso)),
-                'procesal'=>$procesal
+                'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
+                'procesal' => $procesal
             ];
             if ($person) {
                 if ($person->nat_id !== null) {
@@ -80,7 +82,7 @@ class ProceedingController extends Controller
     protected function listarestado(Request $request)
     {
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-            ->where('exp_estado_proceso',$request->estado)
+            ->where('exp_estado_proceso', $request->exp_estado_proceso)
             ->with('person.juridica', 'person.persona')
             ->get();
         $data = $proceedings->map(function ($proceeding) {
@@ -89,22 +91,24 @@ class ProceedingController extends Controller
             if ($proceeding) {
                 if ($proceeding->exp_demandante !== null) {
                     $person = $proceeding->demandante;
-                    $procesal='demandante';
+                    $procesal = 'demandante';
                 } elseif ($proceeding->exp_demandado !== null) {
                     $person = $proceeding->demandado;
-                    $procesal='demandado';
+                    $procesal = 'demandado';
                 }
             }
+            $fecha_inicio = $proceeding->exp_fecha_inicio;
+            $fecha_formateada = date('d-m-Y', strtotime($fecha_inicio));
             $commonData = [
                 'exp_id' => $proceeding->exp_id,
                 'numero' => $proceeding->exp_numero,
-                'fecha_inicio' => $proceeding->exp_fecha_inicio,
+                'fecha_inicio' => $fecha_formateada,
                 'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
                 'materia' => ucwords(strtolower($proceeding->exp_materia)),
                 'especialidad' => ucwords(strtolower($proceeding->exp_especialidad)),
                 'monto_pretencion' => $proceeding->exp_monto_pretencion,
-                'estado_proceso' =>ucwords(strtolower( $proceeding->exp_estado_proceso)),
-                'procesal'=>$procesal
+                'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
+                'procesal' => $procesal
             ];
             if ($person) {
                 if ($person->nat_id !== null) {
@@ -210,10 +214,10 @@ class ProceedingController extends Controller
 
             /*Actulizar el expediente  asignando laersona y el abogado*/
             $EX = \App\Models\Proceeding::find($exp->exp_id);
-            if($request->procesal=='DEMANDANTE'){
-            $EX->exp_demandante = strtoupper(trim($perId));}
-            else{
-            $EX->exp_demandado=strtoupper(trim($perId));
+            if ($request->procesal == 'DEMANDANTE') {
+                $EX->exp_demandante = strtoupper(trim($perId));
+            } else {
+                $EX->exp_demandado = strtoupper(trim($perId));
             }
             $EX->abo_id = $request->abo_id;
             $EX->save();
@@ -224,7 +228,7 @@ class ProceedingController extends Controller
             $abogado->save();
             \DB::commit();
 
-            return \response()->json(['state' => 0, 'data' => $EX,'dir'=>$request->dir], 200);
+            return \response()->json(['state' => 0, 'data' => $EX, 'dir' => $request->dir], 200);
         } catch (Exception $e) {
             \DB::rollback();
             return ['state' => '1', 'exception' => (string) $e];
@@ -237,15 +241,15 @@ class ProceedingController extends Controller
 
             $exp = \App\Models\Proceeding::find($request->expediente['exp_id']);
             $exp->exp_numero = strtoupper(trim($request->expediente['exp_numero']));
-            $exp->exp_fecha_inicio= $request->expediente['exp_fecha_inicio'];
-            $exp->exp_pretencion= strtoupper(trim($request->expediente['exp_pretencion']));
+            $exp->exp_fecha_inicio = $request->expediente['exp_fecha_inicio'];
+            $exp->exp_pretencion = strtoupper(trim($request->expediente['exp_pretencion']));
             $exp->exp_materia = strtoupper(trim($request->expediente['exp_materia']));
             $exp->exp_especialidad = trim($request->expediente['exp_especialidad']);
-            $exp->exp_monto_pretencion =trim($request->expediente['exp_monto_pretencion']);
-            $exp->exp_estado_proceso =trim($request->expediente['exp_estado_proceso']);
-            
+            $exp->exp_monto_pretencion = trim($request->expediente['exp_monto_pretencion']);
+            $exp->exp_estado_proceso = trim($request->expediente['exp_estado_proceso']);
+
             $exp->save();
-            
+
             $persona = null;
             $direccion = null;
             $per = null;
@@ -299,25 +303,26 @@ class ProceedingController extends Controller
 
             /*Actulizar el expediente  asignando laersona y el abogado*/
             $EX = \App\Models\Proceeding::find($exp->exp_id);
-            if($request->procesal=='DEMANDANTE'){
-            $EX->exp_demandante = strtoupper(trim($perId));}
-            else{
-            $EX->exp_demandado=strtoupper(trim($perId));
+            if ($request->procesal == 'DEMANDANTE') {
+                $EX->exp_demandante = strtoupper(trim($perId));
+            } else {
+                $EX->exp_demandado = strtoupper(trim($perId));
             }
             $EX->abo_id = $request->abo_id;
             $EX->save();
             /*ACTULIZAR ESTADO DE ABOGADO */
             \DB::commit();
 
-            return \response()->json(['state' => 0, 'data' => $EX,'dir'=>$request->dir], 200);
+            return \response()->json(['state' => 0, 'data' => $EX, 'dir' => $request->dir], 200);
         } catch (Exception $e) {
             \DB::rollback();
             return ['state' => '1', 'exception' => (string) $e];
         }
     }
     protected function show($id)
-    {    $person =null;
-         $procesal=null;
+    {
+        $person = null;
+        $procesal = null;
         $proceeding = \App\Models\Proceeding::with('specialty.instance.judicialdistrict')
             ->find($id);
 
@@ -327,15 +332,14 @@ class ProceedingController extends Controller
         if ($proceeding) {
             if ($proceeding->exp_demandante !== null) {
                 $person = $proceeding->demandante;
-                $procesal='demandante';
-              
+                $procesal = 'demandante';
             } elseif ($proceeding->exp_demandado !== null) {
                 $person = $proceeding->demandado;
-                $procesal='demandado';
+                $procesal = 'demandado';
             }
         }
-    
-     //   $person = $proceeding->person;
+
+        //   $person = $proceeding->person;
         $personData = null;
         $tipo_persona = null;
 
@@ -352,17 +356,17 @@ class ProceedingController extends Controller
 
         $data = $this->transformProceedingData($proceeding, $personData, $tipo_persona);
         $data['per_id'] = $person ? $person->per_id : null;
-      //traer archivos
-         $eje=\App\Models\LegalDocument::where('exp_id',$id)
-         ->where('doc_tipo','EJE')
-         ->get()
-         ;
-         $escritos=\App\Models\LegalDocument::where('exp_id',$id)
-         ->where('doc_tipo','ESCRITO')
-         ->get()
-         ;
-        return response()->json(['data' => $data,'eje'=>$eje,
-        'escritos'=>$escritos,'procesal'=>$procesal], 200);
+        //traer archivos
+        $eje = \App\Models\LegalDocument::where('exp_id', $id)
+            ->where('doc_tipo', 'EJE')
+            ->get();
+        $escritos = \App\Models\LegalDocument::where('exp_id', $id)
+            ->where('doc_tipo', 'ESCRITO')
+            ->get();
+        return response()->json([
+            'data' => $data, 'eje' => $eje,
+            'escritos' => $escritos, 'procesal' => $procesal
+        ], 200);
     }
     protected function showupdate($id)
     {
@@ -370,15 +374,15 @@ class ProceedingController extends Controller
         $procesal = null;
         $personData = null;
         $tipo_persona = null;
-    
+
         $proceeding = \App\Models\Proceeding::with('specialty.instance.judicialdistrict')
             ->with('abogado.persona')
             ->find($id);
-    
+
         if (!$proceeding) {
             return response()->json(['error' => 'Expediente no encontrado'], 404);
         }
-    
+
         if ($proceeding->exp_demandante !== null) {
             $person = \App\Models\Person::with('address.district.province.departament')
                 ->where('per_id', $proceeding->exp_demandante)
@@ -390,7 +394,7 @@ class ProceedingController extends Controller
                 ->first();
             $procesal = 'demandado';
         }
-    
+
         if ($person) {
             if ($person->nat_id !== null) {
                 $personData = $person->natural;
@@ -400,7 +404,7 @@ class ProceedingController extends Controller
                 $tipo_persona = 'juridica';
             }
         }
-    
+
         return response()->json([
             'proceeding' => $proceeding,
             'person' => $person,
@@ -409,7 +413,7 @@ class ProceedingController extends Controller
             'procesal' => $procesal,
         ], 200);
     }
-    
+
 
     private function getNaturalPersonData($person)
     {
@@ -455,5 +459,4 @@ class ProceedingController extends Controller
             $personData // Aquí agregamos los datos de la persona
         );
     }
-
 }
