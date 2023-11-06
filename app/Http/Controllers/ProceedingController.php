@@ -15,6 +15,7 @@ class ProceedingController extends Controller
     protected function index()
     {
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
+            ->whereIn('exp_estado_proceso', ['EN TRAMITE', 'EN EJECUCION'])
             ->with('person.juridica', 'person.persona')
             ->get();
         $data = $proceedings->map(function ($proceeding) {
@@ -76,7 +77,70 @@ class ProceedingController extends Controller
         return response()->json(['data' => $data], 200);
     }
 
+    protected function listarestado(Request $request)
+    {
+        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
+            ->where('exp_estado_proceso',$request->estado)
+            ->with('person.juridica', 'person.persona')
+            ->get();
+        $data = $proceedings->map(function ($proceeding) {
+            $procesal = null;
+            $tipo_persona = null;
+            if ($proceeding) {
+                if ($proceeding->exp_demandante !== null) {
+                    $person = $proceeding->demandante;
+                    $procesal='demandante';
+                } elseif ($proceeding->exp_demandado !== null) {
+                    $person = $proceeding->demandado;
+                    $procesal='demandado';
+                }
+            }
+            $commonData = [
+                'exp_id' => $proceeding->exp_id,
+                'numero' => $proceeding->exp_numero,
+                'fecha_inicio' => $proceeding->exp_fecha_inicio,
+                'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
+                'materia' => ucwords(strtolower($proceeding->exp_materia)),
+                'especialidad' => ucwords(strtolower($proceeding->exp_especialidad)),
+                'monto_pretencion' => $proceeding->exp_monto_pretencion,
+                'estado_proceso' =>ucwords(strtolower( $proceeding->exp_estado_proceso)),
+                'procesal'=>$procesal
+            ];
+            if ($person) {
+                if ($person->nat_id !== null) {
+                    $personData = $person->persona;
+                    $tipo_persona = 'natural';
+                } elseif ($person->jur_id !== null) {
+                    $personData = $person->juridica;
+                    $tipo_persona = 'juridica';
+                }
+            }
 
+            if ($tipo_persona === 'natural') {
+                $personDataArray = [
+                    'dni' => $personData->nat_dni,
+                    'apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
+                    'apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
+                    'nombres' => ucwords(strtolower($personData->nat_nombres)),
+                    'telefono' => $personData->nat_telefono,
+                    'correo' => strtolower($personData->nat_correo),
+                ];
+            } elseif ($tipo_persona === 'juridica') {
+                $personDataArray = [
+                    'ruc' => ucwords(strtolower($personData->jur_ruc)),
+                    'razon_social' => ucwords(strtolower($personData->jur_razon_social)),
+                    'telefono' => $personData->jur_telefono,
+                    'correo' => strtolower($personData->jur_correo),
+                ];
+            } else {
+                $personDataArray = [];
+            }
+
+            return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
+        });
+
+        return response()->json(['data' => $data], 200);
+    }
     protected function registrarcaso(Request $request)
     {
         try {

@@ -7,20 +7,6 @@ use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\JudicialDistrictController;
 use App\Http\Controllers\ProceedingController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
-
-// Route::middleware('auth:api')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
 Route::prefix('/user')->group(function () {
     Route::post('/login', 'App\Http\Controllers\LoginController@login');
     Route::post('/logout', 'App\Http\Controllers\LoginController@salir');
@@ -39,8 +25,9 @@ Route::middleware(['auth:api'])->group(function () {
     // Abogados
     Route::prefix('lawyer')->group(function () {
         Route::get('/', 'App\Http\Controllers\LawyerController@index')->name('lawyer.index');
-        Route::get('/{id}/show', 'App\Http\Controllers\LawyerController@show')->name('lawyer.show');
+        Route::post('/show', 'App\Http\Controllers\LawyerController@show')->name('lawyer.show');
         Route::post('/registrar', 'App\Http\Controllers\LawyerController@registrar')->name('lawyer.registrar');
+        Route::post('/update', 'App\Http\Controllers\LawyerController@update')->name('lawyer.update');
         Route::post('eliminar/{id}', 'App\Http\Controllers\LawyerController@eliminar')->name('lawyer.eliminar');
     });
 
@@ -51,7 +38,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/{id}/show', 'App\Http\Controllers\ProceedingController@showupdate')->name('proceeding.showupdate');
         Route::post('/update', 'App\Http\Controllers\ProceedingController@update')->name('proceeding.update');
         Route::post('/registrarcaso', 'App\Http\Controllers\ProceedingController@registrarcaso')->name('proceeding.registrarcaso');
-      
+        Route::post('/listarestado', 'App\Http\Controllers\ProceedingController@listarestado')->name('proceeding.listarestado');
     });
 
     //  Distritos Judiciales

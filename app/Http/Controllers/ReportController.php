@@ -37,6 +37,7 @@ class ReportController extends Controller
     protected function exprecientes(Request $request)
     {
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
+        ->whereIn('exp_estado_proceso', ['EN TRAMITE', 'EN EJECUCION'])
         ->with('person.juridica', 'person.persona')
         ->take(5)
         ->get();

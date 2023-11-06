@@ -25,6 +25,12 @@ class LawyerController extends Controller
 
         return \response()->json(['data' => $data], 200);
     }
+    protected function show(Request $request)
+    {
+        $Lawyer = \App\Models\Lawyer::where('abo_id',$request->abo_id )->with('persona')->first();
+         $data = LawyerResource::collection([$Lawyer]);
+        return \response()->json(['data' => $data], 200);
+    }
     
     protected function registrar(Request $request)
     {
@@ -57,6 +63,33 @@ class LawyerController extends Controller
             \DB::commit();
 
             return \response()->json(['state' => 0, 'data' => $abogado], 200);
+        } catch (Exception $e) {
+            \DB::rollback();
+            return ['state' => '1', 'exception' => (string) $e];
+        }
+    }
+    protected function update(Request $request)
+    {
+        try {
+            \DB::beginTransaction();
+
+            $persona = \App\Models\PeopleNatural::find($request->nat_id);
+            $persona->nat_dni = trim($request->nat_dni); 
+            $persona->nat_apellido_paterno = strtoupper(trim($request->nat_apellido_paterno));
+            $persona->nat_apellido_materno = strtoupper(trim($request->nat_apellido_materno));
+            $persona->nat_nombres = strtoupper(trim($request->nat_nombres));
+            $persona->nat_telefono =strtoupper(trim($request->nat_telefono));
+            $persona->nat_correo = trim($request->nat_correo);
+            $persona->save();
+           //actulizar  su usuario 
+            $user = \App\Models\User::where('per_id', $persona->nat_id)->first();
+            $user->name = strtoupper(trim($request->nat_apellido_paterno . ' ' . $request->nat_apellido_materno . ' ' . $request->nat_nombres));
+            $user->email = trim($request->nat_correo);
+            $user->usu_rol = 'ABOGADO';
+            $user->password = bcrypt(trim($request->nat_dni));
+            $user->save();
+            \DB::commit();
+            return \response()->json(['state' => 0, 'data'=>'actulizado correcto'], 200);
         } catch (Exception $e) {
             \DB::rollback();
             return ['state' => '1', 'exception' => (string) $e];
