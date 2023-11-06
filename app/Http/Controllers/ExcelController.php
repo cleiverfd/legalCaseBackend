@@ -21,21 +21,21 @@ public function index(Request $request)
         for ($i = 1; $i < count($data); $i++) {
              $row = $data[$i];
             //buscar la especialidad a travez del distrito judicial
-             $nombredistrito=strtoupper(trim($row[3]));
+             $nombredistrito=strtoupper(trim($row[5]));
              $distrito = \App\Models\JudicialDistrict::where('judis_nombre', $nombredistrito)->first();
-             $nombreinstancia=strtoupper(trim($row[4]));
+             $nombreinstancia=strtoupper(trim($row[6]));
              $instancia = \App\Models\Instance::where('judis_id', $distrito->judis_id)
              ->where('ins_nombre',$nombreinstancia)->first();
-             $nombreespecialidad=strtoupper(trim($row[5]));
+             $nombreespecialidad=strtoupper(trim($row[7]));
              $especialidad = \App\Models\Specialty::where('ins_id', $instancia->ins_id)
              ->where('esp_nombre',$nombreespecialidad)->first();
             
             $exp = \App\Models\Proceeding::create([
                 'exp_numero' => strtoupper(trim($row[0])),
                 'exp_fecha_inicio' => Carbon::parse($row[1])->format('Y-m-d'),
-                'exp_materia' => strtoupper(trim($row[2])),
-                'exp_pretencion' =>strtoupper(trim($row[6])),
-                'exp_monto_pretencion' => strtoupper(trim($row[7])),
+                'exp_materia' => strtoupper(trim($row[4])),
+                'exp_pretencion' =>strtoupper(trim($row[2])),
+                'exp_monto_pretencion' => strtoupper(trim($row[3])),
                 'exp_estado_proceso' => 'EN TRAMITE',
                 'exp_juzgado' => strtoupper(trim($row[8])),
                 'exp_especialidad' =>$especialidad->esp_id,
