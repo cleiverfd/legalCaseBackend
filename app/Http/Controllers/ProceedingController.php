@@ -231,7 +231,7 @@ class ProceedingController extends Controller
             return \response()->json(['state' => 0, 'data' => $EX, 'dir' => $request->dir], 200);
         } catch (Exception $e) {
             \DB::rollback();
-            return ['state' => '1', 'exception' => (string) $e];
+            return  \response()->json( ['state' => '1', 'exception' => (string) $e]);
         }
     }
     protected function update(Request $request)

@@ -120,7 +120,7 @@ public function index(Request $request)
         return response()->json(['state' => 0, 'data' => $data], 200);
     } catch (Exception $e) {
         \DB::rollback();
-        return ['state' => '1', 'exception' => (string) $e];
+          return response()->json(['state' => 1, 'exception' => (string) $e]);
     }
 }
 
