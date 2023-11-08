@@ -23,6 +23,9 @@ class Proceeding extends Model
         'exp_demandado',
         'exp_juzgado',
         'abo_id',
+        'exp_monto_consentido',
+        'exp_intereses',
+        'exp_costos'
     ];
 
     protected $dates = ['deleted_at'];
