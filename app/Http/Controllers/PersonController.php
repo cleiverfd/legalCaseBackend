@@ -84,7 +84,7 @@ class PersonController extends Controller
         ->whereNotNull('exp_demandado')
         ->get();
 
-    $data = $proceedings->map(function ($proceeding) {
+     $data = $proceedings->map(function ($proceeding) {
         $person = $proceeding->demandado;
         $tipo_persona = null;
 
@@ -187,7 +187,61 @@ class PersonController extends Controller
         }
     }
 
+    protected function traerExpedientesDemandado(Request $request)
+    {
+        try {
+            DB::beginTransaction();
 
+            $documento = $request->documento;
+            $person = $this->getPersonByDocument($documento);
+
+            if (!$person) {
+                return response()->json(['state' => 1, 'message' => 'Persona no encontrada'], 404);
+            }
+
+            $personaData = [];
+            $tipoPersona = null;
+
+            if ($person->natural) {
+                $tipoPersona = 'natural';
+                $personaData = [
+                    'per_id' => $person->per_id,
+                    'nat_id' => $person->natural->nat_id,
+                    'nat_nombres' => $person->natural->nat_nombres,
+                    'nat_apellido_paterno' => $person->natural->nat_apellido_paterno,
+                    'nat_apellido_materno' => $person->natural->nat_apellido_materno,
+                ];
+            } elseif ($person->juridica) {
+                $tipoPersona = 'juridica';
+                $personaData = [
+                    'per_id' => $person->per_id,
+                    'jur_id' => $person->juridica->jur_id,
+                    'jur_razon_social' => $person->juridica->jur_razon_social,
+                ];
+            }
+
+            $expedientes = Proceeding::where('exp_demandado', $person->per_id)->get();
+
+            DB::commit();
+
+            $response = [
+                'state' => 0,
+                'persona' => $personaData,
+                'tipo_persona' => $tipoPersona,
+                'expedientes' => $expedientes->map(function ($expediente) {
+                    return [
+                        'exp_id' => $expediente->exp_id,
+                        'exp_numero' => $expediente->exp_numero,
+                    ];
+                }),
+            ];
+
+            return response()->json($response, 200);
+        } catch (Exception $e) {
+            DB::rollback();
+            return ['state' => '1', 'exception' => (string) $e];
+        }
+    }
     protected function detalleDemandante($doc)
     {
         $person = $this->getPersonByDocument($doc);
@@ -197,6 +251,73 @@ class PersonController extends Controller
         }
 
         $proceedings = Proceeding::where('exp_demandante', $person->per_id)
+            ->orderBy('created_at', 'DESC')
+            ->get();
+
+        $data = $proceedings->map(function ($proceeding) use ($person) {
+            $tipo_persona = null;
+            $commonData = [
+                'exp_id' => $proceeding->exp_id,
+                'exp_numero' => $proceeding->exp_numero,
+            ];
+
+            if ($person->nat_id !== null) {
+                $personData = $person->persona;
+                $tipo_persona = 'natural';
+            } elseif ($person->jur_id !== null) {
+                $personData = $person->juridica;
+                $tipo_persona = 'juridica';
+            }
+
+            $address = Address::where('per_id', $person->per_id)
+                ->with('district.province.departament')
+                ->first();
+
+            $personDataArray = [];
+            $addressDataArray = [];
+
+            if ($tipo_persona === 'natural') {
+                $personDataArray = [
+                    'nat_dni' => $personData->nat_dni,
+                    'nat_apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
+                    'nat_apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
+                    'nat_nombres' => ucwords(strtolower($personData->nat_nombres)),
+                    'nat_telefono' => $personData->nat_telefono,
+                    'nat_correo' => strtolower($personData->nat_correo),
+                ];
+            } elseif ($tipo_persona === 'juridica') {
+                $personDataArray = [
+                    'jur_ruc' => $personData->jur_ruc,
+                    'jur_azon_social' => ucwords(strtolower($personData->jur_razon_social)),
+                    'jur_telefono' => $personData->jur_telefono,
+                    'jur_correo' => strtolower($personData->jur_correo),
+                ];
+            }
+
+            if ($address) {
+                $addressDataArray = [
+                    'dir_calle_av' => ucwords(strtolower($address->dir_calle_av)),
+                    'dis_nombre' => ucwords(strtolower($address->district->dis_nombre)),
+                    'pro_nombre' => ucwords(strtolower($address->district->province->pro_nombre)),
+                    'dep_nombre' => ucwords(strtolower($address->district->province->departament->dep_nombre)),
+                ];
+            }
+
+            $result = array_merge($commonData, $personDataArray, $addressDataArray, ['tipo_persona' => $tipo_persona]);
+            return $result;
+        });
+
+        return response()->json(['data' => $data->first()], 200);
+    }
+    protected function detalleDemandado($doc)
+    {
+        $person = $this->getPersonByDocument($doc);
+
+        if (!$person) {
+            return response()->json(['state' => 1, 'message' => 'Persona no encontrada'], 404);
+        }
+
+        $proceedings = Proceeding::where('exp_demandado', $person->per_id)
             ->orderBy('created_at', 'DESC')
             ->get();
 
@@ -267,7 +388,7 @@ class PersonController extends Controller
             return $persona ? Person::where('jur_id', $persona->jur_id)->first() : null;
         }
     }
-
+    
     protected function getHistoryByDocument($doc)
 {
     try {

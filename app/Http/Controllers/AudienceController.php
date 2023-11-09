@@ -37,7 +37,15 @@ class AudienceController extends Controller
                 'exp_numero' => $audiencia->exp->exp_numero,
                 'tipo_persona' => $tipoPersona,
             ];
-
+             if($audiencia->exp->exp_demandante){
+                $response += ['procesal' =>'demandante',    
+                ];
+             }
+             elseif($audiencia->exp->exp_demandado){
+                $response += [
+                    'procesal' =>'demandado',    
+                ];
+             }
             if ($tipoPersona === "Natural") {
                 $response += [
                     'nat_id' => $audiencia->person->nat_id,

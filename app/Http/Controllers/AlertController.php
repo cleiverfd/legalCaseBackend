@@ -18,8 +18,8 @@ class AlertController extends Controller
     protected function index()
     {
         try {
-            $alerts = \App\Models\Alert::all();
-            return response()->json(['state' => 0, 'data' => $alerts], 200);
+            $alertas =\App\Models\Alert::obtenerAlertasFaltantes();
+            return response()->json(['state' => 0, 'data' => $alertas], 200);
         } catch (\Exception $e) {
             return response()->json(['state' => 1, 'error' => $e->getMessage()], 500);
         }

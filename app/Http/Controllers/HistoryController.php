@@ -33,8 +33,17 @@ class HistoryController extends Controller
                     'his_medio_comuniacion' => $historial->his_medio_comuniacion,
                     'his_detalle' => $historial->his_detalle,
                     'exp_id' => $historial->exp_id,
-                    'exp_numero' => $expediente->exp_numero
+                    'exp_numero' => $expediente->exp_numero,          
                 ];
+                if($expediente->exp_demandante){
+                    $commonData += ['procesal' =>'demandante',    
+                    ];
+                 }
+                 elseif($expediente->exp_demandado){
+                    $commonData += [
+                        'procesal' =>'demandado',    
+                    ];
+                 }
 
                 if ($person) {
                     if ($person->nat_id !== null) {

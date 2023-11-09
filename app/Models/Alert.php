@@ -18,8 +18,6 @@ class Alert extends Model
         'ale_dias_faltantes',
     ];
     protected $dates = ['ale_fecha_vencimiento', 'created_at', 'updated_at', 'deleted_at'];
-
-
     public function expediente()
     {
         return $this->belongsTo(Proceeding::class, 'exp_id', 'exp_id');
