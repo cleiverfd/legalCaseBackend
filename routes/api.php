@@ -125,4 +125,9 @@ Route::middleware(['auth:api'])->group(function () {
      Route::prefix('calendario')->group(function(){
         Route::get('/', 'App\Http\Controllers\CalendarioController@index')->name('calendario.index');
     });
+    //Juzgados
+    Route::prefix('juzgado')->group(function(){
+        Route::get('/', 'App\Http\Controllers\CourtController@index')->name('juzgado.index');
+        Route::post('/store', 'App\Http\Controllers\CourtController@store')->name('juzgado.store');
+    });
 });
