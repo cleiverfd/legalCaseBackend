@@ -247,10 +247,11 @@ class ProceedingController extends Controller
             $exp->exp_especialidad = trim($request->expediente['exp_especialidad']);
             $exp->exp_monto_pretencion = trim($request->expediente['exp_monto_pretencion']);
             $exp->exp_juzgado= trim($request->expediente['exp_juzgado']);
+            if($request->expediente['exp_monto_ejecucion']!=''){
             $exp->exp_monto_ejecucion= trim($request->expediente['exp_monto_ejecucion']);
             $exp->exp_monto_consentido= trim($request->expediente['exp_monto_consentido']);
             $exp->exp_costos= trim($request->expediente['exp_costos']);
-            $exp->exp_intereses= trim($request->expediente['exp_intereses']);
+            $exp->exp_intereses= trim($request->expediente['exp_intereses']);}
             $exp->exp_estado_proceso = trim($request->expediente['exp_estado_proceso']);
             $exp->save();
 
@@ -433,6 +434,7 @@ class ProceedingController extends Controller
                 'exp_especialidad',
                 'exp_monto_pretencion',
                 'exp_estado_proceso',
+                'exp_juzgado',
             ]),
             $proceeding->specialty->instance->judicialdistrict->only(['judis_nombre']),
             ['esp_nombre' => $proceeding->specialty->esp_nombre],

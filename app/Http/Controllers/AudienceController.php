@@ -28,7 +28,7 @@ class AudienceController extends Controller
 
             $response = [
                 'aud_id' => $audiencia->au_id,
-                'aud_fecha' => $audiencia->au_fecha,
+                'aud_fecha' => $audiencia->au_fecha->format('d-m-Y'),
                 'aud_hora' => $audiencia->au_hora,
                 'aud_lugar' => $audiencia->au_lugar,
                 'aud_detalles' => $audiencia->au_detalles,
@@ -80,6 +80,7 @@ class AudienceController extends Controller
                 'per_id' => trim($request->per_id),
                 'exp_id' => strtoupper(trim($request->exp_id)),
                 'au_fecha' => $au_fecha,
+                'au_link'=>$request->au_link,
                 'au_hora' => $request->au_hora,
                 'au_lugar' => $request->au_lugar,
                 'au_detalles' => $request->au_detalles,

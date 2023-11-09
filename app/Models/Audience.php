@@ -14,6 +14,7 @@ class Audience extends Model
         'au_fecha',
         'au_hora',
         'au_lugar',
+        'au_link',
         'au_detalles',
         'au_dias_faltantes',
         'per_id',
@@ -42,7 +43,6 @@ class Audience extends Model
         $audiencias = self::whereDate('au_fecha', '>=', $today)
             ->whereNotNull('au_hora')
             ->whereNotNull('au_lugar')
-            ->whereNotNull('au_detalles')
             ->get();
 
         $audienciasConPorcentaje = $audiencias->map(function ($audiencia) use ($today) {
@@ -53,6 +53,7 @@ class Audience extends Model
             return [
                 'au_fecha' => $fechaAudiencia->toDateString(),
                 'au_hora' => $audiencia->au_hora,
+                'fecha' => $audiencia->au_fecha->format('d-m-Y'),
                 'au_lugar' => $audiencia->au_lugar,
                 'au_detalles' => $audiencia->au_detalles,
                 'porcentaje' => $porcentaje,
