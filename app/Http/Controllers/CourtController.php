@@ -39,4 +39,17 @@ class CourtController extends Controller
             return response()->json(['state' => 1, 'error' => $e->getMessage()], 500);
         }
     }
+    protected function destroy(Request $request){
+        try {
+            \DB::beginTransaction();
+            $court = \App\Models\Court::where('co_id', $request->id)->delete();
+            \DB::commit();
+            return \response()->json(['state' => 0, 'id' => $request->id], 200);
+
+        } catch (Exception $e) {
+            \DB::rollback();
+            return ['state' => '1', 'exception' => (string) $e];
+        }
+
+    }
 }

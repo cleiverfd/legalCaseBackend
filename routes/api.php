@@ -129,5 +129,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::prefix('juzgado')->group(function(){
         Route::get('/', 'App\Http\Controllers\CourtController@index')->name('juzgado.index');
         Route::post('/store', 'App\Http\Controllers\CourtController@store')->name('juzgado.store');
+        Route::post('/destroy', 'App\Http\Controllers\CourtController@destroy')->name('juzgado.destroy');
+    
     });
 });
