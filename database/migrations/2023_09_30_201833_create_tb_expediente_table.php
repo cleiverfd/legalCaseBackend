@@ -18,13 +18,8 @@ return new class extends Migration
             $table->string('exp_pretencion', 255)->nullable();
             $table->string('exp_materia', 255)->nullable();
             $table->unsignedBigInteger('exp_especialidad')->nullable()->comment('parte_procesal_demandante');
-            $table->float('exp_monto_pretencion')->nullable();
-            $table->float('exp_monto_ejecucion')->nullable();
+            $table->decimal('exp_monto_pretencion')->nullable();
             $table->string('exp_estado_proceso', 255)->nullable();
-            //nuevos para ejecucion
-            $table->float('exp_monto_consentido')->nullable();
-            $table->float('exp_intereses')->nullable();
-            $table->float('exp_costos')->nullable(); 
             $table->unsignedBigInteger('exp_demandante')->nullable()->comment('parte_procesal_demandante');
             $table->unsignedBigInteger('exp_demandado')->nullable()->comment('parte_procesal_demandado');
             $table->string('exp_juzgado')->nullable()->comment('juzgado_donde_se_lleva_el_proceso');
