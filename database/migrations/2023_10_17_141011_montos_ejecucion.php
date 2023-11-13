@@ -10,11 +10,11 @@ return new class extends Migration
     {
         Schema::create('execution_amounts', function (Blueprint $table) {
             $table->id('ex_id');
-            $table->decimal('ex_ejecucion_1')->nullable();
-            $table->decimal('ex_ejecucion_2')->nullable();
-            $table->decimal('ex_interes_1')->nullable();
-            $table->decimal('ex_interes_2')->nullable();
-            $table->decimal('ex_costos')->nullable();
+            $table->decimal('ex_ejecucion_1',20,2)->nullable();
+            $table->decimal('ex_ejecucion_2',20,2)->nullable();
+            $table->decimal('ex_interes_1',20,2)->nullable();
+            $table->decimal('ex_interes_2',20,2)->nullable();
+            $table->decimal('ex_costos',20,2)->nullable();
             $table->unsignedBigInteger('exp_id');
             $table->foreign('exp_id')
                 ->references('exp_id')

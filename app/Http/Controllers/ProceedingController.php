@@ -247,13 +247,22 @@ class ProceedingController extends Controller
             $exp->exp_especialidad = trim($request->expediente['exp_especialidad']);
             $exp->exp_monto_pretencion = trim($request->expediente['exp_monto_pretencion']);
             $exp->exp_juzgado= trim($request->expediente['exp_juzgado']);
-            if($request->expediente['exp_estado_proceso']=='EN EJECUCION' ||
-               $request->expediente['exp_estado_proceso']=='ARCHIVADO'){
-             //implemntar para  insertar datos en la tabla   de montos
-             }
             $exp->exp_estado_proceso = trim($request->expediente['exp_estado_proceso']);
             $exp->save();
-
+          // actualizar o crear costos
+            if ($request->expediente['exp_estado_proceso'] == 'EN EJECUCION' ||
+            $request->expediente['exp_estado_proceso'] == 'ARCHIVADO') {
+            $costo = \App\Models\ExecutionAmount::updateOrCreate(
+                ['exp_id' => strtoupper(trim($request->expediente['exp_id']))],
+                [
+                    'ex_ejecucion_1' => $request->expediente['exp_monto_ejecucion1'] != '' ? strtoupper(trim($request->expediente['exp_monto_ejecucion1'])) : null,
+                    'ex_ejecucion_2' => $request->expediente['exp_monto_ejecucion2'] != '' ? strtoupper(trim($request->expediente['exp_monto_ejecucion2'])) : null,
+                    'ex_interes_1'   => $request->expediente['exp_interes1'] != '' ? strtoupper(trim($request->expediente['exp_interes1'])) : null,
+                    'ex_interes_2'   => $request->expediente['exp_interes2'] != '' ? strtoupper(trim($request->expediente['exp_interes2'])) : null,
+                    'ex_costos'      => $request->expediente['exp_costos'] != '' ? strtoupper(trim($request->expediente['exp_costos'])) : null,
+                ]
+            );
+            }
             $persona = null;
             $direccion = null;
             $per = null;
@@ -386,6 +395,9 @@ class ProceedingController extends Controller
                 $tipo_persona = 'juridica';
             }
         }
+        $costos= \App\Models\ExecutionAmount::
+                where('exp_id', $proceeding->exp_id)
+                ->first();
 
         return response()->json([
             'proceeding' => $proceeding,
@@ -393,6 +405,7 @@ class ProceedingController extends Controller
             'tipo_persona' => $tipo_persona,
             'personData' => $personData,
             'procesal' => $procesal,
+            'costos'=>$costos
         ], 200);
     }
 

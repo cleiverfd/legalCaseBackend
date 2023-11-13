@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('exp_pretencion', 255)->nullable();
             $table->string('exp_materia', 255)->nullable();
             $table->unsignedBigInteger('exp_especialidad')->nullable()->comment('parte_procesal_demandante');
-            $table->decimal('exp_monto_pretencion')->nullable();
+            $table->decimal('exp_monto_pretencion',20,2)->nullable();
             $table->string('exp_estado_proceso', 255)->nullable();
             $table->unsignedBigInteger('exp_demandante')->nullable()->comment('parte_procesal_demandante');
             $table->unsignedBigInteger('exp_demandado')->nullable()->comment('parte_procesal_demandado');
