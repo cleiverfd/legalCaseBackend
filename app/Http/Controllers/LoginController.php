@@ -52,7 +52,9 @@ class LoginController extends Controller
                 'user' => [
                     'id' => $user->id,
                     'usu_rol'=>$user->usu_rol,
-                    'name' => $user->name,
+                    'name' =>   ucwords(strtolower($personaNatural->nat_apellido_paterno)).' '.
+                    ucwords(strtolower($personaNatural->nat_apellido_materno)).' '.
+                    ucwords(strtolower($personaNatural->nat_nombres)),
                     'email' => $user->email,
                     'token' => $accessToken,
                     'datos' => $datosPersonaNatural,
