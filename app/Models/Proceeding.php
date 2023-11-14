@@ -17,15 +17,11 @@ class Proceeding extends Model
         'exp_materia',
         'exp_especialidad',
         'exp_monto_pretencion',
-        'exp_monto_ejecucion',
         'exp_estado_proceso',
         'exp_demandante',
         'exp_demandado',
         'exp_juzgado',
         'abo_id',
-        'exp_monto_consentido',
-        'exp_intereses',
-        'exp_costos'
     ];
 
     protected $dates = ['deleted_at'];
