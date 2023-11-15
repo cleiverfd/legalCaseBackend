@@ -76,39 +76,52 @@
     <p>No hay datos disponibles</p>
     @else
     <table>
-        <thead>
-            <tr>
-                <th>Número</th>
-                <th>Fecha de Inicio</th>
-                <th>Demandante</th>
-                <th>Demandado</th>
-                <th>Materia</th>
-                <th>Especialidad</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($data as $expediente)
-            <tr>
-                <td>{{ $expediente['exp_numero'] ?? '' }}</td>
-                <td>{{ $expediente['exp_fecha_inicio'] ?? ''}}</td>
-                <td>
-                    {{ $expediente['type'] === 'natural' ? ucwords(strtolower($expediente['person_data']['nat_nombres'] ?? '')) . ' ' . ucwords(strtolower($expediente['person_data']['nat_apellido_paterno'] ?? '')) . ' ' . ucwords(strtolower($expediente['person_data']['nat_apellido_materno'] ?? '')) : ucwords(strtolower($expediente['person_data']['jur_razon_social'] ?? '')) }}
-                </td>
-                <!-- <td>
-                    {{ $expediente['type'] === 'natural' ? ($expediente['person_data']['nat_dni'] ?? '') : 'RUC: ' . ($expediente['person_data']['jur_ruc'] ?? '') }}
-                </td> -->
-                <td>Unprg</td>
-                <td>{{ ucwords(strtolower($expediente['exp_materia'] ?? ''))}}</td>
-                <td>
-                    {{ ucwords(strtolower($expediente['specialty']['esp_nombre']  ?? ''))}} 
-                    <!-- /
-                    {{ $expediente['specialty']['instance']['ins_nombre']  ?? ''}} /
-                    {{ $expediente['specialty']['instance']['judicialdistrict']['judis_nombre'] ?? ''}} -->
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+    <thead>
+        <tr>
+            <th>Número</th>
+            <th>Fecha de Inicio</th>
+            <th>Demandante</th>
+            <th>Demandado</th>
+            <th>Materia</th>
+            <th>Especialidad</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($data as $expediente)
+        <tr>
+            <td>{{ $expediente['numero'] ?? '' }}</td>
+            <td>{{ $expediente['fecha_inicio'] ?? ''}}</td>
+            <td>
+                @if($expediente['procesal'] === 'demandante')
+                    @if($expediente['tipo_persona'] === 'natural')
+                        {{ ucwords(strtolower($expediente['nombres'] ?? '')) . ' ' . ucwords(strtolower($expediente['apellido_paterno'] ?? '')) . ' ' . ucwords(strtolower($expediente['apellido_materno'] ?? '')) }}
+                    @else
+                        {{ ucwords(strtolower($expediente['razon_social'] ?? '')) }}
+                    @endif
+                @else
+                    Unprg
+                @endif
+            </td>
+            <td>
+                @if($expediente['procesal'] !== 'demandante')
+                    @if($expediente['tipo_persona'] === 'natural')
+                        {{ ucwords(strtolower($expediente['nombres'] ?? '')) . ' ' . ucwords(strtolower($expediente['apellido_paterno'] ?? '')) . ' ' . ucwords(strtolower($expediente['apellido_materno'] ?? '')) }}
+                    @else
+                        {{ ucwords(strtolower($expediente['razon_social'] ?? '')) }}
+                    @endif
+                @else
+                    Unprg
+                @endif
+            </td>
+            <td>{{ ucwords(strtolower($expediente['materia'] ?? ''))}}</td>
+            <td>
+                {{ ucwords(strtolower($expediente['especialidad']  ?? ''))}}
+            </td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
+
     @endif
 
 </body>
