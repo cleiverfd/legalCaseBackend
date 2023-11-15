@@ -29,6 +29,12 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/registrar', 'App\Http\Controllers\LawyerController@registrar')->name('lawyer.registrar');
         Route::post('/update', 'App\Http\Controllers\LawyerController@update')->name('lawyer.update');
         Route::post('eliminar/{id}', 'App\Http\Controllers\LawyerController@eliminar')->name('lawyer.eliminar');
+       //audiencias  por abogado
+        Route::post('/audiencias', 'App\Http\Controllers\LawyerController@audiencias')->name('lawyer.audiencias');
+        //alertas por abogado
+        Route::post('/alertas', 'App\Http\Controllers\LawyerController@alertas')->name('lawyer.alertas');
+        //expedientes por abogado
+        Route::post('/expedientes', 'App\Http\Controllers\LawyerController@expedientes')->name('lawyer.expedientes');
     });
 
     // Expedientes

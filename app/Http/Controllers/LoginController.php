@@ -47,8 +47,10 @@ class LoginController extends Controller
                 'telefono' => $personaNatural->nat_telefono,
                 'correo' => $personaNatural->nat_correo,
             ];
-    
-            return response()->json([
+        if($user->usu_rol=='ABOGADO'){
+            $abogado= $user->personaNatural->abogado;
+        }
+        return response()->json([
                 'user' => [
                     'id' => $user->id,
                     'usu_rol'=>$user->usu_rol,
@@ -58,6 +60,7 @@ class LoginController extends Controller
                     'email' => $user->email,
                     'token' => $accessToken,
                     'datos' => $datosPersonaNatural,
+                    'abo_id'=>$user->usu_rol=='ABOGADO' ? $abogado->abo_id:null
                 ],
                 'state' => 200
             ], 200);

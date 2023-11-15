@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Resources\{
     LawyerResource
 };
+use App\Models\Proceeding;
+use App\Models\Audience;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Uuid;
@@ -123,4 +126,156 @@ class LawyerController extends Controller
             return \response()->json(['message' => 'Error al eliminar el abogado', 'exception' => $e->getMessage()], 500);
         }
     }
+    protected function expedientes(Request $request)
+    {
+        try {
+            \DB::beginTransaction();
+            $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
+            ->where('abo_id',$request->abo_id)
+            ->with('person.juridica', 'person.persona')
+            ->get();
+        $data = $proceedings->map(function ($proceeding) {
+            $procesal = null;
+            $tipo_persona = null;
+            if ($proceeding) {
+                if ($proceeding->exp_demandante !== null) {
+                    $person = $proceeding->demandante;
+                    $procesal = 'demandante';
+                } elseif ($proceeding->exp_demandado !== null) {
+                    $person = $proceeding->demandado;
+                    $procesal = 'demandado';
+                }
+            }
+            $fecha_inicio = $proceeding->exp_fecha_inicio;
+            $fecha_formateada = date('d-m-Y', strtotime($fecha_inicio));
+            $commonData = [
+                'exp_id' => $proceeding->exp_id,
+                'numero' => $proceeding->exp_numero,
+                'fecha_inicio' => $fecha_formateada,
+                'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
+                'materia' => ucwords(strtolower($proceeding->exp_materia)),
+                'especialidad' => ucwords(strtolower($proceeding->exp_especialidad)),
+                'monto_pretencion' => $proceeding->exp_monto_pretencion,
+                'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
+                'procesal' => $procesal
+            ];
+            if ($person) {
+                if ($person->nat_id !== null) {
+                    $personData = $person->persona;
+                    $tipo_persona = 'natural';
+                } elseif ($person->jur_id !== null) {
+                    $personData = $person->juridica;
+                    $tipo_persona = 'juridica';
+                }
+            }
+
+            if ($tipo_persona === 'natural') {
+                $personDataArray = [
+                    'dni' => $personData->nat_dni,
+                    'apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
+                    'apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
+                    'nombres' => ucwords(strtolower($personData->nat_nombres)),
+                    'telefono' => $personData->nat_telefono,
+                    'correo' => strtolower($personData->nat_correo),
+                ];
+            } elseif ($tipo_persona === 'juridica') {
+                $personDataArray = [
+                    'ruc' => ucwords(strtolower($personData->jur_ruc)),
+                    'razon_social' => ucwords(strtolower($personData->jur_razon_social)),
+                    'telefono' => $personData->jur_telefono,
+                    'correo' => strtolower($personData->jur_correo),
+                ];
+            } else {
+                $personDataArray = [];
+            }
+
+            return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
+        });
+
+        return response()->json(['data' => $data], 200);
+          
+            \DB::commit();
+            return \response()->json(['state' => 0, 'data'=>''], 200);
+        } catch (Exception $e) {
+            \DB::rollback();
+            return ['state' => '1', 'exception' => (string) $e];
+        }
+    }
+    protected function alertas(Request $request){
+        try {
+            \DB::beginTransaction();
+            $today = Carbon::now('America/Lima')->startOfDay();
+            $expedientes = Proceeding::where('abo_id',$request->abo_id)
+            ->whereIn('exp_estado_proceso', ['EN TRAMITE', 'EN EJECUCION'])
+            ->get();
+            $alertas = collect();
+          foreach ($expedientes as $expediente) {
+                    $alertasAbogado = $expediente->alertas()
+                        ->whereDate('ale_fecha_vencimiento', '>=', $today)
+                        ->get();
+    
+                    foreach ($alertasAbogado as $alerta) {
+                        $fechaVencimiento = Carbon::parse($alerta->ale_fecha_vencimiento);
+                        $diasFaltantes = $fechaVencimiento->startOfDay()->diffInDays($today);
+                        $porcentaje = round($diasFaltantes / $alerta->ale_dias_faltantes, 2);
+                        $alertas->push([
+                            'ale_fecha_vencimiento' => $alerta->ale_fecha_vencimiento->toDateString(), // Obtén la fecha en formato 'Y-m-d'
+                            'ale_descripcion' => $alerta->ale_descripcion,
+                            'fecha' => $alerta->ale_fecha_vencimiento->format('d-m-Y'),
+                            'ale_expediente' => $alerta->expediente ? $alerta->expediente->exp_numero : 'N/A',
+                            'ale_porcentaje' => $porcentaje,
+                            'ale_exp_id'  => $alerta->expediente ? $alerta->expediente->exp_id : 'N/A',
+                            'ale_id'=>$alerta->ale_id
+                        ]);
+                    }
+                }
+            \DB::commit();
+            return \response()->json(['state' => 0, 'data'=>$alertas], 200);
+        }
+        catch(Exception $e){
+            \DB::rollback();
+            return ['state' => '1', 'exception' => (string) $e];
+    }
+    }
+    protected function audiencias(Request $request){
+        try {
+            \DB::beginTransaction();
+            $today = Carbon::now('America/Lima')->startOfDay();
+            $expedientes = Proceeding::where('abo_id',$request->abo_id)
+            ->whereIn('exp_estado_proceso', ['EN TRAMITE', 'EN EJECUCION'])
+            ->get();
+
+            $audienciasFaltantes = collect();
+    
+            foreach ($expedientes as $expediente) {
+                $audiencias = $expediente->audiencias()
+                    ->whereDate('au_fecha', '>=', $today)
+                    ->whereNull('au_link')
+                    ->get();
+    
+                foreach ($audiencias as $audiencia) {
+                    $fechaAudiencia = Carbon::parse($audiencia->au_fecha);
+                    $diasFaltantes = $fechaAudiencia->startOfDay()->diffInDays($today);
+                    $porcentaje = round($diasFaltantes / $audiencia->au_dias_faltantes, 2);
+                    $audienciasFaltantes->push([  
+                        'au_fecha' =>  $fechaAudiencia->toDateString(),
+                        'au_hora' => $audiencia->au_hora,
+                        'fecha' => $audiencia->au_fecha->format('d-m-Y'),
+                        'au_lugar' => $audiencia->au_lugar,
+                        'au_detalles' => $audiencia->au_detalles,
+                        'porcentaje' => $porcentaje,
+                        'exp_id' => $audiencia->exp_id,
+                        'exp_numero' =>$expediente->exp_numero,
+                        'id'=>$audiencia->au_id,
+                    ]);
+                }
+            }
+            \DB::commit();
+            return \response()->json(['state' => 0, 'data'=>$audienciasFaltantes], 200);
+        }
+        catch(Exception $e){
+            \DB::rollback();
+            return ['state' => '1', 'exception' => (string) $e];
+    }
+}
 }

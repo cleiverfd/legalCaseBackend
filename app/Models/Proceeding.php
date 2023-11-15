@@ -47,6 +47,10 @@ class Proceeding extends Model
     {
         return $this->hasMany(Audience::class, 'au_id');
     }
+    public function alertas()
+    {
+        return $this->hasMany(Alert::class, 'ale_id');
+    }
     public function persona()
     {
         return $this->belongsTo(Person::class);
