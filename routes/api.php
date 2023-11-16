@@ -29,6 +29,12 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/registrar', 'App\Http\Controllers\LawyerController@registrar')->name('lawyer.registrar');
         Route::post('/update', 'App\Http\Controllers\LawyerController@update')->name('lawyer.update');
         Route::post('eliminar/{id}', 'App\Http\Controllers\LawyerController@eliminar')->name('lawyer.eliminar');
+       //audiencias  por abogado
+        Route::post('/audiencias', 'App\Http\Controllers\LawyerController@audiencias')->name('lawyer.audiencias');
+        //alertas por abogado
+        Route::post('/alertas', 'App\Http\Controllers\LawyerController@alertas')->name('lawyer.alertas');
+        //expedientes por abogado
+        Route::post('/expedientes', 'App\Http\Controllers\LawyerController@expedientes')->name('lawyer.expedientes');
     });
 
     // Expedientes
@@ -61,7 +67,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/pagos/{doc}', 'App\Http\Controllers\PersonController@getPaymentsByDocument')->name('demandante.getpaymentsbydocument');
     });
     Route::prefix('demandado')->group(function () {
-        Route::get('/', 'App\Http\Controllers\PersonController@indexdemandados')->name('demandante.indexdemandados');
+        Route::get('/', 'App\Http\Controllers\PersonController@indexdemandados')->name('demandado.indexdemandados');
         Route::get('/detalledemandado/{doc}', 'App\Http\Controllers\PersonController@detalledemandado')->name('demandado.detalledemandado');
         Route::get('/historial/{doc}', 'App\Http\Controllers\PersonController@getHistoryByDocument')->name('demandado.gethistorybydocument');
         Route::post('/expedientes', 'App\Http\Controllers\PersonController@traerexpedientesDemandado')->name('demandado.traerexpedientesDemandado');
@@ -92,6 +98,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/pdfdemandantes', 'App\Http\Controllers\ReportController@pdfdemandantes')->name('reportes.pdfdemandantes');
         Route::get('/pdffechaaño', 'App\Http\Controllers\ReportController@pdffechaaño')->name('reportes.pdffechaaño');
         Route::get('/pdfmateria', 'App\Http\Controllers\ReportController@pdfmateria')->name('reportes.pdfmateria');
+        Route::get('/pdfexpsabogado', 'App\Http\Controllers\ReportController@pdfexpsabogado')->name('reportes.pdfexpsabogado');
     });
 
     // Audiencias

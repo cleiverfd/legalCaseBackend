@@ -18,5 +18,8 @@ class PeopleNatural extends Model
         'nat_correo'
     ];
     protected $dates = ['deleted_at'];
-
+    public function abogado()
+    {
+        return $this->belongsTo(Lawyer::class, 'nat_id', 'nat_id');
+    }
 }
