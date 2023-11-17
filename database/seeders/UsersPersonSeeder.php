@@ -77,7 +77,7 @@ class UsersPersonSeeder extends Seeder
 
         // Inserta un registro en la tabla users relacionado con la segunda persona natural
         DB::table('users')->insert([
-            'name' => 'Carlos Palomino',
+            'name' => 'Carlos',
             'email' => ' cpalominog@unprg.edu.pe',
             'usu_rol' => 'ADMIN', // Cambia esto si el rol es diferente
             'per_id' => 3, // El ID de la segunda persona natural manualmente ingresada
