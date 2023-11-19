@@ -17,7 +17,7 @@ class JudicialDistrictController extends Controller
 
     public function index(Request $request)
     {
-        $judicialDistricts = JudicialDistrict::orderBy('created_at', 'DESC')
+        $judicialDistricts =JudicialDistrict::orderBy('created_at', 'DESC')
             ->get(['judis_id', 'judis_nombre']);
 
         return response()->json(['data' => $judicialDistricts], 200);
@@ -54,5 +54,56 @@ class JudicialDistrictController extends Controller
             ->get(['esp_id','esp_nombre','ins_id']);
 
         return response()->json(['data' => $specialties], 200);
+    }
+    //CRUD
+    protected function show(Request $request)
+    {
+        $JD = JudicialDistrict::where('judis_id', $request->judis_id)->first();
+        return \response()->json(['data' => $JD], 200);
+    }
+
+    protected function registrar(Request $request)
+    {
+        try {
+            \DB::beginTransaction();
+           $JD = JudicialDistrict::create([
+                'judis_nombre' => strtoupper(trim($request->judis_nombre)),
+            ]);
+            \DB::commit();
+            return \response()->json(['state' => 0, 'data' => $JD], 200);
+        } catch (Exception $e) {
+            \DB::rollback();
+            return ['state' => '1', 'exception' => (string) $e];
+        }
+    }
+    protected function update(Request $request)
+    {
+        try {
+            \DB::beginTransaction();
+            $JD = JudicialDistrict::find($request->judis_id);
+            $JD->judis_nombre = strtoupper(trim($request->judis_nombre));
+            $JD->save();
+            \DB::commit();
+            return \response()->json(['state' => 0, 'data' => 'actulizado correcto'], 200);
+        } catch (Exception $e) {
+            \DB::rollback();
+            return ['state' => '1', 'exception' => (string) $e];
+        }
+    }
+
+    protected function eliminar(Request $request)
+    {
+        try {
+            \DB::beginTransaction();
+
+            $JD = JudicialDistrict::find($request->judis_id);
+            $JD->delete();
+            \DB::commit();
+
+            return \response()->json(['state'=>0,'data' => 'eliminado'], 200);
+        } catch (Exception $e) {
+            \DB::rollback();
+            return \response()->json(['message' => 'Error al eliminar ', 'exception' => $e->getMessage()], 500);
+        }
     }
 }

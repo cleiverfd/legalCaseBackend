@@ -49,11 +49,14 @@ Route::middleware(['auth:api'])->group(function () {
 
     //  Distritos Judiciales
     Route::prefix('judicialdistrict')->group(function () {
-        Route::get('/', [JudicialDistrictController::class, 'index'])->name('judicialdistrict.index');
-
-        Route::post('/instancias', [JudicialDistrictController::class, 'instancia'])->name('judicialdistrict.instancia');
-
-        Route::post('/especialidades', [JudicialDistrictController::class, 'especialidad'])->name('judicialdistrict.especilidad');
+        Route::get('/', 'App\Http\Controllers\JudicialDistrictController@index')->name('judicialdistrict.index');
+        Route::post('/instancias', 'App\Http\Controllers\JudicialDistrictController@instancia')->name('judicialdistrict.instancia');
+        Route::post('/especialidades', 'App\Http\Controllers\JudicialDistrictController@especialidad')->name('judicialdistrict.especilidad');
+        Route::post('/show', 'App\Http\Controllers\JudicialDistrictController@show')->name('judicialdistrict.show');
+        Route::post('/store', 'App\Http\Controllers\JudicialDistrictController@registrar')->name('judicialdistrict.registrar');
+        Route::post('/update', 'App\Http\Controllers\JudicialDistrictController@update')->name('judicialdistrict.update');
+        Route::post('/destroy', 'App\Http\Controllers\JudicialDistrictController@eliminar')->name('judicialdistrict.eliminar');
+     
     });
 
     // Demandantes
@@ -145,6 +148,6 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/show', 'App\Http\Controllers\SubjectController@show')->name('subject.show');
         Route::post('/store', 'App\Http\Controllers\SubjectController@registrar')->name('subject.registrar');
         Route::post('/update', 'App\Http\Controllers\SubjectController@update')->name('subject.update');
-        Route::post('delete/{id}', 'App\Http\Controllers\SubjectController@eliminar')->name('subject.eliminar');
+        Route::post('/destroy', 'App\Http\Controllers\SubjectController@eliminar')->name('subject.eliminar');
      });
 });

@@ -52,16 +52,16 @@ class SubjectController extends Controller
         }
     }
 
-    protected function eliminar($id)
+    protected function eliminar(Request $request)
     {
         try {
             \DB::beginTransaction();
 
-            $subject = \App\Models\Subject::find($id);
+            $subject = \App\Models\Subject::find($request->mat_id);
             $subject->delete();
             \DB::commit();
 
-            return \response()->json(['message' => 'eliminado'], 200);
+            return \response()->json(['state'=>0,'data' => 'eliminado'], 200);
         } catch (Exception $e) {
             \DB::rollback();
             return \response()->json(['message' => 'Error al eliminar ', 'exception' => $e->getMessage()], 500);
