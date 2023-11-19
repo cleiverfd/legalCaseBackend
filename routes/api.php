@@ -139,4 +139,12 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/destroy', 'App\Http\Controllers\CourtController@destroy')->name('juzgado.destroy');
     
     });
+    //materias
+    Route::prefix('subject')->group(function () {
+        Route::get('/', 'App\Http\Controllers\SubjectController@index')->name('subject.index');
+        Route::post('/show', 'App\Http\Controllers\SubjectController@show')->name('subject.show');
+        Route::post('/store', 'App\Http\Controllers\SubjectController@registrar')->name('subject.registrar');
+        Route::post('/update', 'App\Http\Controllers\SubjectController@update')->name('subject.update');
+        Route::post('delete/{id}', 'App\Http\Controllers\SubjectController@eliminar')->name('subject.eliminar');
+     });
 });
