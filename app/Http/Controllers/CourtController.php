@@ -39,15 +39,33 @@ class CourtController extends Controller
             return response()->json(['state' => 1, 'error' => $e->getMessage()], 500);
         }
     }
+
+    protected function update(Request $request){
+        try{
+            DB::beginTransaction();
+            $court = \App\Models\Court::find($request->co_id);
+            $court->co_nombre = strtoupper(trim($request->co_nombre));
+            $court->save();
+            DB::commit();
+            return \response()->json(['state' => 0], 200);
+
+        }catch(Exception $e){
+            DB::rollBack();
+            return ['state' => '1', 'exception' => (string) $e];
+        }
+    }
+
     protected function destroy(Request $request){
         try {
-            \DB::beginTransaction();
-            $court = \App\Models\Court::where('co_id', $request->id)->delete();
-            \DB::commit();
-            return \response()->json(['state' => 0, 'id' => $request->id], 200);
+            DB::beginTransaction();
+            $court = \App\Models\Court::find($request->co_id);
+            $court->delete();
+           
+            DB::commit();
+            return \response()->json(['state' => 0, 200]);
 
         } catch (Exception $e) {
-            \DB::rollback();
+            DB::rollback();
             return ['state' => '1', 'exception' => (string) $e];
         }
 
