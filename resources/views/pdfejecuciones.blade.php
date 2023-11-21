@@ -127,11 +127,23 @@
                             Unprg
                         @endif
                     </td>
-                    <td>{{ $expediente['monto_ejecucion1'] ?? '0.00' }}</td>
-                    <td>{{ $expediente['monto_ejecucion2'] ?? '0.00' }}</td>
-                    <td>{{ $expediente['interes1'] ?? '0.00' }}</td>
-                    <td>{{ $expediente['interes2'] ?? '0.00' }}</td>
-                    <td>{{ $expediente['costos'] ?? '0.00' }}</td>
+                    <td>
+                        {{ !empty($expediente['monto_ejecucion1']) ? $expediente['monto_ejecucion1'] : '0.00' }}
+                    </td>
+                    <td>
+                        {{ !empty($expediente['monto_ejecucion2']) ? $expediente['monto_ejecucion2'] : '0.00' }}
+                    </td>
+                    <td>
+                        {{ !empty($expediente['interes1']) ? $expediente['interes1'] : '0.00' }}
+                    </td>
+                    <td>
+                        {{ !empty($expediente['interes2']) ? $expediente['interes2'] : '0.00' }}
+                    </td>
+                    <td>
+                        {{ !empty($expediente['costos']) ? $expediente['costos'] : '0.00' }}
+                    </td>
+
+
                     <td>
                         @php
                             $ejecucion1 = floatval($expediente['monto_ejecucion1'] ?? '0.00');
