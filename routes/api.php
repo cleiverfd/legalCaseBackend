@@ -150,4 +150,9 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/update', 'App\Http\Controllers\SubjectController@update')->name('subject.update');
         Route::post('/destroy', 'App\Http\Controllers\SubjectController@eliminar')->name('subject.eliminar');
      });
+
+     //pretensiones
+     Route::prefix('claim')->group(function(){
+        Route::get('/', 'App\Http\Controllers\ClaimController@index')->name('claim.index');
+     });
 });
