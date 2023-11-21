@@ -102,6 +102,9 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/pdffechaaño', 'App\Http\Controllers\ReportController@pdffechaaño')->name('reportes.pdffechaaño');
         Route::get('/pdfmateria', 'App\Http\Controllers\ReportController@pdfmateria')->name('reportes.pdfmateria');
         Route::get('/pdfexpsabogado', 'App\Http\Controllers\ReportController@pdfexpsabogado')->name('reportes.pdfexpsabogado');
+        Route::get('/pdfpretensiones', 'App\Http\Controllers\ReportController@pdfpretenciones')->name('reportes.pdfpretenciones');
+        Route::get('/pdfejecuciones', 'App\Http\Controllers\ReportController@pdfejecuciones')->name('reportes.pdfejecuciones'); 
+        Route::get('/pdfpretension', 'App\Http\Controllers\ReportController@pdfpretension')->name('reportes.pdfpretension'); 
     });
 
     // Audiencias

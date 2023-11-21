@@ -63,4 +63,8 @@ class Proceeding extends Model
     {
         return $this->belongsTo(Lawyer::class, 'abo_id', 'abo_id');
     }
+    public function montos()
+    {
+        return $this->belongsTo(ExecutionAmount::class, 'exp_id', 'exp_id');
+    }
 }
