@@ -23,5 +23,7 @@ class DatabaseSeeder extends Seeder
         $this->call(InstanceSeeder::class);
         $this->call(EspecialidadSeeder::class);
         $this->call(PretensionSeeder::class);
+        $this->call(MateriaSeeder::class);
+        $this->call(JuzgadoSeeder::class);
     }
 }
