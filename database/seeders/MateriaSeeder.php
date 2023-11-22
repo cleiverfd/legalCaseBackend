@@ -16,7 +16,7 @@ class MateriaSeeder extends Seeder
     public function run()
     {
 
-        $pretensiones = [
+        $materias = [
             ['mat_id' => '01', 'mat_nombre' => 'Proceso de Amparo'],
             ['mat_id' => '02', 'mat_nombre' => 'Proceso de Cumplimiento'],
             ['mat_id' => '03', 'mat_nombre' => 'Proceso de Habeas Data'],
@@ -29,12 +29,12 @@ class MateriaSeeder extends Seeder
         ];
 
         $currentTimestamp = Carbon::now();
-        foreach($pretensiones as &$pretension){
-            $pretension['mat_nombre'] = mb_strtoupper($pretension['mat_nombre']);
-            $pretension['created_at'] = $currentTimestamp;
-            $pretension['updated_at'] = $currentTimestamp;
+        foreach($materias as &$materia){
+            $materia['mat_nombre'] = mb_strtoupper($materia['mat_nombre']);
+            $materia['created_at'] = $currentTimestamp;
+            $materia['updated_at'] = $currentTimestamp;
         }
         
-        DB::table('subjects')->insert($pretensiones);
+        DB::table('subjects')->insert($materias);
     }
 }
