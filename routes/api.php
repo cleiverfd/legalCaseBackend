@@ -62,7 +62,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::prefix('instance')->group(function () {
         Route::get('/', 'App\Http\Controllers\InstanceController@index')->name('Instance.index');
         Route::post('/show', 'App\Http\Controllers\InstanceController@show')->name('Instance.show');
-        Route::post('/store', 'App\Http\Controllers\InstanceController@registrar')->name('Instance.registrar');
+        Route::post('/store', 'App\Http\Controllers\InstanceController@store')->name('Instance.store');
         Route::post('/update', 'App\Http\Controllers\InstanceController@update')->name('Instance.update');
         Route::post('/destroy', 'App\Http\Controllers\InstanceController@eliminar')->name('Instance.eliminar');
      });

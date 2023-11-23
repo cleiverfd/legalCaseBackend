@@ -1,13 +1,16 @@
 <?php
 namespace App\Http\Controllers;
+
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class InstanceController extends Controller
 {
     
     public function index(Request $request)
     { try {
-            $instances = Instance::where('judis_id', $request->judis_id)
+            $instances = \App\Models\Instance::where('judis_id', $request->judis_id)
                 ->orderBy('created_at', 'DESC')
                 ->get(['ins_id','ins_nombre','judis_id']);
             return response()->json(['data' => $instances], 200);
