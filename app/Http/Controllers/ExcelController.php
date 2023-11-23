@@ -11,7 +11,7 @@ class ExcelController extends Controller
     {
         $this->middleware('auth');
     }
-private function convertirMinusculasTildadasAMayusculas($cadena) {
+public function convertirMinusculasTildadasAMayusculas($cadena) {
         $minusculas = ['á', 'é', 'í', 'ó', 'ú', 'ü'];
         $mayusculas = ['Á', 'É', 'Í', 'Ó', 'Ú', 'Ü'];
         return str_replace($minusculas, $mayusculas, mb_strtoupper($cadena, 'UTF-8'));
@@ -26,23 +26,23 @@ public function index(Request $request)
         for ($i = 1; $i < count($data); $i++) {
              $row = $data[$i];
             //buscar la especialidad a travez del distrito judicial
-             $nombredistrito=strtoupper(trim($row[5]));
+             $nombredistrito=$this->convertirMinusculasTildadasAMayusculas(trim($row[5]));
              $distrito = \App\Models\JudicialDistrict::where('judis_nombre', $nombredistrito)->first();
-             $nombreinstancia=strtoupper(trim($row[6]));
+             $nombreinstancia=$this->convertirMinusculasTildadasAMayusculas(trim($row[6]));
              $instancia = \App\Models\Instance::where('judis_id', $distrito->judis_id)
              ->where('ins_nombre',$nombreinstancia)->first();
-             $nombreespecialidad=strtoupper(trim($row[7]));
+             $nombreespecialidad=$this->convertirMinusculasTildadasAMayusculas(trim($row[7]));
              $especialidad = \App\Models\Specialty::where('ins_id', $instancia->ins_id)
              ->where('esp_nombre',$nombreespecialidad)->first();
             
             $exp = \App\Models\Proceeding::create([
                 'exp_numero' => strtoupper(trim($row[0])),
                 'exp_fecha_inicio' => Carbon::parse($row[1])->format('Y-m-d'),
-                'exp_materia' => convertirMinusculasTildadasAMayusculas(trim($row[4])),
-                'exp_pretencion' =>convertirMinusculasTildadasAMayusculas(trim($row[2])),
+                'exp_materia' => $this->convertirMinusculasTildadasAMayusculas(trim($row[4])),
+                'exp_pretencion' =>$this->convertirMinusculasTildadasAMayusculas(trim($row[2])),
                 'exp_monto_pretencion' => strtoupper(trim($row[3])),
                 'exp_estado_proceso' => 'EN TRAMITE',
-                'exp_juzgado' => convertirMinusculasTildadasAMayusculas(trim($row[8])),
+                'exp_juzgado' => $this->convertirMinusculasTildadasAMayusculas(trim($row[8])),
                 'exp_especialidad' =>$especialidad->esp_id,
             ]);
             $persona = null;
@@ -54,10 +54,10 @@ public function index(Request $request)
                 $persona = \App\Models\PeopleNatural::updateOrCreate(
                     ['nat_dni' =>trim($row[10])],
                     [
-                        'nat_apellido_paterno' => strtoupper(trim($row[11])),
-                        'nat_apellido_materno' => strtoupper(trim($row[12])),
-                        'nat_nombres' => strtoupper(trim($row[13])),
-                        'nat_telefono' => strtoupper(trim($row[16])),
+                        'nat_apellido_paterno' => $this->convertirMinusculasTildadasAMayusculas(trim($row[11])),
+                        'nat_apellido_materno' => $this->convertirMinusculasTildadasAMayusculas(trim($row[12])),
+                        'nat_nombres' => $this->convertirMinusculasTildadasAMayusculas(trim($row[13])),
+                        'nat_telefono' => $this->convertirMinusculasTildadasAMayusculas(trim($row[16])),
                         'nat_correo' => trim($row[17])
                     ]
                 );
@@ -70,8 +70,8 @@ public function index(Request $request)
                 $persona = \App\Models\PeopleJuridic::updateOrCreate(
                     ['jur_ruc' => strtoupper(trim($row[14]))],
                     [
-                        'jur_razon_social' => strtoupper(trim($row[15])),
-                        'jur_telefono' => strtoupper(trim($row[16])),
+                        'jur_razon_social' => $this->convertirMinusculasTildadasAMayusculas(trim($row[15])),
+                        'jur_telefono' => $this->convertirMinusculasTildadasAMayusculas(trim($row[16])),
                         'jur_correo' => trim($row[17]),
                         'jur_rep_legal' => '-',
                     ]
