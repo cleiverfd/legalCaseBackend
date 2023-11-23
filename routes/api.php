@@ -64,15 +64,15 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/show', 'App\Http\Controllers\InstanceController@show')->name('Instance.show');
         Route::post('/store', 'App\Http\Controllers\InstanceController@store')->name('Instance.store');
         Route::post('/update', 'App\Http\Controllers\InstanceController@update')->name('Instance.update');
-        Route::post('/destroy', 'App\Http\Controllers\InstanceController@eliminar')->name('Instance.eliminar');
+        Route::post('/destroy', 'App\Http\Controllers\InstanceController@destroy')->name('Instance.eliminar');
      });
      //especialidades
     Route::prefix('specialty')->group(function () {
         Route::get('/', 'App\Http\Controllers\SpecialtyController@index')->name('specialty.index');
         Route::post('/show', 'App\Http\Controllers\SpecialtyController@show')->name('specialty.show');
-        Route::post('/store', 'App\Http\Controllers\SpecialtyController@registrar')->name('specialty.registrar');
+        Route::post('/store', 'App\Http\Controllers\SpecialtyController@store')->name('specialty.registrar');
         Route::post('/update', 'App\Http\Controllers\SpecialtyController@update')->name('specialty.update');
-        Route::post('/destroy', 'App\Http\Controllers\SpecialtyController@eliminar')->name('specialty.eliminar');
+        Route::post('/destroy', 'App\Http\Controllers\SpecialtyController@destroy')->name('specialty.eliminar');
      });
 
     // Demandantes
