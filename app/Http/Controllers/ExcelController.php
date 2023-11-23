@@ -11,6 +11,11 @@ class ExcelController extends Controller
     {
         $this->middleware('auth');
     }
+private function convertirMinusculasTildadasAMayusculas($cadena) {
+        $minusculas = ['á', 'é', 'í', 'ó', 'ú', 'ü'];
+        $mayusculas = ['Á', 'É', 'Í', 'Ó', 'Ú', 'Ü'];
+        return str_replace($minusculas, $mayusculas, mb_strtoupper($cadena, 'UTF-8'));
+}
 public function index(Request $request)
 {
     try {
@@ -33,11 +38,11 @@ public function index(Request $request)
             $exp = \App\Models\Proceeding::create([
                 'exp_numero' => strtoupper(trim($row[0])),
                 'exp_fecha_inicio' => Carbon::parse($row[1])->format('Y-m-d'),
-                'exp_materia' => strtoupper(trim($row[4])),
-                'exp_pretencion' =>strtoupper(trim($row[2])),
+                'exp_materia' => convertirMinusculasTildadasAMayusculas(trim($row[4])),
+                'exp_pretencion' =>convertirMinusculasTildadasAMayusculas(trim($row[2])),
                 'exp_monto_pretencion' => strtoupper(trim($row[3])),
                 'exp_estado_proceso' => 'EN TRAMITE',
-                'exp_juzgado' => strtoupper(trim($row[8])),
+                'exp_juzgado' => convertirMinusculasTildadasAMayusculas(trim($row[8])),
                 'exp_especialidad' =>$especialidad->esp_id,
             ]);
             $persona = null;
