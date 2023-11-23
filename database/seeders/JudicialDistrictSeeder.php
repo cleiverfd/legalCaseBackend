@@ -61,6 +61,7 @@ class JudicialDistrictSeeder extends Seeder
 
         foreach ($distritosJudiciales as $distritoJudicial) {
             JudicialDistrict::create([
+                'judis_nombre' => $distritoJudicial['judis_nombre'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

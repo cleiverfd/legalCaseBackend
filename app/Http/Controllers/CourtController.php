@@ -14,10 +14,12 @@ class CourtController extends Controller
         $this->middleware('auth');
     }
 
-    protected function index()
+    protected function index(Request $request)
     {
         try {
-            $juzgados =\App\Models\Court::orderBy('created_at', 'DESC')->get();;
+            $juzgados =\App\Models\Court::where('judis_id',$request->judis_id)
+            ->orderBy('created_at', 'DESC')
+            ->get(['co_id','co_nombre','judis_id']);
             return response()->json(['state' => 0, 'data' => $juzgados], 200);
         } catch (\Exception $e) {
             return response()->json(['state' => 1, 'error' => $e->getMessage()], 500);

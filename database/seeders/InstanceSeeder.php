@@ -26,7 +26,7 @@ class InstanceSeeder extends Seeder
         foreach ($instancias as $instancia) {
             Instance::create([
                 'ins_nombre' => $instancia,
-                'judis_id' => 17,
+                'judis_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

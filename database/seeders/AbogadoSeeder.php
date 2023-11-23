@@ -23,7 +23,7 @@ class AbogadoSeeder extends Seeder
                 'nat_nombres' => 'Antonio Lenín',
                 'nat_correo' => 'antoniocoronadorioja@gmail.con',
                 'nat_telefono' => '957945569',
-                'nat_direccion' => 'Av. Santa Rosa 400 - Condominio Los Rosales',
+                
             ],
             [
                 'nat_dni' => '47345175',
@@ -32,7 +32,7 @@ class AbogadoSeeder extends Seeder
                 'nat_nombres' => 'Diana Carolina',
                 'nat_correo' => 'carolinaguevara91@outlook.com',
                 'nat_telefono' => '975943495',
-                'nat_direccion' => 'Calle Libertad 841',
+               
             ],
             [
                 'nat_dni' => '16794061',
@@ -41,7 +41,7 @@ class AbogadoSeeder extends Seeder
                 'nat_nombres' => 'Christian Miguel',
                 'nat_correo' => 'rioslora.asesor.consultor@gmail.com',
                 'nat_telefono' => '991526970',
-                'nat_direccion' => 'MZ E LOTE 16 - Urbanización Villas del Norte',
+             
             ],
             [
                 'nat_dni' => '16725844',
@@ -50,7 +50,7 @@ class AbogadoSeeder extends Seeder
                 'nat_nombres' => 'Manuel Fernando',
                 'nat_correo' => 'manuelfernandocubasmori@gmail.com',
                 'nat_telefono' => '948417991',
-                'nat_direccion' => 'Las Moras 360, 2do Piso, Dpto 201, Urb Los Parques, Chiclayo',
+                
             ],
             [
                 'nat_dni' => '45616071',
@@ -59,7 +59,7 @@ class AbogadoSeeder extends Seeder
                 'nat_nombres' => 'Isvin',
                 'nat_correo' => null,
                 'nat_telefono' => null,
-                'nat_direccion' => 'Calle 25 de Noviembre N 200 PJ San Miguel',
+               
             ],
             [
                 'nat_dni' => '40640979',
@@ -68,7 +68,7 @@ class AbogadoSeeder extends Seeder
                 'nat_nombres' => 'Omar Simón',
                 'nat_correo' => 'omar_082679@hotmail.com',
                 'nat_telefono' => '948499363',
-                'nat_direccion' => 'Calle Carabaya 1093, PJ Villa El Sol',
+               
             ],
             [
                 'nat_dni' => '16799993',
@@ -77,7 +77,7 @@ class AbogadoSeeder extends Seeder
                 'nat_nombres' => 'Juan Carlos',
                 'nat_correo' => 'juancarlostorresoballe@gmail.com',
                 'nat_telefono' => '948569277',
-                'nat_direccion' => 'Calle Alfonso Ugarate 721 Int. 401',
+              
             ],
         ];
 

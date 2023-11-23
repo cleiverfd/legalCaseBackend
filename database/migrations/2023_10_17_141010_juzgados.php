@@ -14,6 +14,12 @@ class Juzgados extends Migration
         Schema::create('courts', function (Blueprint $table) {
             $table->id('co_id');
             $table->text('co_nombre', 255)->nullable();
+            $table->unsignedBigInteger('judis_id')->nullable();
+            $table->foreign('judis_id')
+                ->references('judis_id')
+                ->on('judicial_districts')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
             $table->timestamps();
             $table->softDeletes();
         });
