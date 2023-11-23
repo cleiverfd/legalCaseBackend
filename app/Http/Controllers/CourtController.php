@@ -33,6 +33,7 @@ class CourtController extends Controller
             DB::beginTransaction();
             $court = \App\Models\Court::create([
                 'co_nombre' =>  strtoupper(trim($request->co_nombre)),
+                'judis_id' =>  strtoupper(trim($request->judis_id)),
             ]);
             DB::commit();
             return response()->json(['state' => 0, 'data' => $court], 200);
@@ -47,6 +48,7 @@ class CourtController extends Controller
             DB::beginTransaction();
             $court = \App\Models\Court::find($request->co_id);
             $court->co_nombre = strtoupper(trim($request->co_nombre));
+            $court->judis_id = strtoupper(trim($request->judis_id));
             $court->save();
             DB::commit();
             return \response()->json(['state' => 0], 200);
