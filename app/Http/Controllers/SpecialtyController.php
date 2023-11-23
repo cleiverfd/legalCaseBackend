@@ -8,7 +8,7 @@ class SpecialtyController extends Controller
 {
     public function index(Request $request)
     {
-        $specialties = Specialty::where('ins_id', $request->ins_id)
+        $specialties = \App\Models\Specialty::where('ins_id', $request->ins_id)
             ->orderBy('created_at', 'DESC')
             ->get(['esp_id','esp_nombre','ins_id']);
         return response()->json(['data' => $specialties], 200);
