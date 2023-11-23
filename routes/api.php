@@ -157,5 +157,11 @@ Route::middleware(['auth:api'])->group(function () {
      //pretensiones
      Route::prefix('claim')->group(function(){
         Route::get('/', 'App\Http\Controllers\ClaimController@index')->name('claim.index');
-     });
+        Route::get('/', 'App\Http\Controllers\ClaimController@index')->name('claim.index');
+        Route::post('/show', 'App\Http\Controllers\ClaimController@show')->name('claim.show');
+        Route::post('/store', 'App\Http\Controllers\ClaimController@registrar')->name('claim.registrar');
+        Route::post('/update', 'App\Http\Controllers\ClaimController@update')->name('claim.update');
+        Route::post('/destroy', 'App\Http\Controllers\ClaimController@eliminar')->name('claim.eliminar');
+    
+    });
 });
