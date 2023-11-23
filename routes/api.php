@@ -58,6 +58,22 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/destroy', 'App\Http\Controllers\JudicialDistrictController@eliminar')->name('judicialdistrict.eliminar');
      
     });
+    //instancias
+    Route::prefix('instance')->group(function () {
+        Route::get('/', 'App\Http\Controllers\InstanceController@index')->name('Instance.index');
+        Route::post('/show', 'App\Http\Controllers\InstanceController@show')->name('Instance.show');
+        Route::post('/store', 'App\Http\Controllers\InstanceController@registrar')->name('Instance.registrar');
+        Route::post('/update', 'App\Http\Controllers\InstanceController@update')->name('Instance.update');
+        Route::post('/destroy', 'App\Http\Controllers\InstanceController@eliminar')->name('Instance.eliminar');
+     });
+     //especialidades
+    Route::prefix('specialty')->group(function () {
+        Route::get('/', 'App\Http\Controllers\SpecialtyController@index')->name('specialty.index');
+        Route::post('/show', 'App\Http\Controllers\SpecialtyController@show')->name('specialty.show');
+        Route::post('/store', 'App\Http\Controllers\SpecialtyController@registrar')->name('specialty.registrar');
+        Route::post('/update', 'App\Http\Controllers\SpecialtyController@update')->name('specialty.update');
+        Route::post('/destroy', 'App\Http\Controllers\SpecialtyController@eliminar')->name('specialty.eliminar');
+     });
 
     // Demandantes
     Route::prefix('demandante')->group(function () {
