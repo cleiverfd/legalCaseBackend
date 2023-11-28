@@ -15,6 +15,8 @@ class Proceeding extends Model
         'exp_fecha_inicio',
         'exp_pretencion',
         'exp_materia',
+        'exp_dis_judicial',
+        'exp_instancia',
         'exp_especialidad',
         'exp_monto_pretencion',
         'exp_estado_proceso',
@@ -38,9 +40,34 @@ class Proceeding extends Model
         return $this->belongsTo(Person::class, 'exp_demandado', 'per_id');
     }
 
+    public function pretension()
+    {
+        return $this->belongsTo(Claim::class, 'exp_pretencion', 'pre_id');
+    }
+
+    public function materia()
+    {
+        return $this->belongsTo(Subject::class, 'exp_materia', 'mat_id');
+    }
+
+    public function distritoJudicial()
+    {
+        return $this->belongsTo(JudicialDistrict::class, 'exp_dis_judicial', 'judis_id');
+    }
+
+    public function instancia()
+    {
+        return $this->belongsTo(Instance::class, 'exp_instancia', 'ins_id');
+    }
+
     public function specialty()
     {
         return $this->belongsTo(Specialty::class, 'exp_especialidad', 'esp_id');
+    }
+
+    public function juzgado()
+    {
+        return $this->belongsTo(Court::class, 'exp_juzgado', 'co_id');
     }
 
     public function audiencias()

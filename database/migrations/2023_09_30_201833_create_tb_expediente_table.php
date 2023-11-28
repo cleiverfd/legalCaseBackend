@@ -15,15 +15,43 @@ return new class extends Migration
             $table->id('exp_id');
             $table->string('exp_numero', 255);
             $table->string('exp_fecha_inicio', 255)->nullable();
-            $table->string('exp_pretencion', 255)->nullable();
-            $table->string('exp_materia', 255)->nullable();
-            $table->unsignedBigInteger('exp_especialidad')->nullable()->comment('parte_procesal_demandante');
-            $table->decimal('exp_monto_pretencion',20,2)->nullable();
+            $table->unsignedBigInteger('exp_pretencion')->nullable();
+            $table->unsignedBigInteger('exp_materia')->nullable();
+            $table->unsignedBigInteger('exp_dis_judicial')->nullable();
+            $table->unsignedBigInteger('exp_instancia')->nullable();
+            $table->unsignedBigInteger('exp_especialidad')->nullable();
+            $table->decimal('exp_monto_pretencion', 20, 2)->nullable();
             $table->string('exp_estado_proceso', 255)->nullable();
             $table->unsignedBigInteger('exp_demandante')->nullable()->comment('parte_procesal_demandante');
             $table->unsignedBigInteger('exp_demandado')->nullable()->comment('parte_procesal_demandado');
-            $table->string('exp_juzgado')->nullable()->comment('juzgado_donde_se_lleva_el_proceso');
+            $table->unsignedBigInteger('exp_juzgado')->nullable();
             $table->unsignedBigInteger('abo_id')->nullable();
+
+            $table->foreign('exp_juzgado')
+                ->references('co_id')
+                ->on('courts')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('exp_pretencion')
+                ->references('pre_id')
+                ->on('claims')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('exp_materia')
+                ->references('mat_id')
+                ->on('subjects')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('exp_dis_judicial')
+                ->references('judis_id')
+                ->on('judicial_districts')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('exp_instancia')
+                ->references('ins_id')
+                ->on('instances')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
             $table->foreign('exp_especialidad')
                 ->references('esp_id')
                 ->on('specialties')

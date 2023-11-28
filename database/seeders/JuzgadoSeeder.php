@@ -99,22 +99,6 @@ class JuzgadoSeeder extends Seeder
             ["co_nombre" => "2º Juzgado de Paz Letrado Comisaría de Ferreñafe"],
             ["co_nombre" => "Juzgado Transitorio Laboral de Chiclayo"],
             ["co_nombre" => "9º Juzgado de Paz Letrado  de Chiclayo"]
-
-            // ["co_nombre" => "1º Juzgado de Trabajo de Chiclayo"],
-            // ["co_nombre" => "2º Juzgado de Trabajo de Chiclayo"],
-            // ["co_nombre" => "3º Juzgado de Trabajo de Chiclayo"],
-            // ["co_nombre" => "4º Juzgado de Trabajo de Chiclayo"],
-            // ["co_nombre" => "5° Juzgado de Trabajo de Chiclayo"],
-            // ["co_nombre" => "6° Juzgado de Trabajo de Chiclayo"],
-            // ["co_nombre" => "7° Juzgado de Trabajo de Chiclayo"],
-            // ["co_nombre" => "8° Juzgado de Trabajo de Chiclayo"],
-            // ["co_nombre" => "9° Juzgado de Trabajo de Chiclayo"],
-            // ["co_nombre" => "10° Juzgado de Trabajo de Chiclayo"],
-            // ["co_nombre" => "11° Juzgado de Trabajo de Chiclayo"],
-            // ["co_nombre" => "Juzgado de Trabajo de Lambayeque"],
-            // ["co_nombre" => "Juzgado Mixto de Lambayeque"],
-            // ["co_nombre" => "Juzgado Transitorio Laboral de Chiclayo"],
-            // ["co_nombre" => "Juzgado de Paz Letrado de Lambayeque"],
         ];
 
         foreach ($juzgados as &$juzgado) {

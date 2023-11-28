@@ -15,4 +15,9 @@ class Claim extends Model
         'pre_nombre'
     ];
     protected $dates = ['deleted_at'];
+
+    public function expedientes()
+    {
+        return $this->hasMany(Expediente::class, 'pre_id', 'exp_pretencion');
+    }
 }

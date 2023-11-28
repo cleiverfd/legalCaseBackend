@@ -15,4 +15,9 @@ class Court extends Model
         'judis_id'
     ];
     protected $dates = ['deleted_at'];
+
+    public function expedientes()
+    {
+        return $this->hasMany(Proceeding::class, 'co_id', 'exp_juzgado');
+    }
 }

@@ -14,5 +14,10 @@ class Subject extends Model
         'mat_nombre',
     ];
     protected $dates = ['deleted_at'];
+
+    public function expedientes()
+    {
+        return $this->hasMany(Expediente::class, 'mat_id', 'exp_materia');
+    }
 }
 

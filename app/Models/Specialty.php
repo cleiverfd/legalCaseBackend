@@ -16,8 +16,12 @@ class Specialty extends Model
     ];
     protected $dates = ['created_at', 'updated_at', 'deleted_at'];
 
-    public function instance()
+    // public function instance()
+    // {
+    //     return $this->belongsTo(Instance::class, 'ins_id', 'ins_id');
+    // }
+    public function expedientes()
     {
-        return $this->belongsTo(Instance::class, 'ins_id', 'ins_id');
+        return $this->hasMany(Expediente::class, 'esp_id', 'exp_especialidad');
     }
 }
