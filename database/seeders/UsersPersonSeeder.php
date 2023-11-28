@@ -70,7 +70,7 @@ class UsersPersonSeeder extends Seeder
             'nat_apellido_paterno' => 'Palomino',
             'nat_apellido_materno' => 'Guerra',
             'nat_telefono' => '+51 979945594', 
-            'nat_correo' => ' cpalominog@unprg.edu.pe',
+            'nat_correo' => 'cpalominog@unprg.edu.pe',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
