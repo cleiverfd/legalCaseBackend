@@ -220,7 +220,9 @@ class ProceedingController extends Controller
             $EX = \App\Models\Proceeding::find($exp->exp_id);
             if ($request->procesal == 'DEMANDANTE') {
                 $EX->exp_demandante = strtoupper(trim($perId));
+                $EX->exp_demandado = null;
             } else {
+                $EX->exp_demandante = null;
                 $EX->exp_demandado = strtoupper(trim($perId));
             }
             $EX->abo_id = $request->abo_id;
