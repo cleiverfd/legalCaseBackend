@@ -121,6 +121,8 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/pdfpretensiones', 'App\Http\Controllers\ReportController@pdfpretenciones')->name('reportes.pdfpretenciones');
         Route::get('/pdfejecuciones', 'App\Http\Controllers\ReportController@pdfejecuciones')->name('reportes.pdfejecuciones'); 
         Route::get('/pdfpretension', 'App\Http\Controllers\ReportController@pdfpretension')->name('reportes.pdfpretension'); 
+        Route::get('/pdffechas', 'App\Http\Controllers\ReportController@pdffechas')->name('reportes.pdffechas'); 
+    
     });
 
     // Audiencias
