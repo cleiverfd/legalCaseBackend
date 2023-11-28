@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Court;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -15,13 +16,16 @@ class JuzgadoSeeder extends Seeder
      */
     public function run()
     {
-        $pretensiones = [
-            ["co_nombre" => "1º SALA CIVIL de Chiclayo"],
-            ["co_nombre" => "2º SALA CIVIL de Chiclayo"],
-            ["co_nombre" => "1° SALA LABORAL de Chiclayo"],
-            ["co_nombre" => "2° SALA LABORAL de Chiclayo"],
-            ["co_nombre" => "3º SALA LABORAL de Chiclayo"],
-            ["co_nombre" => "SALA MIXTA de Jaén"],
+
+        $currentTimestamp = Carbon::now();
+
+        $juzgados = [
+            ["co_nombre" => "1º Sala Civil de Chiclayo"],
+            ["co_nombre" => "2º Sala Civil de Chiclayo"],
+            ["co_nombre" => "1° Sala Laboral de Chiclayo"],
+            ["co_nombre" => "2° Sala Laboral de Chiclayo"],
+            ["co_nombre" => "3º Sala Laboral de Chiclayo"],
+            ["co_nombre" => "Sala Mixta de Jaén"],
             ["co_nombre" => "1º Juzgado Civil de Chiclayo"],
             ["co_nombre" => "1º Juzgado Civil de Jaén"],
             ["co_nombre" => "2º Juzgado Civil de Chiclayo"],
@@ -95,16 +99,32 @@ class JuzgadoSeeder extends Seeder
             ["co_nombre" => "2º Juzgado de Paz Letrado Comisaría de Ferreñafe"],
             ["co_nombre" => "Juzgado Transitorio Laboral de Chiclayo"],
             ["co_nombre" => "9º Juzgado de Paz Letrado  de Chiclayo"]
+
+            // ["co_nombre" => "1º Juzgado de Trabajo de Chiclayo"],
+            // ["co_nombre" => "2º Juzgado de Trabajo de Chiclayo"],
+            // ["co_nombre" => "3º Juzgado de Trabajo de Chiclayo"],
+            // ["co_nombre" => "4º Juzgado de Trabajo de Chiclayo"],
+            // ["co_nombre" => "5° Juzgado de Trabajo de Chiclayo"],
+            // ["co_nombre" => "6° Juzgado de Trabajo de Chiclayo"],
+            // ["co_nombre" => "7° Juzgado de Trabajo de Chiclayo"],
+            // ["co_nombre" => "8° Juzgado de Trabajo de Chiclayo"],
+            // ["co_nombre" => "9° Juzgado de Trabajo de Chiclayo"],
+            // ["co_nombre" => "10° Juzgado de Trabajo de Chiclayo"],
+            // ["co_nombre" => "11° Juzgado de Trabajo de Chiclayo"],
+            // ["co_nombre" => "Juzgado de Trabajo de Lambayeque"],
+            // ["co_nombre" => "Juzgado Mixto de Lambayeque"],
+            // ["co_nombre" => "Juzgado Transitorio Laboral de Chiclayo"],
+            // ["co_nombre" => "Juzgado de Paz Letrado de Lambayeque"],
         ];
 
-        $currentTimestamp = Carbon::now();
-        foreach ($pretensiones as &$pretension) {
-            $pretension['co_nombre'] = mb_strtoupper($pretension['co_nombre']);
-            $pretension['judis_id'] = 3;
-            $pretension['created_at'] = $currentTimestamp;
-            $pretension['updated_at'] = $currentTimestamp;
+        foreach ($juzgados as &$juzgado) {
+            // $juzgado['co_nombre'] = mb_strtoupper($juzgado['co_nombre']);
+            $juzgado['co_isFavorite'] = 0;
+            $juzgado['judis_id'] = 17;
+            $juzgado['created_at'] = $currentTimestamp;
+            $juzgado['updated_at'] = $currentTimestamp;
         }
 
-        DB::table('courts')->insert($pretensiones);
+       Court::insert($juzgados);
     }
 }

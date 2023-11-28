@@ -30,7 +30,7 @@ class MateriaSeeder extends Seeder
 
         $currentTimestamp = Carbon::now();
         foreach($materias as &$materia){
-            $materia['mat_nombre'] = mb_strtoupper($materia['mat_nombre']);
+            // $materia['mat_nombre'] = mb_strtoupper($materia['mat_nombre']);
             $materia['created_at'] = $currentTimestamp;
             $materia['updated_at'] = $currentTimestamp;
         }

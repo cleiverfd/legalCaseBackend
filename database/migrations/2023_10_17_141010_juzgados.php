@@ -14,6 +14,7 @@ class Juzgados extends Migration
         Schema::create('courts', function (Blueprint $table) {
             $table->id('co_id');
             $table->text('co_nombre', 255)->nullable();
+            $table->boolean('co_isFavorite')->default(0);
             $table->unsignedBigInteger('judis_id')->nullable();
             $table->foreign('judis_id')
                 ->references('judis_id')

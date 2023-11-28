@@ -18,6 +18,8 @@ class DistricSeeder extends Seeder
     public function run()
     {
 
+        $currentTimestamp = Carbon::now();
+
         $districts = [
             ['dis_id' => '010101', 'dis_nombre' => 'Chachapoyas', 'pro_id' => '0101', 'dep_id' => '01'],
             ['dis_id' => '010102', 'dis_nombre' => 'Asunción', 'pro_id' => '0101', 'dep_id' => '01'],
@@ -1895,13 +1897,11 @@ class DistricSeeder extends Seeder
             ['dis_id' => '250401', 'dis_nombre' => 'Purus', 'pro_id' => '2504', 'dep_id' => '25']
         ];
 
-        $currentTimestamp = Carbon::now();
-
         foreach ($districts as &$district) {
             $district['created_at'] = $currentTimestamp;
             $district['updated_at'] = $currentTimestamp;
         }
 
-        DB::table('districts')->insert($districts);
+        District::insert($districts);
     }
 }

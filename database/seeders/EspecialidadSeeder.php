@@ -1,13 +1,9 @@
 <?php
 
 namespace Database\Seeders;
-
-use App\Models\Especialidad;
-
+use App\Models\Specialty;
 use Carbon\Carbon;
-
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class EspecialidadSeeder extends Seeder
 {
@@ -19,36 +15,24 @@ class EspecialidadSeeder extends Seeder
     public function run()
     {
 
-        $especialidades = [
-            ['esp_nombre' => 'CIVIL', 'ins_id' => 1],
-            ['esp_nombre' => 'FAMILIA CIVIL', 'ins_id' => 1],
-            ['esp_nombre' => 'FAMILIA TUTELAR', 'ins_id' => 1],
-            ['esp_nombre' => 'LABORAL', 'ins_id' => 1],
-            ['esp_nombre' => 'JUZGADO DE PAZ LETRADO', 'ins_id' =>1],
-            ['esp_nombre' => 'CIVIL', 'ins_id' => 2],
-            ['esp_nombre' => 'COMERCIAL', 'ins_id' => 2],
-            ['esp_nombre' => 'FAMILIA CIVIL', 'ins_id' => 2],
-            ['esp_nombre' => 'FAMILIA TUTELAR', 'ins_id' => 2],
-            ['esp_nombre' => 'LABORAL', 'ins_id' => 2],
-            ['esp_nombre' => 'CIVIL', 'ins_id' => 3],
-            ['esp_nombre' => 'FAMILIA CIVIL', 'ins_id' => 3],
-            ['esp_nombre' => 'FAMILIA TUTELAR', 'ins_id' => 3],
-            ['esp_nombre' => 'LABORAL', 'ins_id' => 3],
-            ['esp_nombre' => 'CIVIL', 'ins_id' => 4],
-            ['esp_nombre' => 'COMERCIAL', 'ins_id' => 4],
-            ['esp_nombre' => 'DERECHO CONSTITUCIONAL', 'ins_id' => 4],
-            ['esp_nombre' => 'FAMILIA CIVIL', 'ins_id' => 4],
-            ['esp_nombre' => 'FAMILIA TUTELAR', 'ins_id' => 4],
-            ['esp_nombre' => 'LABORAL', 'ins_id' => 4],
-        ];
-
         $currentTimestamp = Carbon::now();
 
+        $especialidades = [
+            ['esp_nombre' => 'Civil'],
+            ['esp_nombre' => 'Familia Civil'],
+            ['esp_nombre' => 'Familia Tutelar'],
+            ['esp_nombre' => 'Laboral'],
+            ['esp_nombre' => 'Comercial'],
+            ['esp_nombre' => 'Derecho Constitucional']
+        ];
+
+        
+
         foreach ($especialidades as $especialidad) {
-            $district['created_at'] = $currentTimestamp;
-            $district['updated_at'] = $currentTimestamp;
+           $especialidad['created_at'] = $currentTimestamp;
+           $especialidad['updated_at'] = $currentTimestamp;
         }
 
-        DB::table('specialties')->insert($especialidades);
+        Specialty::insert($especialidades);
     }
 }

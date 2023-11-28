@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Models\PeopleNatural;
+use App\Models\User;
+use App\Models\Lawyer;
 
 class AbogadoSeeder extends Seeder
 {
@@ -16,104 +18,39 @@ class AbogadoSeeder extends Seeder
     public function run()
     {
         $datosAbogados = [
-            [
-                'nat_dni' => '16797179',
-                'nat_apellido_paterno' => 'Coronado',
-                'nat_apellido_materno' => 'Rioja',
-                'nat_nombres' => 'Antonio Lenín',
-                'nat_correo' => 'antoniocoronadorioja@gmail.con',
-                'nat_telefono' => '957945569',
-                
-            ],
-            [
-                'nat_dni' => '47345175',
-                'nat_apellido_paterno' => 'Guevara',
-                'nat_apellido_materno' => 'Acosta',
-                'nat_nombres' => 'Diana Carolina',
-                'nat_correo' => 'carolinaguevara91@outlook.com',
-                'nat_telefono' => '975943495',
-               
-            ],
-            [
-                'nat_dni' => '16794061',
-                'nat_apellido_paterno' => 'Rios',
-                'nat_apellido_materno' => 'Lora',
-                'nat_nombres' => 'Christian Miguel',
-                'nat_correo' => 'rioslora.asesor.consultor@gmail.com',
-                'nat_telefono' => '991526970',
-             
-            ],
-            [
-                'nat_dni' => '16725844',
-                'nat_apellido_paterno' => 'Cubas',
-                'nat_apellido_materno' => 'Mor',
-                'nat_nombres' => 'Manuel Fernando',
-                'nat_correo' => 'manuelfernandocubasmori@gmail.com',
-                'nat_telefono' => '948417991',
-                
-            ],
-            [
-                'nat_dni' => '45616071',
-                'nat_apellido_paterno' => 'Santamaría',
-                'nat_apellido_materno' => 'Chapoñan',
-                'nat_nombres' => 'Isvin',
-                'nat_correo' => null,
-                'nat_telefono' => null,
-               
-            ],
-            [
-                'nat_dni' => '40640979',
-                'nat_apellido_paterno' => 'Fernandez',
-                'nat_apellido_materno' => 'Acha',
-                'nat_nombres' => 'Omar Simón',
-                'nat_correo' => 'omar_082679@hotmail.com',
-                'nat_telefono' => '948499363',
-               
-            ],
-            [
-                'nat_dni' => '16799993',
-                'nat_apellido_paterno' => 'Torres',
-                'nat_apellido_materno' => 'Oballe',
-                'nat_nombres' => 'Juan Carlos',
-                'nat_correo' => 'juancarlostorresoballe@gmail.com',
-                'nat_telefono' => '948569277',
-              
-            ],
+            ['16725844', 'Cubas', 'Mori', 'Manuel Fernando', '948417991', 'mcubasmo@unprg.edu.pe'],
+            ['45616071', 'Santamaría', 'Chapoñan', 'Isvin', '998962921', 'isantamariac@unprg.edu.pe'],
+            ['40640979', 'Fernández', 'Acha', 'Omar Simón', '948499363', 'ofernandezac@unprg.edu.pe'],
+            ['16799993', 'Torres', 'Oballe', 'Juan Carlos', '948569277', 'jtorreso@unprg.edu.pe'],
+            ['16794061', 'Rios', 'Lora', 'Christian Miguel', '991526970', 'crioslo@unprg.edu.pe'],
+            ['47345175', 'Guevara', 'Acosta', 'Diana Carolina', '975943495', 'cguevaraac@unprg.edu.pe'],
+            ['16797179', 'Coronado', 'Rioja', 'Antonio Lenin', '957945569', 'acoronador@unprg.edu.pe'],
         ];
 
         foreach ($datosAbogados as $datosAbogado) {
-            $datosAbogado['created_at'] = now();
-            $datosAbogado['updated_at'] = now();
+            $personaNatural = PeopleNatural::create([
+                'nat_dni' => $datosAbogado[0],
+                'nat_apellido_paterno' => $datosAbogado[1],
+                'nat_apellido_materno' => $datosAbogado[2],
+                'nat_nombres' => $datosAbogado[3],
+                'nat_telefono' => $datosAbogado[4],
+                'nat_correo' => $datosAbogado[5],
+            ]);
 
-            // Inserta los datos en la tabla persona_natural
-            $idPersonaNatural = DB::table('people_naturals')->insertGetId($datosAbogado);
-
-            // Datos para el usuario
-            $datosUsuario = [
-                'name' => explode(' ', $datosAbogado['nat_nombres'])[0], // Tomamos el primer nombre
-                'email' => $datosAbogado['nat_correo'],
+            User::create([
+                'name' => explode(' ', $datosAbogado[3])[0],
+                'email' => $datosAbogado[5],
                 'usu_rol' => 'ABOGADO',
-                'per_id' => $idPersonaNatural,
+                'per_id' => $personaNatural->nat_id,
                 'email_verified_at' => now(),
-                'password' => Hash::make($datosAbogado['nat_dni']),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
+                'password' => Hash::make($datosAbogado[0]),
+            ]);
 
-            // Inserta los datos en la tabla users
-            DB::table('users')->insert($datosUsuario);
-
-            // Datos para la tabla abogados
-            $datosAbogadoTabla = [
+            Lawyer::create([
                 'abo_carga_laboral' => 0,
                 'abo_disponibilidad' => 'LIBRE',
-                'nat_id' => $idPersonaNatural,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-
-            // Inserta los datos en la tabla abogados
-            DB::table('lawyers')->insert($datosAbogadoTabla);
+                'nat_id' => $personaNatural->nat_id,
+            ]);
         }
     }
 }

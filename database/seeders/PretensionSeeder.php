@@ -41,7 +41,7 @@ class PretensionSeeder extends Seeder
 
         $currentTimestamp = Carbon::now();
         foreach($pretensiones as &$pretension){
-            $pretension['pre_nombre'] = mb_strtoupper($pretension['pre_nombre']);
+            // $pretension['pre_nombre'] = mb_strtoupper($pretension['pre_nombre']);
             $pretension['created_at'] = $currentTimestamp;
             $pretension['updated_at'] = $currentTimestamp;
         }

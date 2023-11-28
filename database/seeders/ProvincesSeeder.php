@@ -6,7 +6,6 @@ use App\Models\Province;
 use Carbon\Carbon;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class ProvincesSeeder extends Seeder
 {
@@ -17,6 +16,8 @@ class ProvincesSeeder extends Seeder
      */
     public function run()
     {
+
+        $currentTimestamp = Carbon::now();
 
         $provinces = [
             ['pro_id' => '0101', 'pro_nombre' => 'Chachapoyas', 'dep_id' => '01'],
@@ -217,13 +218,11 @@ class ProvincesSeeder extends Seeder
             ['pro_id' => '2504', 'pro_nombre' => 'Purús', 'dep_id' => '25']
         ];
 
-        $currentTimestamp = Carbon::now();
-
         foreach ($provinces as &$province) {
             $province['created_at'] = $currentTimestamp;
             $province['updated_at'] = $currentTimestamp;
         }
 
-        DB::table('provinces')->insert($provinces);
+        Province::insert($provinces);
     }
 }

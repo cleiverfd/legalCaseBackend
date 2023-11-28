@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Instance;
-
 use Illuminate\Database\Seeder;
+use Carbon\Carbon;
 
 class InstanceSeeder extends Seeder
 {
@@ -15,21 +15,21 @@ class InstanceSeeder extends Seeder
      */
     public function run()
     {
+
+        $currentTimestamp = Carbon::now();
+
         $instancias = [
-            'JUZGADO DE PAZ LETRADO',
-            'JUZGADO ESPECIALIZADO',
-            'JUZGADO MIXTO',
-            'SALA SUPERIOR',
+            ['ins_nombre' => 'Juzgado de Paz Letrado'],
+            ['ins_nombre' => 'Juzgado Especializado'],
+            ['ins_nombre' => 'Juzgado Mixto'],
+            ['ins_nombre' => 'Sala Superior']
         ];
 
-        // Itera sobre el array y crea registros en la tabla 'instances'
         foreach ($instancias as $instancia) {
-            Instance::create([
-                'ins_nombre' => $instancia,
-                'judis_id' => 3,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            $instancia['created_at'] = $currentTimestamp;
+            $instancia['updated_at'] = $currentTimestamp;
         }
+
+        Instance::insert($instancias);
     }
 }

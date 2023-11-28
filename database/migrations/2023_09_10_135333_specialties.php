@@ -16,7 +16,7 @@ class Specialties extends Migration
         Schema::create('specialties', function (Blueprint $table) {
             $table->id('esp_id');
             $table->string('esp_nombre', 255);
-            $table->unsignedBigInteger('ins_id');
+            $table->unsignedBigInteger('ins_id')->nullable();
             $table->foreign('ins_id')
                 ->references('ins_id')
                 ->on('instances')
