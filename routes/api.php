@@ -35,6 +35,8 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/alertas', 'App\Http\Controllers\LawyerController@alertas')->name('lawyer.alertas');
         //expedientes por abogado
         Route::post('/expedientes', 'App\Http\Controllers\LawyerController@expedientes')->name('lawyer.expedientes');
+
+        Route::post('/changeOfLawyer', 'App\Http\Controllers\LawyerController@changeOfLawyer')->name('lawyer.changeOfLawyer');
     });
 
     // Expedientes
