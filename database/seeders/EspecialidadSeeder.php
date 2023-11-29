@@ -23,7 +23,8 @@ class EspecialidadSeeder extends Seeder
             ['esp_nombre' => 'Familia Tutelar'],
             ['esp_nombre' => 'Laboral'],
             ['esp_nombre' => 'Comercial'],
-            ['esp_nombre' => 'Derecho Constitucional']
+            ['esp_nombre' => 'Derecho Constitucional'],
+            ['esp_nombre' => 'Juzgado de Paz Letrado']
         ];
 
         

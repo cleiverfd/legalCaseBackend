@@ -164,6 +164,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/store', 'App\Http\Controllers\CourtController@store')->name('juzgado.store');
         Route::post('/destroy', 'App\Http\Controllers\CourtController@destroy')->name('juzgado.destroy');
         Route::post('/update', 'App\Http\Controllers\CourtController@update')->name('juzgado.update');
+        Route::post('/favorite', 'App\Http\Controllers\CourtController@favorite')->name('juzgado.favorite');
     });
     //materias
     Route::prefix('subject')->group(function () {

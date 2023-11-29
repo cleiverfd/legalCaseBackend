@@ -126,7 +126,8 @@ class ReportController extends Controller
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
         ->where('exp_estado_proceso', 'EN TRAMITE')
         ->with('person.address')
-        ->with('specialty.instance.judicialdistrict')
+        ->with('specialty')
+        ->with('materia')
         ->with('person.juridica', 'person.persona')
         ->get();
 
@@ -150,7 +151,7 @@ class ReportController extends Controller
                 'numero' => $proceeding->exp_numero,
                 'fecha_inicio' => $fecha_formateada,
                 'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                'materia' => ucwords(strtolower($proceeding->exp_materia)),
+                'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
                 'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
                 'monto_pretencion' => $proceeding->exp_monto_pretencion,
                 'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
@@ -202,7 +203,8 @@ class ReportController extends Controller
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
         ->where('exp_estado_proceso', 'EN EJECUCION')
         ->with('person.address')
-        ->with('specialty.instance.judicialdistrict')
+        ->with('specialty')
+        ->with('materia')
         ->with('person.juridica', 'person.persona')
         ->get();
 
@@ -226,7 +228,7 @@ class ReportController extends Controller
                 'numero' => $proceeding->exp_numero,
                 'fecha_inicio' => $fecha_formateada,
                 'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                'materia' => ucwords(strtolower($proceeding->exp_materia)),
+                'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
                 'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
                 'monto_pretencion' => $proceeding->exp_monto_pretencion,
                 'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
@@ -276,7 +278,8 @@ class ReportController extends Controller
         ]);
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
         ->with('person.address')
-        ->with('specialty.instance.judicialdistrict')
+        ->with('specialty')
+        ->with('materia')
         ->with('person.juridica', 'person.persona')
         ->get();
 
@@ -300,7 +303,7 @@ class ReportController extends Controller
                 'numero' => $proceeding->exp_numero,
                 'fecha_inicio' => $fecha_formateada,
                 'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                'materia' => ucwords(strtolower($proceeding->exp_materia)),
+                'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
                 'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
                 'monto_pretencion' => $proceeding->exp_monto_pretencion,
                 'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
@@ -396,7 +399,8 @@ class ReportController extends Controller
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->with('person.address')
             ->with('person.juridica', 'person.persona')
-            ->with('specialty.instance.judicialdistrict')
+            ->with('specialty')
+            ->with('materia')
             ->where('exp_fecha_inicio', 'LIKE', $fechaBuscada . '%') // Filtra por el mes y año
             ->get();
             $data = $proceedings->map(function ($proceeding) {
@@ -418,7 +422,7 @@ class ReportController extends Controller
                     'numero' => $proceeding->exp_numero,
                     'fecha_inicio' => $fecha_formateada,
                     'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                    'materia' => ucwords(strtolower($proceeding->exp_materia)),
+                    'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
                     'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
                     'monto_pretencion' => $proceeding->exp_monto_pretencion,
                     'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
@@ -470,7 +474,8 @@ class ReportController extends Controller
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->with('person.address')
             ->with('person.juridica', 'person.persona')
-            ->with('specialty.instance.judicialdistrict')
+            ->with('specialty')
+            ->with('materia')
             ->where('exp_materia', $request->exp_materia)
             ->get();
             $data = $proceedings->map(function ($proceeding) {
@@ -492,7 +497,7 @@ class ReportController extends Controller
                     'numero' => $proceeding->exp_numero,
                     'fecha_inicio' => $fecha_formateada,
                     'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                    'materia' => ucwords(strtolower($proceeding->exp_materia)),
+                    'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
                     'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
                     'monto_pretencion' => $proceeding->exp_monto_pretencion,
                     'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
@@ -545,7 +550,8 @@ class ReportController extends Controller
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->with('person.address')
             ->with('person.juridica', 'person.persona')
-            ->with('specialty.instance.judicialdistrict')
+            ->with('specialty')
+            ->with('materia')
             ->where('abo_id', $request->abo_id)
             ->get();
             $data = $proceedings->map(function ($proceeding) {
@@ -567,7 +573,7 @@ class ReportController extends Controller
                     'numero' => $proceeding->exp_numero,
                     'fecha_inicio' => $fecha_formateada,
                     'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                    'materia' => ucwords(strtolower($proceeding->exp_materia)),
+                    'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
                     'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
                     'monto_pretencion' => $proceeding->exp_monto_pretencion,
                     'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
@@ -621,7 +627,8 @@ class ReportController extends Controller
             ->with('person.address')
             ->whereIn('exp_estado_proceso', ['EN TRAMITE', 'EN EJECUCION'])
             ->with('person.juridica', 'person.persona')
-            ->with('specialty.instance.judicialdistrict')
+            ->with('specialty')
+            ->with('materia')
             ->with('montos')
             ->get();
             $data = $proceedings->map(function ($proceeding) {
@@ -645,7 +652,7 @@ class ReportController extends Controller
                     'numero' => $proceeding->exp_numero,
                     'fecha_inicio' => $fecha_formateada,
                     'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                    'materia' => ucwords(strtolower($proceeding->exp_materia)),
+                    'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
                     'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
                     'monto_pretencion' => $proceeding->exp_monto_pretencion,
                     'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
@@ -708,7 +715,8 @@ class ReportController extends Controller
             ->with('person.address')
             ->where('exp_estado_proceso',  'EN EJECUCION')
             ->with('person.juridica', 'person.persona')
-            ->with('specialty.instance.judicialdistrict')
+            ->with('specialty')
+            ->with('materia')
             ->with('montos')
             ->get();
             $data = $proceedings->map(function ($proceeding) {
@@ -794,7 +802,8 @@ class ReportController extends Controller
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->with('person.address')
             ->with('person.juridica', 'person.persona')
-            ->with('specialty.instance.judicialdistrict')
+            ->with('specialty')
+            ->with('materia')
             ->where('exp_pretencion', $request->exp_pretension)
             ->get();
             $data = $proceedings->map(function ($proceeding) {
@@ -816,7 +825,7 @@ class ReportController extends Controller
                     'numero' => $proceeding->exp_numero,
                     'fecha_inicio' => $fecha_formateada,
                     'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                    'materia' => ucwords(strtolower($proceeding->exp_materia)),
+                    'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
                     'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
                     'monto_pretencion' => $proceeding->exp_monto_pretencion,
                     'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
@@ -879,7 +888,8 @@ class ReportController extends Controller
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->with('person.address')
             ->with('person.juridica', 'person.persona')
-            ->with('specialty.instance.judicialdistrict')
+            ->with('specialty')
+            ->with('materia')
             ->whereBetween('exp_fecha_inicio', [$request->fechaDesde,$request->fechaHasta])
             ->get();
             $data = $proceedings->map(function ($proceeding) {
@@ -901,7 +911,7 @@ class ReportController extends Controller
                     'numero' => $proceeding->exp_numero,
                     'fecha_inicio' => $fecha_formateada,
                     'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                    'materia' => ucwords(strtolower($proceeding->exp_materia)),
+                    'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
                     'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
                     'monto_pretencion' => $proceeding->exp_monto_pretencion,
                     'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),

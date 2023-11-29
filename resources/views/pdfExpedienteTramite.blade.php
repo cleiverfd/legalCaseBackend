@@ -99,7 +99,7 @@
                         {{ ucwords(strtolower($expediente['razon_social'] ?? '')) }}
                     @endif
                 @else
-                    Unprg
+                   UNPRG
                 @endif
             </td>
             <td>
@@ -110,7 +110,7 @@
                         {{ ucwords(strtolower($expediente['razon_social'] ?? '')) }}
                     @endif
                 @else
-                    Unprg
+                    UNPRG
                 @endif
             </td>
             <td>{{ ucwords(strtolower($expediente['materia'] ?? ''))}}</td>

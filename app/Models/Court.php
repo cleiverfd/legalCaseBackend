@@ -12,7 +12,8 @@ class Court extends Model
     protected $primaryKey = 'co_id';
     protected $fillable = [
         'co_nombre',
-        'judis_id'
+        'judis_id',
+        'co_isFvorite'
     ];
     protected $dates = ['deleted_at'];
 
