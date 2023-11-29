@@ -323,7 +323,14 @@ class ProceedingController extends Controller
 
     protected function show($id)
     {
-        $proceeding = \App\Models\Proceeding::with('specialty', 'instancia', 'distritoJudicial', 'materia', 'demandante.persona', 'demandado.persona')
+        $proceeding = \App\Models\Proceeding::
+        with('specialty', 
+        'juzgado',
+        'instancia', 
+        'distritoJudicial', 
+        'materia', 
+        'demandante.persona', 
+        'demandado.persona')
             ->find($id);
 
         if (!$proceeding) {
