@@ -307,7 +307,7 @@ class ProceedingController extends Controller
 
             /*Actulizar el expediente  asignando laersona y el abogado*/
             $EX = \App\Models\Proceeding::find($exp->exp_id);
-            if ($request->procesal == 'DEMANDANTE') {
+            if ($request->procesal == 'demandante') {
                 $EX->exp_demandante = $request->expediente['persona'];
             } else {
                 $EX->exp_demandado = $request->expediente['persona'];
