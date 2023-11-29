@@ -380,8 +380,10 @@ class ProceedingController extends Controller
         $data['per_id'] = optional($person)->per_id;
 
         // Traer archivos
-        $eje = \App\Models\LegalDocument::where('exp_id', $id)->where('doc_tipo', 'EJE')->get();
-        $escritos = \App\Models\LegalDocument::where('exp_id', $id)->where('doc_tipo', 'ESCRITO')->get();
+        $eje = \App\Models\LegalDocument::where('exp_id', $id)->where('doc_tipo', 'EJE')
+        ->orderBy('created_at', 'DESC')->get();
+        $escritos = \App\Models\LegalDocument::where('exp_id', $id)->where('doc_tipo', 'ESCRITO')
+        ->orderBy('created_at', 'DESC')->get();
 
         return response()->json([
             'data' => $data,
