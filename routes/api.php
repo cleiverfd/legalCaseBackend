@@ -44,9 +44,11 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/', 'App\Http\Controllers\ProceedingController@index')->name('proceeding.index');
         Route::get('/{id}', 'App\Http\Controllers\ProceedingController@show')->name('proceeding.show');
         Route::get('/{id}/show', 'App\Http\Controllers\ProceedingController@showupdate')->name('proceeding.showupdate');
+        Route::post('/take', 'App\Http\Controllers\ProceedingController@take')->name('proceeding.take');
         Route::post('/update', 'App\Http\Controllers\ProceedingController@update')->name('proceeding.update');
         Route::post('/registrarcaso', 'App\Http\Controllers\ProceedingController@registrarcaso')->name('proceeding.registrarcaso');
         Route::post('/listarestado', 'App\Http\Controllers\ProceedingController@listarestado')->name('proceeding.listarestado');
+        
     });
 
     //  Distritos Judiciales
