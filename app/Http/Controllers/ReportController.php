@@ -11,10 +11,10 @@ use App\Http\Resources\{
 
 class ReportController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth');
+    // }
     protected function inicio(Request $request)
     {
         $expTotal = \App\Models\Proceeding::count();
