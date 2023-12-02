@@ -11,10 +11,10 @@ use App\Http\Resources\{
 
 class ReportController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware('auth');
-    // }
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     protected function inicio(Request $request)
     {
         $expTotal = \App\Models\Proceeding::count();
@@ -191,8 +191,8 @@ class ReportController extends Controller
         });
 
         $pdf = PDF::loadView('pdfExpedienteTramite', ['data' => $data]);
-        // return $pdf->download('archivo.pdf');
-        return $pdf->stream('archivo.pdf');
+         return $pdf->download('archivo.pdf');
+        // return $pdf->stream('archivo.pdf');
     }
     protected function pdfexpejecucion(Request $request)
     {
