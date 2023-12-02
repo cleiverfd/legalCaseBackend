@@ -191,7 +191,8 @@ class ReportController extends Controller
         });
 
         $pdf = PDF::loadView('pdfExpedienteTramite', ['data' => $data]);
-        return $pdf->download('archivo.pdf');
+        // return $pdf->download('archivo.pdf');
+        return $pdf->stream('archivo.pdf');
     }
     protected function pdfexpejecucion(Request $request)
     {

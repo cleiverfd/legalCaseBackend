@@ -128,7 +128,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::prefix('reportes')->group(function () {
         Route::post('/inicio', 'App\Http\Controllers\ReportController@inicio')->name('reportes.inicio');
         Route::post('/exprecientes', 'App\Http\Controllers\ReportController@exprecientes')->name('reportes.exprecientes');
-      
+        Route::post('/exptramite', 'App\Http\Controllers\pdfsController@expedientestramite')->name('reportes.3exprecientes');
     });
 
     // Audiencias
