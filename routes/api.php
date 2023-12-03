@@ -187,4 +187,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/destroy', 'App\Http\Controllers\ClaimController@eliminar')->name('claim.eliminar');
     
     });
+    Route::prefix('mail')->group(function(){
+        Route::post('/', 'App\Http\Controllers\MailController@mail')->name('mail.mail');
+    });
 });

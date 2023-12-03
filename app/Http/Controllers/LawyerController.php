@@ -258,7 +258,6 @@ class LawyerController extends Controller
             foreach ($expedientes as $expediente) {
                 $audiencias = $expediente->audiencias()
                     ->whereDate('au_fecha', '>=', $today)
-                    ->whereNull('au_link')
                     ->get();
 
                 foreach ($audiencias as $audiencia) {
