@@ -26,7 +26,7 @@ class MailController extends Controller
                 $alertasAbogado = $expediente->alertas()
                     ->whereDate('ale_fecha_vencimiento', '>=', $today)
                     ->get();
-
+                $i=1;
                 foreach ($alertasAbogado as $alerta) {
                     $fechaVencimiento = Carbon::parse($alerta->ale_fecha_vencimiento);
                     $diasFaltantes = $fechaVencimiento->startOfDay()->diffInDays($today);
@@ -44,10 +44,10 @@ class MailController extends Controller
                         
                         $destino = $expediente->abogado->persona->nat_correo;
                         $correo = new envio($nombre, $asunto, $descripcion1,$descripcion2,$descripcion3);
-                        $correo->subject('Recordatorio de Alerta-Legal Case UNPRG');
+                        $correo->subject('Recordatorio de Alerta-Legal Case UNPRG-'.$i);
                         Mail::to($destino)->send($correo);                    
                     }
-                    
+                  $i++;  
                 }
             }
             //audiencias
@@ -55,12 +55,14 @@ class MailController extends Controller
                 $audiencias = $expediente->audiencias()
                     ->whereDate('au_fecha', '>=', $today)
                     ->get();
-
+                    $i=1;
                 foreach ($audiencias as $audiencia) {
+                   
                     $fechaAudiencia = Carbon::parse($audiencia->au_fecha);
                     $diasFaltantes = $fechaAudiencia->startOfDay()->diffInDays($today);
                     $porcentaje = round($diasFaltantes / $audiencia->au_dias_faltantes, 2);
                         if($diasFaltantes<=7){
+                            
                             $nombre = ucwords(strtolower(
                                 $expediente->abogado->persona->nat_apellido_paterno . ' ' .
                                 $expediente->abogado->persona->nat_apellido_materno . ' ' .
@@ -74,9 +76,10 @@ class MailController extends Controller
                              a horas:'.$audiencia->au_hora;
                             $destino = $expediente->abogado->persona->nat_correo;
                             $correo = new envio($nombre, $asunto, $descripcion1,$descripcion2,$descripcion3);
-                            $correo->subject('Recordatorio de Audiencia-Legal Case UNPRG');
+                            $correo->subject('Recordatorio de Audiencia-Legal Case UNPRG-'.$i);
                             Mail::to($destino)->send($correo);                    
                         }
+                $i++;
                 }
             }
 
