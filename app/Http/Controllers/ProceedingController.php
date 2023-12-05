@@ -161,9 +161,26 @@ class ProceedingController extends Controller
                 'exp_instancia' => strtoupper(trim($request->exp['exp_instancia'])),
                 'exp_especialidad' => trim($request->exp['exp_especialidad']),
                 'exp_monto_pretencion' => trim($request->exp['exp_monto_pretencion']),
-                'exp_estado_proceso' => 'EN TRAMITE',
+                'exp_estado_proceso' =>trim($request->exp['exp_estado_proceso']),
                 'exp_juzgado' => strtoupper(trim($request->exp['exp_juzgado'])),
+                'exp_procesal_condicion' => strtoupper(trim($request->condicion)),
             ]);
+            // actualizar o crear costos
+            if (
+                $request->exp['exp_estado_proceso'] == 'EN EJECUCION' ||
+                $request->exp['exp_estado_proceso'] == 'ARCHIVADO'
+            ) {
+                $costo = \App\Models\ExecutionAmount::updateOrCreate(
+                    ['exp_id' => strtoupper(trim($exp->exp_id))],
+                    [
+                        'ex_ejecucion_1' => $request->exp['exp_monto_ejecucion1'] != '' ? strtoupper(trim($request->exp['exp_monto_ejecucion1'])) : null,
+                        'ex_ejecucion_2' => $request->exp['exp_monto_ejecucion2'] != '' ? strtoupper(trim($request->exp['exp_monto_ejecucion2'])) : null,
+                        'ex_interes_1'   => $request->exp['exp_interes1'] != '' ? strtoupper(trim($request->exp['exp_interes1'])) : null,
+                        'ex_interes_2'   => $request->exp['exp_interes2'] != '' ? strtoupper(trim($request->exp['exp_interes2'])) : null,
+                        'ex_costos'      => $request->exp['exp_costos'] != '' ? strtoupper(trim($request->exp['exp_costos'])) : null,
+                    ]
+                );
+            }
             // Inicializar variables
             $persona = null;
             $direccion = null;
