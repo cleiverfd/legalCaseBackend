@@ -112,6 +112,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::prefix('reportes')->group(function () {
         Route::post('/inicio', 'App\Http\Controllers\ReportController@inicio')->name('reportes.inicio');
         Route::post('/exprecientes', 'App\Http\Controllers\ReportController@exprecientes')->name('reportes.exprecientes');
+        Route::post('/distritos', 'App\Http\Controllers\ReportController@distritos')->name('reportes.distritos');
      });
      // Generacion de Reportes  pdf
     Route::prefix('reportespfd')->group(function () {
@@ -127,6 +128,7 @@ Route::middleware(['auth:api'])->group(function () {
             Route::get('/pdfejecuciones', 'App\Http\Controllers\ReportController@pdfejecuciones')->name('reportes.pdfejecuciones'); 
             Route::get('/pdfpretension', 'App\Http\Controllers\ReportController@pdfpretension')->name('reportes.pdfpretension'); 
             Route::get('/pdffechas', 'App\Http\Controllers\ReportController@pdffechas')->name('reportes.pdffechas'); 
+            Route::get('/pdfdistrito', 'App\Http\Controllers\ReportController@pdfdistrito')->name('reportes.pdfdistrito'); 
         });
 
     // Audiencias
@@ -137,6 +139,8 @@ Route::middleware(['auth:api'])->group(function () {
     //guardar archivos
     Route::prefix('cargar')->group(function () {
         Route::post('/archivo', 'App\Http\Controllers\ArchivosController@pdfprincipal')->name('cargar.pdfprincipal');
+        Route::post('/archivo/eje', 'App\Http\Controllers\ArchivosController@eje')->name('cargar.eje');
+    
     });
     //llevar excel a la Bd
     Route::prefix('excel')->group(function () {

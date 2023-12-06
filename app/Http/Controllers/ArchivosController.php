@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Uuid;
 class ArchivosController extends Controller
@@ -32,5 +33,19 @@ class ArchivosController extends Controller
     public function traerpdfprincipal(Request $request) {
         $rutaArchivo = storage_path('app/'.$request->nombre);
         return response()->download($rutaArchivo);
+    }
+    public function eje(Request $request) {
+        Storage::delete($request->name);
+        $file = $request->file('file');
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $filePath = $file->storeAs('public/files/ejes', $fileName);
+        $document = \App\Models\LegalDocument::where('exp_id',$request->exp_id)
+        ->where('doc_tipo','EJE')->first();
+        $document->doc_nombre =$file->getClientOriginalName();
+        $document->doc_desciprcion =$request->descripcion;
+        $document->doc_ruta_archivo = 'public/files/ejes/' . $fileName ;
+        $document->exp_id = $request->exp_id;
+       $document->save();
+        return response()->json(['message' => 'Archivo cargado con éxito', 'file' => $fileName]);
     }
 }
