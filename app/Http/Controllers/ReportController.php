@@ -110,12 +110,19 @@ class ReportController extends Controller
             ->get();
             
             $districts = $proceedings->pluck('person.address.district')->unique('dis_id')->map(function ($district) {
-                return [
-                    'id_distrito' => $district['dis_id'],'nombre' => $district['dis_nombre'],'id_provincia' => $district['province']['pro_id'],
-                    'provincia' => ['id' => $district['province']['pro_id'],
-                        'nombre' => $district['province']['pro_nombre'],],
-                ];
-            })->values();
+                if (isset($district['dis_id']) && isset($district['dis_nombre']) && isset($district['province']['pro_id']) && isset($district['province']['pro_nombre'])) {
+                    return [
+                        'id_distrito' => $district['dis_id'],
+                        'nombre' => $district['dis_nombre'],
+                        'id_provincia' => $district['province']['pro_id'],
+                        'provincia' => [
+                            'id' => $district['province']['pro_id'],
+                            'nombre' => $district['province']['pro_nombre'],
+                        ],
+                    ];
+                }
+            })->filter()->values();
+            
             $provinces = $districts->pluck('provincia')->unique('id')->values();
             return response()->json([
                 'distritos' => $districts,
