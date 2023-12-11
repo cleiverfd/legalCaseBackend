@@ -21,7 +21,7 @@ class AudienceController extends Controller
 
     protected function index()
     {
-        $audiencias = Audience::with('exp', 'person.persona', 'person.juridica')->get();
+        $audiencias = Audience::with('exp')->get();
 
         $result = $audiencias->map(function ($audiencia) {
             $tipoPersona = $this->getTipoPersona($audiencia->person);

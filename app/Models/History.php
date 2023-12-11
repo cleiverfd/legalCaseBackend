@@ -13,9 +13,10 @@ class History extends Model
         'his_fecha_hora',
         'his_medio_comuniacion',
         'his_detalle',
-        'per_id',
         'exp_id',
-        'abo_id'
+        'procesal_natural_id',
+        'procesal_juridic_id',
+
     ];
     protected $dates = ['deleted_at'];
 
@@ -24,8 +25,12 @@ class History extends Model
         return $this->belongsTo(Proceeding::class, 'exp_id');
     }
 
-    public function person()
+    public function persona()
     {
-        return $this->belongsTo(Person::class, 'per_id');
+        return $this->belongsTo(ProcesalNatural::class, 'procesal_natural_id');
+    }
+    public function empresa()
+    {
+        return $this->belongsTo(PeopleJuridic::class, 'procesal_juridic_id');
     }
 }
