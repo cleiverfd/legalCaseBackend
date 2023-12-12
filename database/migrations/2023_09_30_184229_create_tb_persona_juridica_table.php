@@ -18,6 +18,19 @@ return new class extends Migration
             $table->string('jur_telefono', 255)->nullable();
             $table->string('jur_correo', 255)->nullable();
             $table->string('jur_rep_legal', 255)->nullable()->comment('representante legal');
+            $table->string('tipo_procesal', 55)->nullable();
+            $table->string('condicion_procesal', 55)->nullable();
+            $table->unsignedBigInteger('exp_id')->nullable();
+            $table->unsignedBigInteger('dir_id')->nullable();
+            $table->foreign('exp_id')
+                ->references('exp_id')
+                ->on('proceedings')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreign('dir_id')
+                ->references('dir_id')
+                ->on('addresses')
+                ->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
         });

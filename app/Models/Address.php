@@ -14,7 +14,6 @@ class Address extends Model
         'dis_id',
         'pro_id',
         'dep_id',
-        'per_id',
     ];
     protected $dates = ['deleted_at'];
     public function district()

@@ -22,12 +22,10 @@ return new class extends Migration
             $table->unsignedBigInteger('exp_especialidad')->nullable();
             $table->decimal('exp_monto_pretencion', 20, 2)->nullable();
             $table->string('exp_estado_proceso', 255)->nullable();
-            $table->string('exp_procesal_condicion', 255)->nullable();
-            $table->unsignedBigInteger('exp_demandante')->nullable()->comment('parte_procesal_demandante');
-            $table->unsignedBigInteger('exp_demandado')->nullable()->comment('parte_procesal_demandado');
+            $table->unsignedBigInteger('exp_demandante')->nullable()->comment('parte_procesal_demandantes');
+            $table->unsignedBigInteger('exp_demandado')->nullable()->comment('parte_procesal_demandados');
             $table->unsignedBigInteger('exp_juzgado')->nullable();
             $table->unsignedBigInteger('abo_id')->nullable();
-
             $table->foreign('exp_juzgado')
                 ->references('co_id')
                 ->on('courts')
@@ -58,22 +56,11 @@ return new class extends Migration
                 ->on('specialties')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
-            $table->foreign('exp_demandante')
-                ->references('per_id')
-                ->on('persons')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->foreign('exp_demandado')
-                ->references('per_id')
-                ->on('persons')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
             $table->foreign('abo_id')
                 ->references('abo_id')
                 ->on('lawyers')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
-
             $table->timestamps();
             $table->softDeletes();
         });

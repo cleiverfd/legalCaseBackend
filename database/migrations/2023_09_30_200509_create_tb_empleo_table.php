@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id('emp_id');
             $table->string('emp_profesion_ocupacion', 255)->nullable();
             $table->string('emp_centro_trabajo', 255)->nullable();
-            $table->unsignedBigInteger('nat_id')->nullable();
-            $table->foreign('nat_id')
-                ->references('nat_id')
-                ->on('people_naturals')
+            $table->unsignedBigInteger('proc_id')->nullable();
+            $table->foreign('proc_id')
+                ->references('proc_id')
+                ->on('procesal_naturals')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->timestamps();

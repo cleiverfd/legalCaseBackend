@@ -24,10 +24,18 @@ class Proceeding extends Model
         'exp_demandado',
         'exp_juzgado',
         'abo_id',
-        'exp_procesal_condicion'
     ];
 
     protected $dates = ['deleted_at'];
+    public function naturales()
+    {
+        return $this->hasMany(ProcesalNatural::class, 'exp_id', 'exp_id');
+    }
+    public function juridicas()
+    {
+        return $this->hasMany(PeopleJuridic::class, 'exp_id', 'exp_id');
+    }
+    
     public function person()
     {
         return $this->belongsTo(Person::class, 'exp_demandante', 'per_id');
@@ -75,10 +83,6 @@ class Proceeding extends Model
     {
         return $this->hasMany(Audience::class, 'au_id');
     }
-    // public function alertas()
-    // {
-    //     return $this->hasMany(Alert::class, 'ale_id');
-    // }
     public function alertas()
     {
         return $this->hasMany(Alert::class, 'exp_id', 'exp_id');

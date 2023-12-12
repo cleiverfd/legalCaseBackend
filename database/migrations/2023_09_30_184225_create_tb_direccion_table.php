@@ -17,7 +17,6 @@ return new class extends Migration
             $table->unsignedBigInteger('dis_id')->nullable();
             $table->unsignedBigInteger('pro_id')->nullable();
             $table->unsignedBigInteger('dep_id')->nullable();
-            $table->unsignedBigInteger('per_id')->nullable();
 
             $table->foreign('dis_id')
                 ->references('dis_id')
@@ -33,12 +32,6 @@ return new class extends Migration
                 ->references('dep_id')
                 ->on('departments')
                 ->onDelete('cascade');
-           
-            $table->foreign('per_id')
-                ->references('per_id')
-                ->on('persons')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
 
             $table->timestamps();
             $table->softDeletes();
