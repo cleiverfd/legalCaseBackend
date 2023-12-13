@@ -22,7 +22,7 @@ class PretensionSeeder extends Seeder
             ['pre_id' => '03', 'pre_nombre' => 'Beneficios sociales'],
             ['pre_id' => '04', 'pre_nombre' => 'Bonificación por 25 y 30 años'],
             ['pre_id' => '05', 'pre_nombre' => 'CAFAE'],
-            ['pre_id' => '06', 'pre_nombre' => 'Fonavi – 10%'],
+            ['pre_id' => '06', 'pre_nombre' => 'FONAVI – 10%'],
             ['pre_id' => '07', 'pre_nombre' => 'Homologación'],
             ['pre_id' => '08', 'pre_nombre' => 'Impugnación de sanción administrativa'],
             ['pre_id' => '09', 'pre_nombre' => 'Impugnación de sanción docente'],
