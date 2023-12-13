@@ -16,11 +16,11 @@ class ExpedientesSeeder extends Seeder
     public function run()
     {
         // \App\Models\User::factory(10)->create();
-        \App\Models\PeopleNatural::factory()->count(1000)->create();
-        \App\Models\Person::factory()->count(1000)->create();
-        \App\Models\Proceeding::factory()->count(1000)->create();
-        \App\Models\Address::factory()->count(1000)->create();
-        \App\Models\Alert::factory()->count(250)->create();
-        \App\Models\Audience::factory()->count(250)->create();
+        \App\Models\PeopleNatural::factory()->count(50)->create();
+        \App\Models\Person::factory()->count(50)->create();
+        \App\Models\Proceeding::factory()->count(50)->create();
+        \App\Models\Address::factory()->count(50)->create();
+        \App\Models\Alert::factory()->count(25)->create();
+        \App\Models\Audience::factory()->count(25)->create();
     }
 }
