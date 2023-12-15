@@ -22,8 +22,7 @@ return new class extends Migration
             $table->unsignedBigInteger('exp_especialidad')->nullable();
             $table->decimal('exp_monto_pretencion', 20, 2)->nullable();
             $table->string('exp_estado_proceso', 255)->nullable();
-            $table->unsignedBigInteger('exp_demandante')->nullable()->comment('parte_procesal_demandantes');
-            $table->unsignedBigInteger('exp_demandado')->nullable()->comment('parte_procesal_demandados');
+            $table->unsignedBigInteger('multiple')->nullable()->comment('parte_procesal_demandantes');
             $table->unsignedBigInteger('exp_juzgado')->nullable();
             $table->unsignedBigInteger('abo_id')->nullable();
             $table->foreign('exp_juzgado')

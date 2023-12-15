@@ -151,7 +151,8 @@ class ProceedingController extends Controller
     {
         try {
             DB::beginTransaction();
-
+            $exp_demandante = $request->multiple == "0" ? 0 : 1;
+            $exp_demandado = $request->multiple == "0" ? 0 : 1;
             $exp = \App\Models\Proceeding::create([
                 'exp_numero' => strtoupper(trim($request->exp['exp_numero'])),
                 'exp_fecha_inicio' => $request->exp['exp_fecha_inicio'],
@@ -163,10 +164,12 @@ class ProceedingController extends Controller
                 'exp_monto_pretencion' => trim($request->exp['exp_monto_pretencion']),
                 'exp_estado_proceso' =>trim($request->exp['exp_estado_proceso']),
                 'exp_juzgado' => strtoupper(trim($request->exp['exp_juzgado'])),
-                'exp_procesal_condicion' => strtoupper(trim($request->condicion)),
+                'exp_demandante' => $exp_demandante,
+                'exp_demandado' => $exp_demandado,
+                'abo_id' =>$request->abo_id
             ]);
             // actualizar o crear costos
-            if (
+           if (
                 $request->exp['exp_estado_proceso'] == 'EN EJECUCION' ||
                 $request->exp['exp_estado_proceso'] == 'ARCHIVADO'
             ) {
@@ -181,27 +184,29 @@ class ProceedingController extends Controller
                     ]
                 );
             }
-            // Inicializar variables
-            $persona = null;
+            //verificar si es multiple  o no 
+     if ($request->multiple=="0") {
             $direccion = null;
-            $per = null;
-
-            // Verificar si la persona ya existe
+            $direccion = \App\Models\Address::Create([
+                    'dir_calle_av'=> trim($request->dir['dir_calle_av']),
+                    'dis_id' => trim($request->dir['dis_id']),
+                    'pro_id' => trim($request->dir['pro_id']),
+                    'dep_id' => trim($request->dir['dep_id']),
+            ]
+            );
             if ($request->tipopersona == 'NATURAL') {
-                $persona = \App\Models\PeopleNatural::updateOrCreate(
+                $persona = \App\Models\ProcesalNatural::updateOrCreate(
                     ['nat_dni' => strtoupper(trim($request->pn['nat_dni']))],
                     [
                         'nat_apellido_paterno' => strtoupper(trim($request->pn['nat_apellido_paterno'])),
                         'nat_apellido_materno' => strtoupper(trim($request->pn['nat_apellido_materno'])),
                         'nat_nombres' => strtoupper(trim($request->pn['nat_nombres'])),
                         'nat_telefono' => strtoupper(trim($request->pn['nat_telefono'])),
-                        'nat_correo' => trim($request->pn['nat_correo'])
+                        'nat_correo' => trim($request->pn['nat_correo']),
+                        'dir_id'=>$direccion->dir_id,
+                        'exp_id'=>$exp->exp_id,
+                        'condicion_procesal'=>$request->procesal
                     ]
-                );
-
-                $per = \App\Models\Person::updateOrCreate(
-                    ['nat_id' => $persona->nat_id],
-                    []
                 );
             } else {
                 $persona = \App\Models\PeopleJuridic::updateOrCreate(
@@ -211,48 +216,66 @@ class ProceedingController extends Controller
                         'jur_telefono' => strtoupper(trim($request->pj['jur_telefono'])),
                         'jur_correo' => trim($request->pj['jur_correo']),
                         'jur_rep_legal' => strtoupper(trim($request->pj['jur_rep_legal'])),
+                        'dir_id'=>$direccion->dir_id,
+                        'exp_id'=>$exp->exp_id,
+                        'condicion_procesal'=>$request->procesal
                     ]
                 );
 
-                $per = \App\Models\Person::updateOrCreate(
-                    ['jur_id' => $persona->jur_id],
-                    []
-                );
+                
             }
-            // Obtener el ID de la persona
-            $perId = $per->per_id;
-
-            // Insertar o actualizar dirección
-            $direccion = \App\Models\Address::updateOrCreate(
-                ['per_id' => $perId],
-                [
-                    'dir_calle_av' => trim($request->dir['dir_calle_av']),
-                    'dis_id' => trim($request->dir['dis_id']),
-                    'pro_id' => trim($request->dir['pro_id']),
-                    'dep_id' => trim($request->dir['dep_id']),
-                ]
-            );
-
-            /*Actulizar el expediente  asignando laersona y el abogado*/
-            $EX = \App\Models\Proceeding::find($exp->exp_id);
-            if ($request->procesal == 'DEMANDANTE') {
-                $EX->exp_demandante = strtoupper(trim($perId));
-                $EX->exp_demandado = null;
-            } else {
-                $EX->exp_demandante = null;
-                $EX->exp_demandado = strtoupper(trim($perId));
-            }
-            $EX->abo_id = $request->abo_id;
-            $EX->save();
-
             /*ACTULIZAR ESTADO DE ABOGADO */
-            $abogado = \App\Models\Lawyer::find($request->abo_id);
-            $abogado->abo_disponibilidad = 'OCUPADO';
-            $abogado->abo_carga_laboral = $abogado->abo_carga_laboral + 1;
-            $abogado->save();
-            DB::commit();
+        
+        }
+        else{
+            $personas = $request->Personas;
 
-            return \response()->json(['state' => 0, 'data' => $EX, 'dir' => $request->dir], 200);
+            foreach ($personas as $persona) {
+                // Crear dirección para cada persona
+                $direccion = \App\Models\Address::create([
+                    'dir_calle_av' => trim($persona['dir_calle_av']),
+                    'dis_id' => trim($persona['dis_id']),
+                    'pro_id' => trim($persona['pro_id']),
+                    'dep_id' => trim($persona['dep_id']),
+                ]);
+
+                if ($persona['tipo'] == 'NATURAL') {
+                    // Crear registro para persona natural
+                    \App\Models\ProcesalNatural::updateOrcreate(
+                        ['nat_dni' => strtoupper(trim($persona['nat_dni']))],
+                        [
+                        'nat_apellido_paterno' => strtoupper(trim($persona['nat_apellido_paterno'])),
+                        'nat_apellido_materno' => strtoupper(trim($persona['nat_apellido_materno'])),
+                        'nat_nombres' => strtoupper(trim($persona['nat_nombres'])),
+                        'nat_telefono' => strtoupper(trim($persona['nat_telefono'])),
+                        'nat_correo' => trim($persona['nat_correo']),
+                        'dir_id' => $direccion->dir_id,
+                        'exp_id' => $exp->exp_id,
+                        'condicion_procesal' => $persona['procesal'],
+                    ]);
+                } else {
+                    $per = \App\Models\PeopleJuridic::updateOrCreate(
+                        ['jur_ruc' => strtoupper(trim($persona['jur_ruc']))],
+                        [
+                            'jur_razon_social' => strtoupper(trim($persona['jur_razon_social'])),
+                            'jur_telefono' => strtoupper(trim($persona['jur_telefono'])),
+                            'jur_correo' => trim($persona['jur_correo']),
+                            'jur_rep_legal' => strtoupper(trim($persona['jur_rep_legal'])),
+                            'dir_id'=>$direccion->dir_id,
+                            'exp_id'=>$exp->exp_id,
+                            'condicion_procesal'=>$persona['procesal'],
+                        ]
+                    );
+                   
+                }
+            }
+        }
+        $abogado = \App\Models\Lawyer::find($request->abo_id);
+        $abogado->abo_disponibilidad = 'OCUPADO';
+        $abogado->abo_carga_laboral = $abogado->abo_carga_laboral + 1;
+        $abogado->save();
+        DB::commit();
+          return \response()->json(['state' => 0, 'data' => $exp], 200);
         } catch (Exception $e) {
             DB::rollback();
             return  \response()->json(['state' => '1', 'exception' => (string) $e]);
