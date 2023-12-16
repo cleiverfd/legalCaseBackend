@@ -5,9 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-class ProcesalNatural extends Model
+class Procesal extends Model
 {
     use HasFactory,SoftDeletes;
+    protected $table = 'procesals';
     protected $primaryKey = 'proc_id';
     protected $fillable = [
         'jur_ruc',
