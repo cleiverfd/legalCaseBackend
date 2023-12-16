@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('proc_id')->nullable();
             $table->foreign('proc_id')
                 ->references('proc_id')
-                ->on('procesal_naturals')
+                ->on('procesals')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->timestamps();

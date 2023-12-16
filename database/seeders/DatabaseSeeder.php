@@ -25,6 +25,6 @@ class DatabaseSeeder extends Seeder
         $this->call(PretensionSeeder::class);
         $this->call(MateriaSeeder::class);
         $this->call(JuzgadoSeeder::class);
-        $this->call(ExpedientesSeeder::class);
+        // $this->call(ExpedientesSeeder::class);
     }
 }

@@ -16,19 +16,14 @@ return new class extends Migration
             $table->string('his_fecha_hora', 255)->nullable();
             $table->string('his_medio_comuniacion', 255)->nullable();
             $table->text('his_detalle')->nullable();
-            $table->unsignedBigInteger('procesal_natural_id')->nullable();
-            $table->unsignedBigInteger('procesal_juridic_id')->nullable();
+            $table->unsignedBigInteger('proc_id')->nullable();
             $table->unsignedBigInteger('exp_id')->nullable();
-            $table->foreign('procesal_natural_id')
+            $table->foreign('proc_id')
                 ->references('proc_id')
-                ->on('procesal_naturals')
+                ->on('procesals')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
-            $table->foreign('procesal_juridic_id')
-                ->references('jur_id')
-                ->on('people_juridics')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
+           
             $table->foreign('exp_id')
                 ->references('exp_id')
                 ->on('proceedings')
