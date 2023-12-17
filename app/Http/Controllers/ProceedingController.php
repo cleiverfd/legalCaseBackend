@@ -162,11 +162,13 @@ class ProceedingController extends Controller
             }
 
             $procesal=null;
-            $procesal= \App\Models\Procesal::updateOrCreate(
-                ['per_id' =>$persona->per_id],
+            $procesal= \App\Models\Procesal::Create(
+                
                 [
                     'tipo_procesal'=> trim($request->procesal),
                     'tipo_persona' => trim($request->tipopersona),
+                    'per_id' =>$persona->per_id,
+                    'exp_id'=>$exp->exp_id,
                 ]
             );
             $direccion = null;
@@ -212,16 +214,17 @@ class ProceedingController extends Controller
                         ); 
                 }
                 $procesal=null;
-                $procesal= \App\Models\Procesal::updateOrCreate(
-                    ['per_id' =>$person->per_id],
+                $procesal= \App\Models\Procesal::Create(
                     [
                         'tipo_procesal'=> $persona['procesal'],
-                        'tipo_persona' => $persona['tipo']
+                        'tipo_persona' => $persona['tipo'],
+                        'per_id' =>$persona->per_id,
+                        'exp_id'=>$exp->exp_id,
                     ]
                 );
                 $direccion = null;
                 $direccion = \App\Models\Address::updateOrCreate(
-                    ['proc_id' =>$person->proc_id],
+                    ['proc_id' =>$procesal->proc_id],
                     [
                         'dir_calle_av'=> trim($persona['dir_calle_av']),
                         'dis_id' => trim($persona['dis_id']),
@@ -450,68 +453,64 @@ class ProceedingController extends Controller
     protected function take()
     {
         $proceedings = \App\Models\Proceeding::latest('created_at')
-            ->with('person.juridica', 'person.persona', 'pretension', 'materia')
+            ->with('procesal.persona', 'pretension', 'materia')
             ->take(5)
             ->get();
 
-        $data = $proceedings->map(function ($proceeding) {
-            $procesal = null;
-            $tipo_persona = null;
-            if ($proceeding) {
-                if ($proceeding->exp_demandante !== null) {
-                    $person = $proceeding->demandante;
-                    $procesal = 'demandante';
-                } elseif ($proceeding->exp_demandado !== null) {
-                    $person = $proceeding->demandado;
-                    $procesal = 'demandado';
-                }
-            }
-            $fecha_inicio = $proceeding->exp_fecha_inicio;
-            $fecha_formateada = date('d-m-Y', strtotime($fecha_inicio));
-            $commonData = [
-                'exp_id' => $proceeding->exp_id,
-                'numero' => $proceeding->exp_numero,
-                'fecha_inicio' => $fecha_formateada,
-                'pretencion' => $proceeding->pretension->pre_nombre,
-                'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
-                'monto_pretencion' => $proceeding->exp_monto_pretencion,
-                'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
-                'procesal' => $procesal
-            ];
-            if ($person) {
-                if ($person->nat_id !== null) {
-                    $personData = $person->persona;
-                    $tipo_persona = 'natural';
-                } elseif ($person->jur_id !== null) {
-                    $personData = $person->juridica;
-                    $tipo_persona = 'juridica';
-                }
-            }
+        // $data = $proceedings->map(function ($proceeding) {
+        //     $tipo_persona = null;
+        //     if ($proceeding) {
+            
+        //             $person = $proceeding->demandante;
+        //             $procesal = 'demandante';
+            
+        //     }
+        //     $fecha_inicio = $proceeding->exp_fecha_inicio;
+        //     $fecha_formateada = date('d-m-Y', strtotime($fecha_inicio));
+        //     $commonData = [
+        //         'exp_id' => $proceeding->exp_id,
+        //         'numero' => $proceeding->exp_numero,
+        //         'fecha_inicio' => $fecha_formateada,
+        //         'pretencion' => $proceeding->pretension->pre_nombre,
+        //         'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
+        //         'monto_pretencion' => $proceeding->exp_monto_pretencion,
+        //         'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
+        //         'procesal' => $procesal
+        //     ];
+        //     if ($person) {
+        //         if ($person->nat_id !== null) {
+        //             $personData = $person->persona;
+        //             $tipo_persona = 'natural';
+        //         } elseif ($person->jur_id !== null) {
+        //             $personData = $person->juridica;
+        //             $tipo_persona = 'juridica';
+        //         }
+        //     }
 
-            if ($tipo_persona === 'natural') {
-                $personDataArray = [
-                    'dni' => $personData->nat_dni,
-                    'apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
-                    'apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
-                    'nombres' => ucwords(strtolower($personData->nat_nombres)),
-                    'telefono' => $personData->nat_telefono,
-                    'correo' => strtolower($personData->nat_correo),
-                ];
-            } elseif ($tipo_persona === 'juridica') {
-                $personDataArray = [
-                    'ruc' => ucwords(strtolower($personData->jur_ruc)),
-                    'razon_social' => ucwords(strtolower($personData->jur_razon_social)),
-                    'telefono' => $personData->jur_telefono,
-                    'correo' => strtolower($personData->jur_correo),
-                ];
-            } else {
-                $personDataArray = [];
-            }
+        //     if ($tipo_persona === 'natural') {
+        //         $personDataArray = [
+        //             'dni' => $personData->nat_dni,
+        //             'apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
+        //             'apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
+        //             'nombres' => ucwords(strtolower($personData->nat_nombres)),
+        //             'telefono' => $personData->nat_telefono,
+        //             'correo' => strtolower($personData->nat_correo),
+        //         ];
+        //     } elseif ($tipo_persona === 'juridica') {
+        //         $personDataArray = [
+        //             'ruc' => ucwords(strtolower($personData->jur_ruc)),
+        //             'razon_social' => ucwords(strtolower($personData->jur_razon_social)),
+        //             'telefono' => $personData->jur_telefono,
+        //             'correo' => strtolower($personData->jur_correo),
+        //         ];
+        //     } else {
+        //         $personDataArray = [];
+        //     }
 
-            return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
-        });
+        //     return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
+        // });
 
-        return response()->json(['data' => $data], 200);
+        return response()->json(['data' => $proceedings], 200);
     }
  
 }

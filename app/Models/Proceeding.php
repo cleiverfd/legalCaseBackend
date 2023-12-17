@@ -28,10 +28,10 @@ class Proceeding extends Model
     ];
 
     protected $dates = ['deleted_at'];
-    // public function procesales()
-    // {
-    //     return $this->hasMany(Procesal::class, 'exp_id', 'exp_id');
-    // }
+    public function procesal()
+    {
+    return $this->hasMany(Procesal::class, 'exp_id', 'exp_id');
+    }
     public function pretension()
     {
         return $this->belongsTo(Claim::class, 'exp_pretencion', 'pre_id');
