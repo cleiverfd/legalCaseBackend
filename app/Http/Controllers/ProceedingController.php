@@ -218,7 +218,7 @@ class ProceedingController extends Controller
                     [
                         'tipo_procesal'=> $persona['procesal'],
                         'tipo_persona' => $persona['tipo'],
-                        'per_id' =>$persona->per_id,
+                        'per_id' =>$person->per_id,
                         'exp_id'=>$exp->exp_id,
                     ]
                 );
