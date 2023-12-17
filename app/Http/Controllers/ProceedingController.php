@@ -132,11 +132,10 @@ class ProceedingController extends Controller
                     ]
                 );
             }
-            //verificar si es multiple  o no 
         $persona=null;
      if ($request->multiple=="0") {
             if ($request->tipopersona == 'NATURAL') {
-                $persona = \App\Models\Procesal::updateOrCreate(
+                $persona = \App\Models\Person::updateOrCreate(
                     ['nat_dni' => strtoupper(trim($request->pn['nat_dni']))],
                     [
                         'nat_apellido_paterno' => strtoupper(trim($request->pn['nat_apellido_paterno'])),
@@ -144,13 +143,12 @@ class ProceedingController extends Controller
                         'nat_nombres' => strtoupper(trim($request->pn['nat_nombres'])),
                         'nat_telefono' => strtoupper(trim($request->pn['nat_telefono'])),
                         'nat_correo' => trim($request->pn['nat_correo']),
-                        'exp_id'=>$exp->exp_id,
                         'tipo_procesal'=>$request->procesal,
                         'condicion_procesal'=>$request->condicion
                     ]
                 );
             } else {
-                $persona = \App\Models\Procesal::updateOrCreate(
+                $persona = \App\Models\Person::updateOrCreate(
                     ['jur_ruc' => strtoupper(trim($request->pj['jur_ruc']))],
                     [
                         'jur_razon_social' => strtoupper(trim($request->pj['jur_razon_social'])),
@@ -162,9 +160,18 @@ class ProceedingController extends Controller
                     ]
                 ); 
             }
+
+            $procesal=null;
+            $procesal= \App\Models\Procesal::updateOrCreate(
+                ['per_id' =>$persona->per_id],
+                [
+                    'tipo_procesal'=> trim($request->procesal),
+                    'tipo_persona' => trim($request->tipopersona),
+                ]
+            );
             $direccion = null;
             $direccion = \App\Models\Address::updateOrCreate(
-                ['proc_id' =>$persona->proc_id],
+                ['proc_id' =>$procesal->proc_id],
                 [
                     'dir_calle_av'=> trim($request->dir['dir_calle_av']),
                     'dis_id' => trim($request->dir['dis_id']),
@@ -180,7 +187,7 @@ class ProceedingController extends Controller
                 $person=null;
                 if ($persona['tipo'] == 'NATURAL') {
                     // Crear registro para persona natural
-                    $person=\App\Models\Procesal::updateOrcreate(
+                    $person=\App\Models\Person::updateOrcreate(
                         ['nat_dni' => strtoupper(trim($persona['nat_dni']))],
                         [
                         'nat_apellido_paterno' => strtoupper(trim($persona['nat_apellido_paterno'])),
@@ -188,24 +195,30 @@ class ProceedingController extends Controller
                         'nat_nombres' => strtoupper(trim($persona['nat_nombres'])),
                         'nat_telefono' => strtoupper(trim($persona['nat_telefono'])),
                         'nat_correo' => trim($persona['nat_correo']),
-                        'exp_id' => $exp->exp_id,
                         'condicion_procesal' => $persona['condicion'],
                         'tipo_procesal'=>$persona['procesal']
                     ]);
                 } else {
-                    $person= \App\Models\Procesal::updateOrCreate(
+                    $person= \App\Models\Person::updateOrCreate(
                         ['jur_ruc' => strtoupper(trim($persona['jur_ruc']))],
                         [
                             'jur_razon_social' => strtoupper(trim($persona['jur_razon_social'])),
                             'jur_telefono' => strtoupper(trim($persona['jur_telefono'])),
                             'jur_correo' => trim($persona['jur_correo']),
                             'jur_rep_legal' => strtoupper(trim($persona['jur_rep_legal'])),
-                            'exp_id' => $exp->exp_id,
                             'condicion_procesal' => $persona['condicion'],
                             'tipo_procesal'=>$persona['procesal']
                         ]
                         ); 
                 }
+                $procesal=null;
+                $procesal= \App\Models\Procesal::updateOrCreate(
+                    ['per_id' =>$person->per_id],
+                    [
+                        'tipo_procesal'=> $persona['procesal'],
+                        'tipo_persona' => $persona['tipo']
+                    ]
+                );
                 $direccion = null;
                 $direccion = \App\Models\Address::updateOrCreate(
                     ['proc_id' =>$person->proc_id],
