@@ -144,7 +144,7 @@ class ProceedingController extends Controller
                         'nat_telefono' => strtoupper(trim($request->pn['nat_telefono'])),
                         'nat_correo' => trim($request->pn['nat_correo']),
                         'tipo_procesal'=>$request->procesal,
-                        'condicion_procesal'=>$request->condicion
+                        'per_condicion'=>$request->condicion
                     ]
                 );
             } else {
@@ -156,7 +156,7 @@ class ProceedingController extends Controller
                         'jur_correo' => trim($request->pj['jur_correo']),
                         'jur_rep_legal' => strtoupper(trim($request->pj['jur_rep_legal'])),
                         'tipo_procesal'=>$request->procesal,
-                        'condicion_procesal'=>$request->condicion
+                        'per_condicion'=>$request->condicion
                     ]
                 ); 
             }
@@ -195,7 +195,7 @@ class ProceedingController extends Controller
                         'nat_nombres' => strtoupper(trim($persona['nat_nombres'])),
                         'nat_telefono' => strtoupper(trim($persona['nat_telefono'])),
                         'nat_correo' => trim($persona['nat_correo']),
-                        'condicion_procesal' => $persona['condicion'],
+                        'per_condicion' => $persona['condicion'],
                         'tipo_procesal'=>$persona['procesal']
                     ]);
                 } else {
@@ -206,7 +206,7 @@ class ProceedingController extends Controller
                             'jur_telefono' => strtoupper(trim($persona['jur_telefono'])),
                             'jur_correo' => trim($persona['jur_correo']),
                             'jur_rep_legal' => strtoupper(trim($persona['jur_rep_legal'])),
-                            'condicion_procesal' => $persona['condicion'],
+                            'per_condicion' => $persona['condicion'],
                             'tipo_procesal'=>$persona['procesal']
                         ]
                         ); 
