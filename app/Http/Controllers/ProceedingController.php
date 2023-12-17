@@ -18,66 +18,10 @@ class ProceedingController extends Controller
     {
         $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->whereIn('exp_estado_proceso', ['EN TRAMITE', 'EN EJECUCION'])
-            ->with('person.juridica', 'person.persona', 'pretension', 'materia')
+            ->with('procesales', 'pretension')
             ->get();
-        $data = $proceedings->map(function ($proceeding) {
-            $procesal = null;
-            $tipo_persona = null;
-            if ($proceeding) {
-                if ($proceeding->exp_demandante !== null) {
-                    $person = $proceeding->demandante;
-                    $procesal = 'demandante';
-                } elseif ($proceeding->exp_demandado !== null) {
-                    $person = $proceeding->demandado;
-                    $procesal = 'demandado';
-                }
-            }
-            $fecha_inicio = $proceeding->exp_fecha_inicio;
-            $fecha_formateada = date('d-m-Y', strtotime($fecha_inicio));
-            $commonData = [
-                'exp_id' => $proceeding->exp_id,
-                'numero' => $proceeding->exp_numero,
-                'fecha_inicio' => $fecha_formateada,
-                'pretencion' => $proceeding->pretension->pre_nombre,
-                'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
-                'monto_pretencion' => $proceeding->exp_monto_pretencion,
-                'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
-                'procesal' => $procesal
-            ];
-            if ($person) {
-                if ($person->nat_id !== null) {
-                    $personData = $person->persona;
-                    $tipo_persona = 'natural';
-                } elseif ($person->jur_id !== null) {
-                    $personData = $person->juridica;
-                    $tipo_persona = 'juridica';
-                }
-            }
 
-            if ($tipo_persona === 'natural') {
-                $personDataArray = [
-                    'dni' => $personData->nat_dni,
-                    'apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
-                    'apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
-                    'nombres' => ucwords(strtolower($personData->nat_nombres)),
-                    'telefono' => $personData->nat_telefono,
-                    'correo' => strtolower($personData->nat_correo),
-                ];
-            } elseif ($tipo_persona === 'juridica') {
-                $personDataArray = [
-                    'ruc' => ucwords(strtolower($personData->jur_ruc)),
-                    'razon_social' => ucwords(strtolower($personData->jur_razon_social)),
-                    'telefono' => $personData->jur_telefono,
-                    'correo' => strtolower($personData->jur_correo),
-                ];
-            } else {
-                $personDataArray = [];
-            }
-
-            return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
-        });
-
-        return response()->json(['data' => $data], 200);
+        return response()->json(['data' => $proceedings], 200);
     }
 
     protected function listarestado(Request $request)
@@ -556,61 +500,5 @@ class ProceedingController extends Controller
 
         return response()->json(['data' => $data], 200);
     }
-
-
-    private function getNaturalPersonData($person)
-    {
-        $nat_nombres = $person->persona->nat_nombres;
-        $nombre_array = explode(' ', $nat_nombres);
-
-        $capitalized_names = array_map(function ($name) {
-            return ucwords(strtolower($name));
-        }, $nombre_array);
-
-        return [
-            // 'nat_id' => $person->persona->nat_id,
-            'nat_dni' => $person->persona->nat_dni,
-            'nat_apellido_paterno' => ucwords(strtolower($person->persona->nat_apellido_paterno)),
-            'nat_apellido_materno' => ucwords(strtolower($person->persona->nat_apellido_materno)),
-            'nat_nombres' => implode(' ', $capitalized_names),
-            'nat_telefono' => $person->persona->nat_telefono,
-            'nat_correo' => $person->persona->nat_correo,
-        ];
-    }
-
-    private function getJuridicalPersonData($person)
-    {
-        return [
-            // 'jur_id' => $person->juridica->jur_id,
-            'jur_ruc' => $person->juridica->jur_ruc,
-            'jur_razon_social' => $person->juridica->jur_razon_social,
-            'jur_telefono' => $person->juridica->jur_telefono,
-            'jur_correo' => $person->juridica->jur_correo,
-        ];
-    }
-    private function transformProceedingData($proceeding, $personData, $tipo_persona)
-    {
-        return array_merge(
-            $proceeding->only([
-                'exp_id',
-                'exp_numero',
-                'exp_fecha_inicio',
-                'exp_pretencion',
-                'exp_materia',
-                'exp_especialidad',
-                'exp_monto_pretencion',
-                'exp_estado_proceso',
-                'exp_juzgado',
-            ]),
-            // $proceeding->specialty->instance->judicialdistrict->only(['judis_nombre']),
-            // ['esp_nombre' => $proceeding->specialty->esp_nombre],
-            // ['ins_nombre' => $proceeding->specialty->instance->ins_nombre],
-            ['nombre_materia' => $proceeding->materia->mat_nombre],
-            ['nombre_juzgado' => $proceeding->juzgado->co_nombre],
-            ['tipo_persona' => $tipo_persona],
-            $personData // Aquí agregamos los datos de la persona
-        );
-    }
-
-   
+ 
 }

@@ -5,30 +5,58 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
+
 class Procesal extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
     protected $table = 'procesals';
     protected $primaryKey = 'proc_id';
     protected $fillable = [
-        'jur_ruc',
-        'jur_razon_social',
-        'jur_telefono',
-        'jur_correo',
-        'jur_rep_legal',
-        'nat_dni',
-        'nat_apellido_paterno',
-        'nat_apellido_materno',
-        'nat_nombres',
-        'nat_telefono',
-        'nat_correo',
-        'tipo_procesal',
-        'condicion_procesal',
+        'per_id',
         'exp_id',
+        'tipo_procesal',
+        'tipo_persona'
     ];
     protected $dates = ['deleted_at'];
-    // public function direccion()
-    // {
-    //     return $this->belongsTo(Address::class, 'dir_id', 'dir_id');
-    // }
+
+    public function persona()
+    {
+        return $this->belongsTo(PeopleNatural::class, 'nat_id', 'nat_id');
+    }
+
+    public function natural()
+    {
+        return $this->belongsTo(PeopleNatural::class, 'nat_id', 'nat_id');
+    }
+
+    public function juridica()
+    {
+        return $this->belongsTo(PeopleJuridic::class, 'jur_id', 'jur_id');
+    }
+
+    public function address()
+    {
+        return $this->belongsTo(Address::class, 'per_id', 'per_id');
+    }
+
+    public function audiencias()
+    {
+        return $this->belongsTo(Audience::class, 'au_id');
+    }
+
+    public function historial()
+    {
+        return $this->belongsTo(History::class, 'his_id');
+    }
+
+    public function expedientes()
+    {
+        return $this->belongsTo(Proceeding::class, 'exp_id');
+    }
+
+    public function pagos()
+    {
+        return $this->belongsTo(Payment::class, 'pa_id');
+    }
 }

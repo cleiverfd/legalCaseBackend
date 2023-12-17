@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id('abo_id');
             $table->string('abo_carga_laboral', 255)->nullable()->comment('cantidad de casos');
             $table->string('abo_disponibilidad', 255)->nullable()->comment('ocupado o libre');
-            $table->unsignedBigInteger('nat_id')->nullable();
-            $table->foreign('nat_id')
-                ->references('nat_id')
-                ->on('people_naturals')
+            $table->unsignedBigInteger('per_id')->nullable();
+            $table->foreign('per_id')
+                ->references('per_id')
+                ->on('persons')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->timestamps();

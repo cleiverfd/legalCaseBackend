@@ -11,13 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('jobs', function (Blueprint $table) {
-            $table->id('emp_id');
-            $table->string('emp_profesion_ocupacion', 255)->nullable();
-            $table->string('emp_centro_trabajo', 255)->nullable();
+        Schema::create('procesals', function (Blueprint $table) {
+            $table->id('proc_id');
+            //natural o jurica
+            $table->string('tipo_procesal', 55)->nullable();
+            $table->string('tipo_persona', 55)->nullable();
             $table->unsignedBigInteger('per_id')->nullable();
+            $table->unsignedBigInteger('exp_id')->nullable();
+            $table->foreign('exp_id')
+                ->references('exp_id')
+                ->on('proceedings')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
             $table->foreign('per_id')
-                ->references('per_id')
+                ->references('per_id') 
                 ->on('persons')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
@@ -31,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('jobs');
+        Schema::dropIfExists('procesals');
     }
 };

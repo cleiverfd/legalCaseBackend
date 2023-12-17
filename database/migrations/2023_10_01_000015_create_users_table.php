@@ -22,23 +22,16 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->rememberToken();
-
-            // $table->foreign('name')
-            //     ->references('nat_nombres')
-            //     ->on('tb_persona_natural')
-            //     ->onDelete('cascade')
-            //     ->onUpdate('cascade');
             $table->foreign('email')
                 ->references('nat_correo')
-                ->on('people_naturals')
+                ->on('persons')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->foreign('per_id')
-                ->references('nat_id')
-                ->on('people_naturals')
+                ->references('per_id')
+                ->on('persons')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
-
             $table->timestamps();
             $table->softDeletes();
         });

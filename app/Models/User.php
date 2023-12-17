@@ -46,6 +46,6 @@ class User extends Authenticatable
     ];
     public function personaNatural()
     {
-        return $this->belongsTo(PeopleNatural::class, 'per_id', 'nat_id');
+        return $this->belongsTo(Person::class, 'per_id', 'per_id');
     }
 }

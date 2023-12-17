@@ -14,7 +14,7 @@ class History extends Model
         'his_medio_comuniacion',
         'his_detalle',
         'exp_id',
-        'proc_id',
+        'per_id',
 
     ];
     protected $dates = ['deleted_at'];

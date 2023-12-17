@@ -12,12 +12,12 @@ class Lawyer extends Model
     protected $fillable = [
         'abo_carga_laboral',
         'abo_disponibilidad',
-        'nat_id'
+        'per_id'
     ];
     protected $dates = ['deleted_at'];
     public function persona()
     {
-        return $this->belongsTo(PeopleNatural::class, 'nat_id', 'nat_id');
+        return $this->belongsTo(Person::class, 'per_id', 'per_id');
     }
 
 }

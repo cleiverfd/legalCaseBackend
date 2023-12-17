@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use App\Models\PeopleNatural;
+use App\Models\Person;
 use App\Models\User;
 use App\Models\Lawyer;
 
@@ -28,20 +28,21 @@ class AbogadoSeeder extends Seeder
         ];
 
         foreach ($datosAbogados as $datosAbogado) {
-            $personaNatural = PeopleNatural::create([
+            $personaNatural = Person::create([
                 'nat_dni' => $datosAbogado[0],
                 'nat_apellido_paterno' => $datosAbogado[1],
                 'nat_apellido_materno' => $datosAbogado[2],
                 'nat_nombres' => $datosAbogado[3],
                 'nat_telefono' => $datosAbogado[4],
                 'nat_correo' => $datosAbogado[5],
+                'per_condicion'=>'ABOGADO'
             ]);
 
             User::create([
                 'name' => explode(' ', $datosAbogado[3])[0],
                 'email' => $datosAbogado[5],
                 'usu_rol' => 'ABOGADO',
-                'per_id' => $personaNatural->nat_id,
+                'per_id' => $personaNatural->per_id,
                 'email_verified_at' => now(),
                 'password' => Hash::make($datosAbogado[0]),
             ]);
@@ -49,7 +50,7 @@ class AbogadoSeeder extends Seeder
             Lawyer::create([
                 'abo_carga_laboral' => 0,
                 'abo_disponibilidad' => 'LIBRE',
-                'nat_id' => $personaNatural->nat_id,
+                'per_id' => $personaNatural->per_id,
             ]);
         }
     }

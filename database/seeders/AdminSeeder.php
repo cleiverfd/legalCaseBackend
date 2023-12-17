@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use App\Models\PeopleNatural;
+use App\Models\Person;
 use App\Models\User;
 
 class AdminSeeder extends Seeder
@@ -24,7 +24,7 @@ class AdminSeeder extends Seeder
         ];
 
         foreach ($datosAdmins as $datosAdmin) {
-            $personaNatural = PeopleNatural::create([
+            $personaNatural = Person::create([
                 'nat_dni' => $datosAdmin[0],
                 'nat_apellido_paterno' => $datosAdmin[1],
                 'nat_apellido_materno' => $datosAdmin[2],
@@ -37,7 +37,7 @@ class AdminSeeder extends Seeder
                 'name' => explode(' ', $datosAdmin[3])[0],
                 'email' => $datosAdmin[5],
                 'usu_rol' => 'ADMIN',
-                'per_id' => $personaNatural->nat_id,
+                'per_id' => $personaNatural->per_id,
                 'email_verified_at' => now(),
                 'password' => Hash::make($datosAdmin[0]),
             ]);
