@@ -16,11 +16,11 @@ class ProceedingController extends Controller
 
     protected function index()
     {
-            $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
+        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->whereIn('exp_estado_proceso', ['EN TRAMITE', 'EN EJECUCION'])
             ->with('procesal.persona', 'pretension', 'materia')
             ->get();
-    
+
         $formattedData = [];
         foreach ($proceedings as $proceeding) {
             $processedProcesals = $this->formatProcesalData($proceeding->procesal);
@@ -37,7 +37,7 @@ class ProceedingController extends Controller
             ];
             $formattedData[] = $commonData;
         }
-    
+
         return response()->json(['data' => $formattedData], 200);
     }
 
@@ -112,13 +112,13 @@ class ProceedingController extends Controller
     {
         try {
             DB::beginTransaction();
-            $multiple=null;
-            if ($request->multiple=="0") {
-                $multiple=0;
-            }else{
-                $multiple=1;
+            $multiple = null;
+            if ($request->multiple == "0") {
+                $multiple = 0;
+            } else {
+                $multiple = 1;
             }
-          
+
             $exp = \App\Models\Proceeding::create([
                 'exp_numero' => strtoupper(trim($request->exp['exp_numero'])),
                 'exp_fecha_inicio' => $request->exp['exp_fecha_inicio'],
@@ -128,13 +128,13 @@ class ProceedingController extends Controller
                 'exp_instancia' => strtoupper(trim($request->exp['exp_instancia'])),
                 'exp_especialidad' => trim($request->exp['exp_especialidad']),
                 'exp_monto_pretencion' => trim($request->exp['exp_monto_pretencion']),
-                'exp_estado_proceso' =>trim($request->exp['exp_estado_proceso']),
+                'exp_estado_proceso' => trim($request->exp['exp_estado_proceso']),
                 'exp_juzgado' => strtoupper(trim($request->exp['exp_juzgado'])),
                 'multiple' => $multiple,
-                'abo_id' =>$request->abo_id
+                'abo_id' => $request->abo_id
             ]);
             // actualizar o crear costos
-           if (
+            if (
                 $request->exp['exp_estado_proceso'] == 'EN EJECUCION' ||
                 $request->exp['exp_estado_proceso'] == 'ARCHIVADO'
             ) {
@@ -149,115 +149,114 @@ class ProceedingController extends Controller
                     ]
                 );
             }
-        $persona=null;
-     if ($request->multiple=="0") {
-            if ($request->tipopersona == 'NATURAL') {
-                $persona = \App\Models\Person::updateOrCreate(
-                    ['nat_dni' => strtoupper(trim($request->pn['nat_dni']))],
-                    [
-                        'nat_apellido_paterno' => strtoupper(trim($request->pn['nat_apellido_paterno'])),
-                        'nat_apellido_materno' => strtoupper(trim($request->pn['nat_apellido_materno'])),
-                        'nat_nombres' => strtoupper(trim($request->pn['nat_nombres'])),
-                        'nat_telefono' => strtoupper(trim($request->pn['nat_telefono'])),
-                        'nat_correo' => trim($request->pn['nat_correo']),
-                        'tipo_procesal'=>$request->procesal,
-                        'per_condicion'=>$request->condicion
-                    ]
-                );
-            } else {
-                $persona = \App\Models\Person::updateOrCreate(
-                    ['jur_ruc' => strtoupper(trim($request->pj['jur_ruc']))],
-                    [
-                        'jur_razon_social' => strtoupper(trim($request->pj['jur_razon_social'])),
-                        'jur_telefono' => strtoupper(trim($request->pj['jur_telefono'])),
-                        'jur_correo' => trim($request->pj['jur_correo']),
-                        'jur_rep_legal' => strtoupper(trim($request->pj['jur_rep_legal'])),
-                        'tipo_procesal'=>$request->procesal,
-                        'per_condicion'=>$request->condicion
-                    ]
-                ); 
-            }
-
-            $procesal=null;
-            $procesal= \App\Models\Procesal::Create(
-                
-                [
-                    'tipo_procesal'=> trim($request->procesal),
-                    'tipo_persona' => trim($request->tipopersona),
-                    'per_id' =>$persona->per_id,
-                    'exp_id'=>$exp->exp_id,
-                ]
-            );
-            $direccion = null;
-            $direccion = \App\Models\Address::updateOrCreate(
-                ['proc_id' =>$procesal->proc_id],
-                [
-                    'dir_calle_av'=> trim($request->dir['dir_calle_av']),
-                    'dis_id' => trim($request->dir['dis_id']),
-                    'pro_id' => trim($request->dir['pro_id']),
-                    'dep_id' => trim($request->dir['dep_id']),
-            ]
-            );
-        }
-        else{
-            $personas = $request->Personas;
-
-            foreach ($personas as $persona) {
-                $person=null;
-                if ($persona['tipo'] == 'NATURAL') {
-                    // Crear registro para persona natural
-                    $person=\App\Models\Person::updateOrcreate(
-                        ['nat_dni' => strtoupper(trim($persona['nat_dni']))],
+            $persona = null;
+            if ($request->multiple == "0") {
+                if ($request->tipopersona == 'NATURAL') {
+                    $persona = \App\Models\Person::updateOrCreate(
+                        ['nat_dni' => strtoupper(trim($request->pn['nat_dni']))],
                         [
-                        'nat_apellido_paterno' => strtoupper(trim($persona['nat_apellido_paterno'])),
-                        'nat_apellido_materno' => strtoupper(trim($persona['nat_apellido_materno'])),
-                        'nat_nombres' => strtoupper(trim($persona['nat_nombres'])),
-                        'nat_telefono' => strtoupper(trim($persona['nat_telefono'])),
-                        'nat_correo' => trim($persona['nat_correo']),
-                        'per_condicion' => $persona['condicion'],
-                        'tipo_procesal'=>$persona['procesal']
-                    ]);
-                } else {
-                    $person= \App\Models\Person::updateOrCreate(
-                        ['jur_ruc' => strtoupper(trim($persona['jur_ruc']))],
-                        [
-                            'jur_razon_social' => strtoupper(trim($persona['jur_razon_social'])),
-                            'jur_telefono' => strtoupper(trim($persona['jur_telefono'])),
-                            'jur_correo' => trim($persona['jur_correo']),
-                            'jur_rep_legal' => strtoupper(trim($persona['jur_rep_legal'])),
-                            'per_condicion' => $persona['condicion'],
-                            'tipo_procesal'=>$persona['procesal']
+                            'nat_apellido_paterno' => strtoupper(trim($request->pn['nat_apellido_paterno'])),
+                            'nat_apellido_materno' => strtoupper(trim($request->pn['nat_apellido_materno'])),
+                            'nat_nombres' => strtoupper(trim($request->pn['nat_nombres'])),
+                            'nat_telefono' => strtoupper(trim($request->pn['nat_telefono'])),
+                            'nat_correo' => trim($request->pn['nat_correo']),
+                            'tipo_procesal' => $request->procesal,
+                            'per_condicion' => $request->condicion
                         ]
-                        ); 
+                    );
+                } else {
+                    $persona = \App\Models\Person::updateOrCreate(
+                        ['jur_ruc' => strtoupper(trim($request->pj['jur_ruc']))],
+                        [
+                            'jur_razon_social' => strtoupper(trim($request->pj['jur_razon_social'])),
+                            'jur_telefono' => strtoupper(trim($request->pj['jur_telefono'])),
+                            'jur_correo' => trim($request->pj['jur_correo']),
+                            'jur_rep_legal' => strtoupper(trim($request->pj['jur_rep_legal'])),
+                            'tipo_procesal' => $request->procesal,
+                            'per_condicion' => $request->condicion
+                        ]
+                    );
                 }
-                $procesal=null;
-                $procesal= \App\Models\Procesal::Create(
+
+                $procesal = null;
+                $procesal = \App\Models\Procesal::Create(
+
                     [
-                        'tipo_procesal'=> $persona['procesal'],
-                        'tipo_persona' => $persona['tipo'],
-                        'per_id' =>$person->per_id,
-                        'exp_id'=>$exp->exp_id,
+                        'tipo_procesal' => trim($request->procesal),
+                        'tipo_persona' => trim($request->tipopersona),
+                        'per_id' => $persona->per_id,
+                        'exp_id' => $exp->exp_id,
                     ]
                 );
                 $direccion = null;
                 $direccion = \App\Models\Address::updateOrCreate(
-                    ['proc_id' =>$procesal->proc_id],
+                    ['proc_id' => $procesal->proc_id],
                     [
-                        'dir_calle_av'=> trim($persona['dir_calle_av']),
-                        'dis_id' => trim($persona['dis_id']),
-                        'pro_id' => trim($persona['pro_id']),
-                        'dep_id' => trim($persona['dep_id']),
-                ]
+                        'dir_calle_av' => trim($request->dir['dir_calle_av']),
+                        'dis_id' => trim($request->dir['dis_id']),
+                        'pro_id' => trim($request->dir['pro_id']),
+                        'dep_id' => trim($request->dir['dep_id']),
+                    ]
                 );
-                
+            } else {
+                $personas = $request->Personas;
+
+                foreach ($personas as $persona) {
+                    $person = null;
+                    if ($persona['tipo'] == 'NATURAL') {
+                        // Crear registro para persona natural
+                        $person = \App\Models\Person::updateOrcreate(
+                            ['nat_dni' => strtoupper(trim($persona['nat_dni']))],
+                            [
+                                'nat_apellido_paterno' => strtoupper(trim($persona['nat_apellido_paterno'])),
+                                'nat_apellido_materno' => strtoupper(trim($persona['nat_apellido_materno'])),
+                                'nat_nombres' => strtoupper(trim($persona['nat_nombres'])),
+                                'nat_telefono' => strtoupper(trim($persona['nat_telefono'])),
+                                'nat_correo' => trim($persona['nat_correo']),
+                                'per_condicion' => $persona['condicion'],
+                                'tipo_procesal' => $persona['procesal']
+                            ]
+                        );
+                    } else {
+                        $person = \App\Models\Person::updateOrCreate(
+                            ['jur_ruc' => strtoupper(trim($persona['jur_ruc']))],
+                            [
+                                'jur_razon_social' => strtoupper(trim($persona['jur_razon_social'])),
+                                'jur_telefono' => strtoupper(trim($persona['jur_telefono'])),
+                                'jur_correo' => trim($persona['jur_correo']),
+                                'jur_rep_legal' => strtoupper(trim($persona['jur_rep_legal'])),
+                                'per_condicion' => $persona['condicion'],
+                                'tipo_procesal' => $persona['procesal']
+                            ]
+                        );
+                    }
+                    $procesal = null;
+                    $procesal = \App\Models\Procesal::Create(
+                        [
+                            'tipo_procesal' => $persona['procesal'],
+                            'tipo_persona' => $persona['tipo'],
+                            'per_id' => $person->per_id,
+                            'exp_id' => $exp->exp_id,
+                        ]
+                    );
+                    $direccion = null;
+                    $direccion = \App\Models\Address::updateOrCreate(
+                        ['proc_id' => $procesal->proc_id],
+                        [
+                            'dir_calle_av' => trim($persona['dir_calle_av']),
+                            'dis_id' => trim($persona['dis_id']),
+                            'pro_id' => trim($persona['pro_id']),
+                            'dep_id' => trim($persona['dep_id']),
+                        ]
+                    );
+                }
             }
-        }
-        $abogado = \App\Models\Lawyer::find($request->abo_id);
-        $abogado->abo_disponibilidad = 'OCUPADO';
-        $abogado->abo_carga_laboral = $abogado->abo_carga_laboral + 1;
-        $abogado->save();
-        DB::commit();
-          return \response()->json(['state' => 0, 'data' => $exp], 200);
+            $abogado = \App\Models\Lawyer::find($request->abo_id);
+            $abogado->abo_disponibilidad = 'OCUPADO';
+            $abogado->abo_carga_laboral = $abogado->abo_carga_laboral + 1;
+            $abogado->save();
+            DB::commit();
+            return \response()->json(['state' => 0, 'data' => $exp], 200);
         } catch (Exception $e) {
             DB::rollback();
             return  \response()->json(['state' => '1', 'exception' => (string) $e]);
@@ -346,14 +345,14 @@ class ProceedingController extends Controller
     protected function show($id)
     {
         $proceeding = \App\Models\Proceeding::with(
-                'specialty',
-                'juzgado',
-                'instancia',
-                'distritoJudicial',
-                'materia',
-                'demandante.persona',
-                'demandado.persona'
-            )
+            'specialty',
+            'juzgado',
+            'instancia',
+            'distritoJudicial',
+            'materia',
+            'demandante.persona',
+            'demandado.persona'
+        )
             ->find($id);
 
         if (!$proceeding) {
@@ -467,14 +466,14 @@ class ProceedingController extends Controller
         ], 200);
     }
 
-    
+
     protected function take()
     {
         $proceedings = \App\Models\Proceeding::latest('created_at')
             ->with('procesal.persona', 'pretension', 'materia')
             ->take(5)
             ->get();
-    
+
         $formattedData = [];
         foreach ($proceedings as $proceeding) {
             $processedProcesals = $this->formatProcesalData($proceeding->procesal);
@@ -491,7 +490,7 @@ class ProceedingController extends Controller
             ];
             $formattedData[] = $commonData;
         }
-    
+
         return response()->json(['data' => $formattedData], 200);
     }
 
@@ -502,6 +501,9 @@ class ProceedingController extends Controller
             ->whereIn('exp_estado_proceso', ['EN TRAMITE', 'EN EJECUCION'])
             ->with('procesal.persona', 'juzgado')
             ->find($expId);
+
+        $eje = \App\Models\LegalDocument::where('exp_id', $expId)->where('doc_tipo', 'EJE')
+            ->orderBy('created_at', 'DESC')->get();
 
         if ($proceeding !== null) {
             $processedProcesals = $this->formatProcesalData($proceeding->procesal);
@@ -514,7 +516,7 @@ class ProceedingController extends Controller
                 'procesal' => $processedProcesals,
             ];
 
-            return response()->json(['data' => $commonData], 200);
+            return response()->json(['data' => $commonData, 'eje' => $eje], 200);
         } else {
             // Manejar el caso cuando no se encuentra el registro
             return response()->json(['error' => 'Expediente no encontrado'], 404);
@@ -525,7 +527,7 @@ class ProceedingController extends Controller
     protected function formatProcesalData($procesal)
     {
         $processedProcesals = [];
-    
+
         foreach ($procesal as $procesalItem) {
             $data = [
                 'proc_id' => $procesalItem->proc_id,
@@ -533,7 +535,7 @@ class ProceedingController extends Controller
                 'tipo_procesal' => $procesalItem->tipo_procesal,
                 'tipo_persona' => $procesalItem->tipo_persona,
             ];
-    
+
             if ($procesalItem->tipo_persona === 'NATURAL') {
                 $data = array_merge($data, [
                     'dni' => $procesalItem->persona->nat_dni,
@@ -553,11 +555,10 @@ class ProceedingController extends Controller
                     'condicion' => strtolower($procesalItem->persona->per_condicion),
                 ]);
             }
-    
+
             $processedProcesals[] = $data;
         }
-    
+
         return $processedProcesals;
     }
- 
 }
