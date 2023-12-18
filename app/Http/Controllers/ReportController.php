@@ -26,7 +26,11 @@ class ReportController extends Controller
             'exp_estado_proceso',
             'EN EJECUCION'
         )->count();
-        $demandantes = \App\Models\Person::count();
+        $demandantes = \App\Models\Procesal::
+        where(
+            'tipo_procesal',
+            'DEMANDANTE'
+        )->count();
 
         return \response()->json([
             'state' => 200, 'exptotal' => $expTotal, 'exptramite' => $expTotalEnTramite,

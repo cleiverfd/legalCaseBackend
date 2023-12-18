@@ -28,18 +28,7 @@ class Procesal extends Model
     {
         return $this->belongsTo(Address::class, 'per_id', 'per_id');
     }
-
-    public function audiencias()
-    {
-        return $this->belongsTo(Audience::class, 'au_id');
-    }
-
-    public function historial()
-    {
-        return $this->belongsTo(History::class, 'his_id');
-    }
-
-    public function expedientes()
+    public function expediente()
     {
         return $this->belongsTo(Proceeding::class, 'exp_id');
     }

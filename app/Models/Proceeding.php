@@ -20,8 +20,6 @@ class Proceeding extends Model
         'exp_especialidad',
         'exp_monto_pretencion',
         'exp_estado_proceso',
-        'exp_demandante',
-        'exp_demandado',
         'exp_juzgado',
         'abo_id',
         'multiple'
