@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Reporte de Expedientes en {{$tipo}}</title>
+    <title>{{$tipo}}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -70,9 +70,9 @@
 
 <div class="header">
     <img src="{{ asset('images/log.jpg') }}" style="position: absolute; 
-        top: 10px; right: 10px; width: 200px; height: auto; z-index: 9999;" />
+        top: 10px; right: 10px; width: 180px; height: auto; z-index: 9999;" />
 
-    <p class="header-title" style="margin-right: 170px;"> Reporte de Expedientes en {{$tipo}}</p>
+    <p class="header-title" style="margin-right: 250px;">{{$tipo}}</p>
 </div>
 
 

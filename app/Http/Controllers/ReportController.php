@@ -176,197 +176,83 @@ class ReportController extends Controller
             ];
             $formattedData[] = $commonData;
     }
-        $tipo="Trámite";
-
-    return \PDF::loadView('pdfExpedienteTramite',compact('formattedData','tipo'))
-         ->download();
-        // return response()->json(['d->ata' => $formattedData], 200);
-        // return $pdf->stream('archivo.pdf');
-    }
+            
+            $tipo="Reporte de Expedientes en Trámite";
+            return \PDF::loadView('pdfExpedienteTramite',compact('formattedData','tipo'))
+                ->download();
+                // return response()->json(['d->ata' => $formattedData], 200);
+                // return $pdf->stream('archivo.pdf');
+ }
     protected function pdfexpejecucion(Request $request)
     {
+       
         $report = \App\Models\Report::create([
             'rep_fecha_generacion' => now()->setTimezone('America/Lima'),
-            'rep_tipo' => 'REPORTE EXPEDIENTE EN EJECUCION/AUTOMATIZADO',
+            'rep_tipo' => 'REPORTE EXPEDIENTE EN TRAMITE/AUTOMATIZADO',
             'usu_id' => $request->usu_id,
         ]);
-        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-        ->where('exp_estado_proceso', 'EN EJECUCION')
-        ->with('person.address')
-        ->with('specialty')
-        ->with('materia')
-        ->with('person.juridica', 'person.persona')
-        ->get();
+            $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
+            ->where('exp_estado_proceso','EN EJECUCION')
+            ->with('procesal.persona', 'pretension', 'materia','specialty')
+            ->get();
 
-
-        $data = $proceedings->map(function ($proceeding) {
-            $procesal = null;
-            $tipo_persona = null;
-            if ($proceeding) {
-                if ($proceeding->exp_demandante !== null) {
-                    $person = $proceeding->demandante;
-                    $procesal = 'demandante';
-                } elseif ($proceeding->exp_demandado !== null) {
-                    $person = $proceeding->demandado;
-                    $procesal = 'demandado';
-                }
-            }
-            $fecha_inicio = $proceeding->exp_fecha_inicio;
-            $fecha_formateada = date('d-m-Y', strtotime($fecha_inicio));
+        $formattedData = [];
+        foreach ($proceedings as $proceeding) {
+            $processedProcesals = $this->formatProcesalData($proceeding->procesal);
             $commonData = [
                 'exp_id' => $proceeding->exp_id,
                 'numero' => $proceeding->exp_numero,
-                'fecha_inicio' => $fecha_formateada,
-                'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
-                'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
+                'fecha_inicio' => date('d-m-Y', strtotime($proceeding->exp_fecha_inicio)),
+                'pretencion' => $proceeding->pretension->pre_nombre,
+                'materia' => $proceeding->materia->mat_nombre,
+                'especialidad'=>$proceeding->specialty->esp_nombre,
                 'monto_pretencion' => $proceeding->exp_monto_pretencion,
                 'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
-                'procesal' => $procesal
+                'multiple' => $proceeding->multiple,
+                'procesal' => $processedProcesals,
             ];
-            if ($person) {
-                if ($person->nat_id !== null) {
-                    $personData = $person->persona;
-                    $tipo_persona = 'natural';
-                } elseif ($person->jur_id !== null) {
-                    $personData = $person->juridica;
-                    $tipo_persona = 'juridica';
-                }
-            }
+            $formattedData[] = $commonData;
+    }
+        $tipo="Reporte de Expedientes en Ejecución";
 
-            if ($tipo_persona === 'natural') {
-                $personDataArray = [
-                    'dni' => $personData->nat_dni,
-                    'apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
-                    'apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
-                    'nombres' => ucwords(strtolower($personData->nat_nombres)),
-                    'telefono' => $personData->nat_telefono,
-                    'correo' => strtolower($personData->nat_correo),
-                ];
-            } elseif ($tipo_persona === 'juridica') {
-                $personDataArray = [
-                    'ruc' => ucwords(strtolower($personData->jur_ruc)),
-                    'razon_social' => ucwords(strtolower($personData->jur_razon_social)),
-                    'telefono' => $personData->jur_telefono,
-                    'correo' => strtolower($personData->jur_correo),
-                ];
-            } else {
-                $personDataArray = [];
-            }
-
-            return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
-        });
-        $pdf = PDF::loadView('vista_pdf_exp_ejc', ['data' => $data]);
-        return $pdf->download('archivo.pdf');
+    return \PDF::loadView('pdfExpedienteTramite',compact('formattedData','tipo'))
+         ->download();
     }
     protected function pdfexps(Request $request)
     {
         $report = \App\Models\Report::create([
             'rep_fecha_generacion' => now()->setTimezone('America/Lima'),
-            'rep_tipo' => 'REPORTE EXPEDIENTES /AUTOMATIZADO',
+            'rep_tipo' => 'REPORTE EXPEDIENTE EN TRAMITE/AUTOMATIZADO',
             'usu_id' => $request->usu_id,
         ]);
-        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-        ->with('person.address')
-        ->with('specialty')
-        ->with('materia')
-        ->with('person.juridica', 'person.persona')
-        ->get();
+            $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
+            ->with('procesal.persona', 'pretension', 'materia','specialty')
+            ->get();
 
-
-        $data = $proceedings->map(function ($proceeding) {
-            $procesal = null;
-            $tipo_persona = null;
-            if ($proceeding) {
-                if ($proceeding->exp_demandante !== null) {
-                    $person = $proceeding->demandante;
-                    $procesal = 'demandante';
-                } elseif ($proceeding->exp_demandado !== null) {
-                    $person = $proceeding->demandado;
-                    $procesal = 'demandado';
-                }
-            }
-            $fecha_inicio = $proceeding->exp_fecha_inicio;
-            $fecha_formateada = date('d-m-Y', strtotime($fecha_inicio));
+        $formattedData = [];
+        foreach ($proceedings as $proceeding) {
+            $processedProcesals = $this->formatProcesalData($proceeding->procesal);
             $commonData = [
                 'exp_id' => $proceeding->exp_id,
                 'numero' => $proceeding->exp_numero,
-                'fecha_inicio' => $fecha_formateada,
-                'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
-                'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
+                'fecha_inicio' => date('d-m-Y', strtotime($proceeding->exp_fecha_inicio)),
+                'pretencion' => $proceeding->pretension->pre_nombre,
+                'materia' => $proceeding->materia->mat_nombre,
+                'especialidad'=>$proceeding->specialty->esp_nombre,
                 'monto_pretencion' => $proceeding->exp_monto_pretencion,
                 'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
-                'procesal' => $procesal
+                'multiple' => $proceeding->multiple,
+                'procesal' => $processedProcesals,
             ];
-            if ($person) {
-                if ($person->nat_id !== null) {
-                    $personData = $person->persona;
-                    $tipo_persona = 'natural';
-                } elseif ($person->jur_id !== null) {
-                    $personData = $person->juridica;
-                    $tipo_persona = 'juridica';
-                }
-            }
+            $formattedData[] = $commonData;
+    }
+        $tipo="Reporte del Total de Expedientes";
 
-            if ($tipo_persona === 'natural') {
-                $personDataArray = [
-                    'dni' => $personData->nat_dni,
-                    'apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
-                    'apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
-                    'nombres' => ucwords(strtolower($personData->nat_nombres)),
-                    'telefono' => $personData->nat_telefono,
-                    'correo' => strtolower($personData->nat_correo),
-                ];
-            } elseif ($tipo_persona === 'juridica') {
-                $personDataArray = [
-                    'ruc' => ucwords(strtolower($personData->jur_ruc)),
-                    'razon_social' => ucwords(strtolower($personData->jur_razon_social)),
-                    'telefono' => $personData->jur_telefono,
-                    'correo' => strtolower($personData->jur_correo),
-                ];
-            } else {
-                $personDataArray = [];
-            }
-
-            return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
-        });
-        $pdf = PDF::loadView('vista_pdf_exps', ['data' => $data]);
-        return $pdf->download('archivo.pdf');
+    return \PDF::loadView('pdfExpedienteTramite',compact('formattedData','tipo'))
+         ->download();
     }
     protected function pdfdemandantes(Request $request)
     {
-        $report = \App\Models\Report::create([
-            'rep_fecha_generacion' => now()->setTimezone('America/Lima'),
-            'rep_tipo' => 'REPORTE DEMANDANTES/AUTOMATIZADO',
-            'usu_id' => $request->usu_id,
-        ]);
-        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-            ->with('person.address')
-            ->get();
-
-        $data = $proceedings->map(function ($proceeding) {
-            $person = $proceeding->person;
-            $personData = null;
-            $type = null;
-            if ($person) {
-                if ($person->nat_id !== null) {
-                    $personData = $person->persona;
-                    $type = 'natural';
-                } elseif ($person->jur_id !== null) {
-                    $personData = $person->juridica;
-                    $type = 'juridica';
-                }
-            }
-            return array_merge($proceeding->toArray(), [
-                'person_data' => $personData ? $personData->toArray() : null,
-                'type' => $type,
-            ]);
-        });
-        $pdf = PDF::loadView('vista_pdf_de', ['data' => $data]);
-        //return $pdf->stream();
-        return $pdf->download('archivo.pdf');
-        // return response()->json(['data' => $data], 200);
 
     }
     protected function pdffechaaño(Request $request)
@@ -386,73 +272,32 @@ class ReportController extends Controller
             $mesFormateado = (string) $mes;
         }
         $fechaBuscada = $año . '-' . $mesFormateado;
-        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-            ->with('person.address')
-            ->with('person.juridica', 'person.persona')
-            ->with('specialty')
-            ->with('materia')
-            ->where('exp_fecha_inicio', 'LIKE', $fechaBuscada . '%') // Filtra por el mes y año
+            $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
+            ->where('exp_fecha_inicio', 'LIKE', $fechaBuscada . '%')
+            ->with('procesal.persona', 'pretension', 'materia','specialty')
             ->get();
-            $data = $proceedings->map(function ($proceeding) {
-                $procesal = null;
-                $tipo_persona = null;
-                if ($proceeding) {
-                    if ($proceeding->exp_demandante !== null) {
-                        $person = $proceeding->demandante;
-                        $procesal = 'demandante';
-                    } elseif ($proceeding->exp_demandado !== null) {
-                        $person = $proceeding->demandado;
-                        $procesal = 'demandado';
-                    }
-                }
-                $fecha_inicio = $proceeding->exp_fecha_inicio;
-                $fecha_formateada = date('d-m-Y', strtotime($fecha_inicio));
-                $commonData = [
-                    'exp_id' => $proceeding->exp_id,
-                    'numero' => $proceeding->exp_numero,
-                    'fecha_inicio' => $fecha_formateada,
-                    'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                    'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
-                    'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
-                    'monto_pretencion' => $proceeding->exp_monto_pretencion,
-                    'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
-                    'procesal' => $procesal
-                ];
-                if ($person) {
-                    if ($person->nat_id !== null) {
-                        $personData = $person->persona;
-                        $tipo_persona = 'natural';
-                    } elseif ($person->jur_id !== null) {
-                        $personData = $person->juridica;
-                        $tipo_persona = 'juridica';
-                    }
-                }
-        
-                if ($tipo_persona === 'natural') {
-                    $personDataArray = [
-                        'dni' => $personData->nat_dni,
-                        'apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
-                        'apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
-                        'nombres' => ucwords(strtolower($personData->nat_nombres)),
-                        'telefono' => $personData->nat_telefono,
-                        'correo' => strtolower($personData->nat_correo),
-                    ];
-                } elseif ($tipo_persona === 'juridica') {
-                    $personDataArray = [
-                        'ruc' => ucwords(strtolower($personData->jur_ruc)),
-                        'razon_social' => ucwords(strtolower($personData->jur_razon_social)),
-                        'telefono' => $personData->jur_telefono,
-                        'correo' => strtolower($personData->jur_correo),
-                    ];
-                } else {
-                    $personDataArray = [];
-                }
-        
-                return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
-            });
-        
-        $pdf = PDF::loadView('vista_pdf_exps', ['data' => $data]);
-        return $pdf->download('archivo.pdf');
+
+        $formattedData = [];
+        foreach ($proceedings as $proceeding) {
+            $processedProcesals = $this->formatProcesalData($proceeding->procesal);
+            $commonData = [
+                'exp_id' => $proceeding->exp_id,
+                'numero' => $proceeding->exp_numero,
+                'fecha_inicio' => date('d-m-Y', strtotime($proceeding->exp_fecha_inicio)),
+                'pretencion' => $proceeding->pretension->pre_nombre,
+                'materia' => $proceeding->materia->mat_nombre,
+                'especialidad'=>$proceeding->specialty->esp_nombre,
+                'monto_pretencion' => $proceeding->exp_monto_pretencion,
+                'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
+                'multiple' => $proceeding->multiple,
+                'procesal' => $processedProcesals,
+            ];
+            $formattedData[] = $commonData;
+         }
+        $tipo="Reporte del  de Expedientes de Mes y Año";
+
+    return \PDF::loadView('pdfExpedienteTramite',compact('formattedData','tipo'))
+         ->download();
     }
     protected function pdfmateria(Request $request)
     {
@@ -461,74 +306,31 @@ class ReportController extends Controller
             'rep_tipo' => 'REPORTE EXPEDIENTE  MATERIA /PERSONALIZADO',
             'usu_id' => $request->usu_id,
         ]);
-        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-            ->with('person.address')
-            ->with('person.juridica', 'person.persona')
-            ->with('specialty')
-            ->with('materia')
+            $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->where('exp_materia', $request->exp_materia)
+            ->with('procesal.persona', 'pretension', 'materia','specialty')
             ->get();
-            $data = $proceedings->map(function ($proceeding) {
-                $procesal = null;
-                $tipo_persona = null;
-                if ($proceeding) {
-                    if ($proceeding->exp_demandante !== null) {
-                        $person = $proceeding->demandante;
-                        $procesal = 'demandante';
-                    } elseif ($proceeding->exp_demandado !== null) {
-                        $person = $proceeding->demandado;
-                        $procesal = 'demandado';
-                    }
-                }
-                $fecha_inicio = $proceeding->exp_fecha_inicio;
-                $fecha_formateada = date('d-m-Y', strtotime($fecha_inicio));
+            $formattedData = [];
+            foreach ($proceedings as $proceeding) {
+                $processedProcesals = $this->formatProcesalData($proceeding->procesal);
                 $commonData = [
                     'exp_id' => $proceeding->exp_id,
                     'numero' => $proceeding->exp_numero,
-                    'fecha_inicio' => $fecha_formateada,
-                    'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                    'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
-                    'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
+                    'fecha_inicio' => date('d-m-Y', strtotime($proceeding->exp_fecha_inicio)),
+                    'pretencion' => $proceeding->pretension->pre_nombre,
+                    'materia' => $proceeding->materia->mat_nombre,
+                    'especialidad'=>$proceeding->specialty->esp_nombre,
                     'monto_pretencion' => $proceeding->exp_monto_pretencion,
                     'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
-                    'procesal' => $procesal
+                    'multiple' => $proceeding->multiple,
+                    'procesal' => $processedProcesals,
                 ];
-                if ($person) {
-                    if ($person->nat_id !== null) {
-                        $personData = $person->persona;
-                        $tipo_persona = 'natural';
-                    } elseif ($person->jur_id !== null) {
-                        $personData = $person->juridica;
-                        $tipo_persona = 'juridica';
-                    }
-                }
-        
-                if ($tipo_persona === 'natural') {
-                    $personDataArray = [
-                        'dni' => $personData->nat_dni,
-                        'apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
-                        'apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
-                        'nombres' => ucwords(strtolower($personData->nat_nombres)),
-                        'telefono' => $personData->nat_telefono,
-                        'correo' => strtolower($personData->nat_correo),
-                    ];
-                } elseif ($tipo_persona === 'juridica') {
-                    $personDataArray = [
-                        'ruc' => ucwords(strtolower($personData->jur_ruc)),
-                        'razon_social' => ucwords(strtolower($personData->jur_razon_social)),
-                        'telefono' => $personData->jur_telefono,
-                        'correo' => strtolower($personData->jur_correo),
-                    ];
-                } else {
-                    $personDataArray = [];
-                }
-        
-                return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
-            });
-
-       
-        $pdf = PDF::loadView('vista_pdf_exps', ['data' => $data]);
-        return $pdf->download('archivo.pdf');
+                $formattedData[] = $commonData;
+             }
+            $tipo="Reporte de Expedientes por Materia";
+    
+        return \PDF::loadView('pdfExpedienteTramite',compact('formattedData','tipo'))
+             ->download();
     }
     protected function pdfexpsabogado(Request $request)
     {
@@ -537,74 +339,36 @@ class ReportController extends Controller
             'rep_tipo' => 'REPORTE EXPEDIENTE  ABOGADO /PERSONALIZADO',
             'usu_id' => $request->usu_id,
         ]);
-        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-            ->with('person.address')
-            ->with('person.juridica', 'person.persona')
-            ->with('specialty')
-            ->with('materia')
+            $abogado=
+             \App\Models\Lawyer::where('abo_id',$request->abo_id)
+            ->with('persona')->first();
+            $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->where('abo_id', $request->abo_id)
+            ->with('procesal.persona', 'pretension', 'materia','specialty')
             ->get();
-            $data = $proceedings->map(function ($proceeding) {
-                $procesal = null;
-                $tipo_persona = null;
-                if ($proceeding) {
-                    if ($proceeding->exp_demandante !== null) {
-                        $person = $proceeding->demandante;
-                        $procesal = 'demandante';
-                    } elseif ($proceeding->exp_demandado !== null) {
-                        $person = $proceeding->demandado;
-                        $procesal = 'demandado';
-                    }
-                }
-                $fecha_inicio = $proceeding->exp_fecha_inicio;
-                $fecha_formateada = date('d-m-Y', strtotime($fecha_inicio));
+            $formattedData = [];
+            foreach ($proceedings as $proceeding) {
+                $processedProcesals = $this->formatProcesalData($proceeding->procesal);
                 $commonData = [
                     'exp_id' => $proceeding->exp_id,
                     'numero' => $proceeding->exp_numero,
-                    'fecha_inicio' => $fecha_formateada,
-                    'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                    'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
-                    'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
+                    'fecha_inicio' => date('d-m-Y', strtotime($proceeding->exp_fecha_inicio)),
+                    'pretencion' => $proceeding->pretension->pre_nombre,
+                    'materia' => $proceeding->materia->mat_nombre,
+                    'especialidad'=>$proceeding->specialty->esp_nombre,
                     'monto_pretencion' => $proceeding->exp_monto_pretencion,
                     'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
-                    'procesal' => $procesal
+                    'multiple' => $proceeding->multiple,
+                    'procesal' => $processedProcesals,
                 ];
-                if ($person) {
-                    if ($person->nat_id !== null) {
-                        $personData = $person->persona;
-                        $tipo_persona = 'natural';
-                    } elseif ($person->jur_id !== null) {
-                        $personData = $person->juridica;
-                        $tipo_persona = 'juridica';
-                    }
-                }
-        
-                if ($tipo_persona === 'natural') {
-                    $personDataArray = [
-                        'dni' => $personData->nat_dni,
-                        'apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
-                        'apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
-                        'nombres' => ucwords(strtolower($personData->nat_nombres)),
-                        'telefono' => $personData->nat_telefono,
-                        'correo' => strtolower($personData->nat_correo),
-                    ];
-                } elseif ($tipo_persona === 'juridica') {
-                    $personDataArray = [
-                        'ruc' => ucwords(strtolower($personData->jur_ruc)),
-                        'razon_social' => ucwords(strtolower($personData->jur_razon_social)),
-                        'telefono' => $personData->jur_telefono,
-                        'correo' => strtolower($personData->jur_correo),
-                    ];
-                } else {
-                    $personDataArray = [];
-                }
-        
-                return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
-            });
-
-       
-        $pdf = PDF::loadView('vista_pdf_exps', ['data' => $data]);
-        return $pdf->download('archivo.pdf');
+                $formattedData[] = $commonData;
+             }
+            $tipo='Expedientes a cargo de:'.$abogado->persona->nat_nombres .'
+            '.$abogado->persona->nat_apellido_paterno.' ' .$abogado->persona->nat_apellido_materno;
+    
+        return \PDF::loadView('pdfExpedienteTramite',compact('formattedData','tipo'))
+             ->download();
+           
     }
     protected function pdfpretenciones(Request $request)
     {
@@ -613,41 +377,29 @@ class ReportController extends Controller
             'rep_tipo' => 'REPORTE EXPEDIENTE  PRETENCIONES /AUTOMATIZADO',
             'usu_id' => $request->usu_id,
         ]);
-        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-            ->with('person.address')
+     
+            $montos=null;
+            $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->whereIn('exp_estado_proceso', ['EN TRAMITE', 'EN EJECUCION'])
-            ->with('person.juridica', 'person.persona')
-            ->with('specialty')
-            ->with('materia')
             ->with('montos')
+            ->with('procesal.persona', 'pretension', 'materia','specialty')
             ->get();
-            $data = $proceedings->map(function ($proceeding) {
-                $procesal = null;
-                $tipo_persona = null;
-                $montos=null;
-                if ($proceeding) {
-                    $montos=$proceeding->montos;
-                    if ($proceeding->exp_demandante !== null) {
-                        $person = $proceeding->demandante;
-                        $procesal = 'demandante';
-                    } elseif ($proceeding->exp_demandado !== null) {
-                        $person = $proceeding->demandado;
-                        $procesal = 'demandado';
-                    }
-                }
-                $fecha_inicio = $proceeding->exp_fecha_inicio;
-                $fecha_formateada = date('d-m-Y', strtotime($fecha_inicio));
+            $formattedData = [];
+            foreach ($proceedings as $proceeding) {
+                $processedProcesals = $this->formatProcesalData($proceeding->procesal);
                 $commonData = [
                     'exp_id' => $proceeding->exp_id,
                     'numero' => $proceeding->exp_numero,
-                    'fecha_inicio' => $fecha_formateada,
-                    'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                    'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
-                    'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
+                    'fecha_inicio' => date('d-m-Y', strtotime($proceeding->exp_fecha_inicio)),
+                    'pretencion' => $proceeding->pretension->pre_nombre,
+                    'materia' => $proceeding->materia->mat_nombre,
+                    'especialidad'=>$proceeding->specialty->esp_nombre,
                     'monto_pretencion' => $proceeding->exp_monto_pretencion,
                     'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
-                    'procesal' => $procesal,
-                     ];
+                    'multiple' => $proceeding->multiple,
+                    'procesal' => $processedProcesals,
+                ];
+                $montos=$proceeding->montos;
                 if($montos){
                     $commonData+=[
                     '$monto_ejecucion1' => $montos->ex_ejecucion_1 != null ? $proceeding->montos->ex_ejecucion_1 : '',
@@ -657,42 +409,15 @@ class ReportController extends Controller
                     '$costos' =>$proceeding->montos->ex_costos != null ? $proceeding->montos->ex_costos : '',
                     ];
                 }
-                if ($person) {
-                    if ($person->nat_id !== null) {
-                        $personData = $person->persona;
-                        $tipo_persona = 'natural';
-                    } elseif ($person->jur_id !== null) {
-                        $personData = $person->juridica;
-                        $tipo_persona = 'juridica';
-                    }
-                }
-        
-                if ($tipo_persona === 'natural') {
-                    $personDataArray = [
-                        'dni' => $personData->nat_dni,
-                        'apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
-                        'apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
-                        'nombres' => ucwords(strtolower($personData->nat_nombres)),
-                        'telefono' => $personData->nat_telefono,
-                        'correo' => strtolower($personData->nat_correo),
-                    ];
-                } elseif ($tipo_persona === 'juridica') {
-                    $personDataArray = [
-                        'ruc' => ucwords(strtolower($personData->jur_ruc)),
-                        'razon_social' => ucwords(strtolower($personData->jur_razon_social)),
-                        'telefono' => $personData->jur_telefono,
-                        'correo' => strtolower($personData->jur_correo),
-                    ];
-                } else {
-                    $personDataArray = [];
-                }
-        
-                return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
-            });
+                $formattedData[] = $commonData;
 
-           // return \response()->json(['state' => 0, 'data' => $data], 200);
-         $pdf = PDF::loadView('pdfpretensiones', ['data' => $data]);
-         return $pdf->download('archivo.pdf');
+             }
+            $tipo="Total de Pretensiones en Demanda";
+    
+        return \PDF::loadView('pdfpretensiones',compact('formattedData','tipo'))
+             ->download();
+               
+         
     }
     protected function pdfejecuciones(Request $request)
     {
@@ -701,86 +426,45 @@ class ReportController extends Controller
             'rep_tipo' => 'REPORTE EXPEDIENTE  EJECUCIONES /AUTOMATIZADO',
             'usu_id' => $request->usu_id,
         ]);
-        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-            ->with('person.address')
-            ->where('exp_estado_proceso',  'EN EJECUCION')
-            ->with('person.juridica', 'person.persona')
-            ->with('specialty')
-            ->with('materia')
+        $montos=null;
+            $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
+            ->whereIn('exp_estado_proceso', ['EN TRAMITE', 'EN EJECUCION'])
             ->with('montos')
+            ->with('procesal.persona', 'pretension', 'materia','specialty')
             ->get();
-            $data = $proceedings->map(function ($proceeding) {
-                $procesal = null;
-                $tipo_persona = null;
-                $montos=null;
-                if ($proceeding) {
-                    $montos=$proceeding->montos;
-                    if ($proceeding->exp_demandante !== null) {
-                        $person = $proceeding->demandante;
-                        $procesal = 'demandante';
-                    } elseif ($proceeding->exp_demandado !== null) {
-                        $person = $proceeding->demandado;
-                        $procesal = 'demandado';
-                    }
-                }
-                $fecha_inicio = $proceeding->exp_fecha_inicio;
-                $fecha_formateada = date('d-m-Y', strtotime($fecha_inicio));
+        $formattedData = [];
+            foreach ($proceedings as $proceeding) {
+                $processedProcesals = $this->formatProcesalData($proceeding->procesal);
                 $commonData = [
                     'exp_id' => $proceeding->exp_id,
                     'numero' => $proceeding->exp_numero,
-                    'fecha_inicio' => $fecha_formateada,
-                    'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                    'materia' => ucwords(strtolower($proceeding->exp_materia)),
-                    'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
+                    'fecha_inicio' => date('d-m-Y', strtotime($proceeding->exp_fecha_inicio)),
+                    'pretencion' => $proceeding->pretension->pre_nombre,
+                    'materia' => $proceeding->materia->mat_nombre,
+                    'especialidad'=>$proceeding->specialty->esp_nombre,
                     'monto_pretencion' => $proceeding->exp_monto_pretencion,
                     'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
-                    'procesal' => $procesal,
-                     ];
+                    'multiple' => $proceeding->multiple,
+                    'procesal' => $processedProcesals,
+                ];
+                $montos=$proceeding->montos;
                 if($montos){
                     $commonData+=[
-                    'monto_ejecucion1' => $montos->ex_ejecucion_1 != null ? $proceeding->montos->ex_ejecucion_1 : '',
-                    'monto_ejecucion2' => $proceeding->montos->ex_ejecucion_2 != null ? $proceeding->montos->ex_ejecucion_2 : '',
-                    'interes1' => $proceeding->montos->ex_interes_1 != null ? $proceeding->montos->ex_interes_1 : '',
-                    'interes2' => $proceeding->montos->ex_interes_2 != null ? $proceeding->montos->ex_interes_2 : '',
-                    'costos' =>$proceeding->montos->ex_costos != null ? $proceeding->montos->ex_costos : '',
+                    '$monto_ejecucion1' => $montos->ex_ejecucion_1 != null ? $proceeding->montos->ex_ejecucion_1 : '',
+                    '$monto_ejecucion2' => $proceeding->montos->ex_ejecucion_2 != null ? $proceeding->montos->ex_ejecucion_2 : '',
+                    '$interes1' => $proceeding->montos->ex_interes_1 != null ? $proceeding->montos->ex_interes_1 : '',
+                    '$interes2' => $proceeding->montos->ex_interes_2 != null ? $proceeding->montos->ex_interes_2 : '',
+                    '$costos' =>$proceeding->montos->ex_costos != null ? $proceeding->montos->ex_costos : '',
                     ];
                 }
-                if ($person) {
-                    if ($person->nat_id !== null) {
-                        $personData = $person->persona;
-                        $tipo_persona = 'natural';
-                    } elseif ($person->jur_id !== null) {
-                        $personData = $person->juridica;
-                        $tipo_persona = 'juridica';
-                    }
-                }
-        
-                if ($tipo_persona === 'natural') {
-                    $personDataArray = [
-                        'dni' => $personData->nat_dni,
-                        'apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
-                        'apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
-                        'nombres' => ucwords(strtolower($personData->nat_nombres)),
-                        'telefono' => $personData->nat_telefono,
-                        'correo' => strtolower($personData->nat_correo),
-                    ];
-                } elseif ($tipo_persona === 'juridica') {
-                    $personDataArray = [
-                        'ruc' => ucwords(strtolower($personData->jur_ruc)),
-                        'razon_social' => ucwords(strtolower($personData->jur_razon_social)),
-                        'telefono' => $personData->jur_telefono,
-                        'correo' => strtolower($personData->jur_correo),
-                    ];
-                } else {
-                    $personDataArray = [];
-                }
-        
-                return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
-            });
+                $formattedData[] = $commonData;
 
-            //return \response()->json(['state' => 0, 'data' => $data], 200);
-         $pdf = PDF::loadView('pdfejecuciones', ['data' => $data]);
-         return $pdf->download('archivo.pdf');
+             }
+            $tipo="Total de Pretensiones en Demanda";
+    
+        return \PDF::loadView('pdfejecuciones',compact('formattedData','tipo'))
+             ->download();
+                 
     }
     protected function pdfpretension(Request $request)
     {
@@ -789,74 +473,32 @@ class ReportController extends Controller
             'rep_tipo' => 'REPORTE EXPEDIENTE  PRETENSION /PERSONALIZADO',
             'usu_id' => $request->usu_id,
         ]);
-        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-            ->with('person.address')
-            ->with('person.juridica', 'person.persona')
-            ->with('specialty')
-            ->with('materia')
+            $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->where('exp_pretencion', $request->exp_pretension)
+            ->with('procesal.persona', 'pretension', 'materia','specialty')
             ->get();
-            $data = $proceedings->map(function ($proceeding) {
-                $procesal = null;
-                $tipo_persona = null;
-                if ($proceeding) {
-                    if ($proceeding->exp_demandante !== null) {
-                        $person = $proceeding->demandante;
-                        $procesal = 'demandante';
-                    } elseif ($proceeding->exp_demandado !== null) {
-                        $person = $proceeding->demandado;
-                        $procesal = 'demandado';
-                    }
-                }
-                $fecha_inicio = $proceeding->exp_fecha_inicio;
-                $fecha_formateada = date('d-m-Y', strtotime($fecha_inicio));
+            $formattedData = [];
+            foreach ($proceedings as $proceeding) {
+                $processedProcesals = $this->formatProcesalData($proceeding->procesal);
                 $commonData = [
                     'exp_id' => $proceeding->exp_id,
                     'numero' => $proceeding->exp_numero,
-                    'fecha_inicio' => $fecha_formateada,
-                    'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                    'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
-                    'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
+                    'fecha_inicio' => date('d-m-Y', strtotime($proceeding->exp_fecha_inicio)),
+                    'pretencion' => $proceeding->pretension->pre_nombre,
+                    'materia' => $proceeding->materia->mat_nombre,
+                    'especialidad'=>$proceeding->specialty->esp_nombre,
                     'monto_pretencion' => $proceeding->exp_monto_pretencion,
                     'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
-                    'procesal' => $procesal
+                    'multiple' => $proceeding->multiple,
+                    'procesal' => $processedProcesals,
                 ];
-                if ($person) {
-                    if ($person->nat_id !== null) {
-                        $personData = $person->persona;
-                        $tipo_persona = 'natural';
-                    } elseif ($person->jur_id !== null) {
-                        $personData = $person->juridica;
-                        $tipo_persona = 'juridica';
-                    }
-                }
-        
-                if ($tipo_persona === 'natural') {
-                    $personDataArray = [
-                        'dni' => $personData->nat_dni,
-                        'apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
-                        'apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
-                        'nombres' => ucwords(strtolower($personData->nat_nombres)),
-                        'telefono' => $personData->nat_telefono,
-                        'correo' => strtolower($personData->nat_correo),
-                    ];
-                } elseif ($tipo_persona === 'juridica') {
-                    $personDataArray = [
-                        'ruc' => ucwords(strtolower($personData->jur_ruc)),
-                        'razon_social' => ucwords(strtolower($personData->jur_razon_social)),
-                        'telefono' => $personData->jur_telefono,
-                        'correo' => strtolower($personData->jur_correo),
-                    ];
-                } else {
-                    $personDataArray = [];
-                }
-        
-                return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
-            });
-
-       
-        $pdf = PDF::loadView('vista_pdf_exps', ['data' => $data]);
-        return $pdf->download('archivo.pdf');
+                $formattedData[] = $commonData;
+             }
+            $tipo="Reporte de Expedientes por Pretensión";
+    
+        return \PDF::loadView('pdfExpedienteTramite',compact('formattedData','tipo'))
+             ->download();
+         
     }
     protected function pdffechas(Request $request)
 
@@ -866,82 +508,33 @@ class ReportController extends Controller
             'rep_tipo' => 'REPORTE EXPEDIENTE  DESDE-HASTA/PERSONALIZADO',
             'usu_id' => $request->usu_id,
         ]);
-        $mes = $request->mes;
-        $año = $request->año;
-        $mes = intval($mes);
-        if ($mes >= 1 && $mes <= 9) {
-            $mesFormateado = '0' . $mes;
-        } else {
-            $mesFormateado = (string) $mes;
-        }
-        $fechaBuscada = $año . '-' . $mesFormateado;
-        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-            ->with('person.address')
-            ->with('person.juridica', 'person.persona')
-            ->with('specialty')
-            ->with('materia')
+            $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->whereBetween('exp_fecha_inicio', [$request->fechaDesde,$request->fechaHasta])
+            ->with('procesal.persona', 'pretension', 'materia','specialty')
             ->get();
-            $data = $proceedings->map(function ($proceeding) {
-                $procesal = null;
-                $tipo_persona = null;
-                if ($proceeding) {
-                    if ($proceeding->exp_demandante !== null) {
-                        $person = $proceeding->demandante;
-                        $procesal = 'demandante';
-                    } elseif ($proceeding->exp_demandado !== null) {
-                        $person = $proceeding->demandado;
-                        $procesal = 'demandado';
-                    }
-                }
-                $fecha_inicio = $proceeding->exp_fecha_inicio;
-                $fecha_formateada = date('d-m-Y', strtotime($fecha_inicio));
+            $formattedData = [];
+            foreach ($proceedings as $proceeding) {
+                $processedProcesals = $this->formatProcesalData($proceeding->procesal);
                 $commonData = [
                     'exp_id' => $proceeding->exp_id,
                     'numero' => $proceeding->exp_numero,
-                    'fecha_inicio' => $fecha_formateada,
-                    'pretencion' => ucwords(strtolower($proceeding->exp_pretencion)),
-                    'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
-                    'especialidad' => ucwords(strtolower($proceeding->specialty->esp_nombre)),
+                    'fecha_inicio' => date('d-m-Y', strtotime($proceeding->exp_fecha_inicio)),
+                    'pretencion' => $proceeding->pretension->pre_nombre,
+                    'materia' => $proceeding->materia->mat_nombre,
+                    'especialidad'=>$proceeding->specialty->esp_nombre,
                     'monto_pretencion' => $proceeding->exp_monto_pretencion,
                     'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
-                    'procesal' => $procesal
+                    'multiple' => $proceeding->multiple,
+                    'procesal' => $processedProcesals,
                 ];
-                if ($person) {
-                    if ($person->nat_id !== null) {
-                        $personData = $person->persona;
-                        $tipo_persona = 'natural';
-                    } elseif ($person->jur_id !== null) {
-                        $personData = $person->juridica;
-                        $tipo_persona = 'juridica';
-                    }
-                }
-        
-                if ($tipo_persona === 'natural') {
-                    $personDataArray = [
-                        'dni' => $personData->nat_dni,
-                        'apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
-                        'apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
-                        'nombres' => ucwords(strtolower($personData->nat_nombres)),
-                        'telefono' => $personData->nat_telefono,
-                        'correo' => strtolower($personData->nat_correo),
-                    ];
-                } elseif ($tipo_persona === 'juridica') {
-                    $personDataArray = [
-                        'ruc' => ucwords(strtolower($personData->jur_ruc)),
-                        'razon_social' => ucwords(strtolower($personData->jur_razon_social)),
-                        'telefono' => $personData->jur_telefono,
-                        'correo' => strtolower($personData->jur_correo),
-                    ];
-                } else {
-                    $personDataArray = [];
-                }
-        
-                return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
-            });
-        
-        $pdf = PDF::loadView('vista_pdf_exps', ['data' => $data]);
-        return $pdf->download('archivo.pdf');
+                $formattedData[] = $commonData;
+             }
+            $tipo="Reporte de Expedientes del:".date('d-m-Y', strtotime($request->fechaDesde)) .' al 
+            '.date('d-m-Y', strtotime($request->fechaHasta));
+    
+        return \PDF::loadView('pdfExpedienteTramite',compact('formattedData','tipo'))
+             ->download();
+            
     }
     protected function pdfdistrito(Request $request)
 
