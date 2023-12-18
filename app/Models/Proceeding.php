@@ -28,7 +28,7 @@ class Proceeding extends Model
     protected $dates = ['deleted_at'];
     public function procesal()
     {
-    return $this->hasMany(Procesal::class, 'exp_id', 'exp_id');
+        return $this->hasMany(Procesal::class, 'exp_id');
     }
     public function pretension()
     {

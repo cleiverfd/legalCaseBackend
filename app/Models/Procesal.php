@@ -26,7 +26,7 @@ class Procesal extends Model
     }
     public function address()
     {
-        return $this->belongsTo(Address::class, 'per_id', 'per_id');
+        return $this->belongsTo(Address::class, 'proc_id');
     }
     public function expediente()
     {

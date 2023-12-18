@@ -20,4 +20,8 @@ class District extends Model
     {
         return $this->belongsTo(Province::class, 'pro_id', 'pro_id');
     }
+
+    public function direccion(){
+        return $this->hasMany(Address::class, 'dis_id');
+    }
 }

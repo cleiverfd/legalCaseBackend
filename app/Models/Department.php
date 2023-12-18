@@ -15,4 +15,7 @@ class Department extends Model
     ];
     protected $dates = ['deleted_at'];
 
+    public function direccion(){
+        return $this->hasMany(Address::class, 'dep_id');
+    }
 }
