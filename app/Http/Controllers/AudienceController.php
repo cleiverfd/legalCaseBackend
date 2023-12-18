@@ -21,10 +21,9 @@ class AudienceController extends Controller
 
     protected function index()
     {
-        $audiencias = Audience::with('exp')->get();
+        $audiencias = Audience::with('exp', 'person')->get();
 
         $result = $audiencias->map(function ($audiencia) {
-            $tipoPersona = $this->getTipoPersona($audiencia->person);
 
             $response = [
                 'aud_id' => $audiencia->au_id,
@@ -35,32 +34,28 @@ class AudienceController extends Controller
                 'per_id' => $audiencia->per_id,
                 'exp_id' => $audiencia->exp->exp_id,
                 'exp_numero' => $audiencia->exp->exp_numero,
-                'tipo_persona' => $tipoPersona,
             ];
-             if($audiencia->exp->exp_demandante){
-                $response += ['procesal' =>'demandante',    
-                ];
-             }
-             elseif($audiencia->exp->exp_demandado){
+
+            $tipoPersona = $audiencia->person->nat_dni;
+            if ($tipoPersona != null) {
                 $response += [
-                    'procesal' =>'demandado',    
+                    'per_id' => $audiencia->person->per_id,
+                    'nat_dni' => $audiencia->person->nat_dni,
+                    'nat_apellido_paterno' => $audiencia->person->nat_apellido_paterno,
+                    'nat_apellido_materno' => $audiencia->person->nat_apellido_materno,
+                    'nat_nombres' => $audiencia->person->nat_nombres,
+                    'nat_telefono' => $audiencia->person->nat_telefono,
+                    'nat_correo' => $audiencia->person->nat_correo,
+                    'tipo_procesal' => $audiencia->person->tipo_procesal,
+                    'tipo_persona' => 'NATURAL'
                 ];
-             }
-            if ($tipoPersona === "Natural") {
+            } else {
                 $response += [
-                    'nat_id' => $audiencia->person->nat_id,
-                    'nat_dni' => $audiencia->person->persona->nat_dni,
-                    'nat_apellido_paterno' => $audiencia->person->persona->nat_apellido_paterno,
-                    'nat_apellido_materno' => $audiencia->person->persona->nat_apellido_materno,
-                    'nat_nombres' => $audiencia->person->persona->nat_nombres,
-                    'nat_telefono' => $audiencia->person->persona->nat_telefono,
-                    'nat_correo' => $audiencia->person->persona->nat_correo,
-                ];
-            } elseif ($tipoPersona === "Jurídica") {
-                $response += [
-                    'jur_id' => $audiencia->person->juridica->jur_id,
-                    'jur_ruc' => $audiencia->person->juridica->jur_ruc,
-                    'jur_razon_social' => $audiencia->person->juridica->jur_razon_social,
+                    'jur_id' => $audiencia->person->jur_id,
+                    'jur_ruc' => $audiencia->person->jur_ruc,
+                    'jur_razon_social' => $audiencia->person->jur_razon_social,
+                    'tipo_procesal' => $audiencia->person->tipo_procesal,
+                    'tipo_persona' => 'JURIDICA'
                 ];
             }
 
@@ -73,7 +68,7 @@ class AudienceController extends Controller
     protected function store(Request $request)
     {
         try {
-            DB::beginTransaction(); 
+            DB::beginTransaction();
 
             $au_fecha = strtoupper(trim($request->au_fecha));
             $hoy = date('Y-m-d'); // Obtiene la fecha actual en el formato 'Año-Mes-Día'
@@ -88,7 +83,7 @@ class AudienceController extends Controller
                 'per_id' => trim($request->per_id),
                 'exp_id' => strtoupper(trim($request->exp_id)),
                 'au_fecha' => $au_fecha,
-                'au_link'=>$request->au_link,
+                'au_link' => $request->au_link,
                 'au_hora' => $request->au_hora,
                 'au_lugar' => $request->au_lugar,
                 'au_detalles' => $request->au_detalles,

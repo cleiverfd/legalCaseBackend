@@ -18,6 +18,7 @@ class Audience extends Model
         'au_detalles',
         'au_dias_faltantes',
         'exp_id',
+        'per_id',
         'abo_id'
     ];
     protected $dates = [ 'au_fecha','deleted_at'];
