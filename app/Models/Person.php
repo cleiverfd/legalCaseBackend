@@ -26,8 +26,8 @@ class Person extends Model
         'tipo_procesal'
     ];
     protected $dates = ['deleted_at'];
-    // public function direccion()
-    // {
-    //     return $this->belongsTo(Address::class, 'dir_id', 'dir_id');
-    // }
+    public function procesal()
+    {
+        return $this->hasMany(Procesal::class, 'per_id','per_id');
+    }
 }

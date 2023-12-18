@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\PeopleNatural;
-use App\Models\PeopleJuridic;
 use App\Models\Person;
 use App\Models\Address;
 use App\Models\History;
-use App\Models\Payment;
 use App\Models\Proceeding;
+use App\Models\Procesal;
 use Exception;
 use Illuminate\Support\Facades\DB; // Add this line to import DB
 
@@ -25,109 +23,26 @@ class PersonController extends Controller
 
     protected function index(Request $request)
     {
-        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-            ->with('person.juridica', 'person.persona', 'person.address')
-            ->whereNotNull('exp_demandante')
-            ->get();
-
-        $data = $proceedings->map(function ($proceeding) {
-            $person = $proceeding->person;
-            $tipo_persona = null;
-
-            $commonData = [
-                'exp_id' => $proceeding->exp_id,
-                'exp_numero' => $proceeding->exp_numero,
-            ];
-            
-            if ($person) {
-                if ($person->nat_id !== null) {
-                    $personData = $person->persona;
-                    $tipo_persona = 'natural';
-                } elseif ($person->jur_id !== null) {
-                    $personData = $person->juridica;
-                    $tipo_persona = 'juridica';
-                }
-            }
-
-            if ($tipo_persona === 'natural') {
-                $personDataArray = [
-                    'nat_dni' => $personData->nat_dni,
-                    'nat_apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
-                    'nat_apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
-                    'nat_nombres' => ucwords(strtolower($personData->nat_nombres)),
-                    'nat_telefono' => $personData->nat_telefono,
-                    'nat_correo' => strtolower($personData->nat_correo),
-                    'dir_calle_av' => ucwords(strtolower($proceeding->person->address->dir_calle_av)),
-                ];
-            } elseif ($tipo_persona === 'juridica') {
-                $personDataArray = [
-                    'jur_ruc' => $personData->jur_ruc,
-                    'jur_razon_social' => ucwords(strtolower($personData->jur_razon_social)),
-                    'jur_telefono' => $personData->jur_telefono,
-                    'jur_correo' => strtolower($personData->jur_correo),
-                    'dir_calle_av' => $proceeding->person->address->dir_calle_av,
-                ];
-            } else {
-                $personDataArray = [];
-            }
-
-            return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
-        });
+        $data = Person::orderBy('created_at', 'DESC')
+        ->where('tipo_procesal', 'DEMANDANTE')
+        ->whereHas('procesal.expediente', function ($query) {
+            $query->whereIn('exp_estado_proceso', ['EN TRAMITE', 'EN EJECUCION']);
+        })
+        ->get();
 
         return response()->json(['data' => $data], 200);
     }
      //traer los demandados
     protected function indexdemandados(Request $request)
     {
-        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
-        ->with('demandado.juridica', 'demandado.persona', 'demandado.address')
-        ->whereNotNull('exp_demandado')
-        ->get();
+        $data = Person::orderBy('created_at', 'DESC')
+    ->where('tipo_procesal', 'DEMANDADO')
+    ->whereHas('procesal.expediente', function ($query) {
+        $query->whereIn('exp_estado_proceso', ['EN TRAMITE', 'EN EJECUCION']);
+    })
+    ->get();
 
-     $data = $proceedings->map(function ($proceeding) {
-        $person = $proceeding->demandado;
-        $tipo_persona = null;
-
-        $commonData = [
-            'exp_id' => $proceeding->exp_id,
-            'exp_numero' => $proceeding->exp_numero,
-        ];
-        
-        if ($person) {
-            if ($person->nat_id !== null) {
-                $personData = $person->persona;
-                $tipo_persona = 'natural';
-            } elseif ($person->jur_id !== null) {
-                $personData = $person->juridica;
-                $tipo_persona = 'juridica';
-            }
-        }
-
-        if ($tipo_persona === 'natural') {
-            $personDataArray = [
-                'nat_dni' => $personData->nat_dni,
-                'nat_apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
-                'nat_apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
-                'nat_nombres' => ucwords(strtolower($personData->nat_nombres)),
-                'nat_telefono' => $personData->nat_telefono,
-                'nat_correo' => strtolower($personData->nat_correo),
-                'dir_calle_av' => ucwords(strtolower($proceeding->demandado->address->dir_calle_av)),
-            ];
-        } elseif ($tipo_persona === 'juridica') {
-            $personDataArray = [
-                'jur_ruc' => $personData->jur_ruc,
-                'jur_razon_social' => ucwords(strtolower($personData->jur_razon_social)),
-                'jur_telefono' => $personData->jur_telefono,
-                'jur_correo' => strtolower($personData->jur_correo),
-                'dir_calle_av' => $proceeding->demandado->address->dir_calle_av,
-            ];
-        } else {
-            $personDataArray = [];
-        }
-
-        return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
-    });
-
+    
     return response()->json(['data' => $data], 200);
     }
 
@@ -135,36 +50,45 @@ class PersonController extends Controller
     {
         try {
             DB::beginTransaction();
-
-            $documento = $request->documento;
-            $person = $this->getPersonByDocument($documento);
-
-            if (!$person) {
-                return response()->json(['state' => 1, 'message' => 'Persona no encontrada'], 404);
+            $doc=$request->documento;
+                $tipoPersona=null;
+                $persona=null;
+                $procesales=[];
+            if (strlen($doc) === 8) {
+                $tipoPersona="NATURAL";
+                $persona = Person::where('nat_dni', $doc)->first();
+            } else {
+                $tipoPersona="JURIDICA";
+                $persona = Person::where('jur_ruc', $doc)->first();
             }
-
+            $procesales=Procesal::where('per_id',$persona->per_id)->get();
             $personaData = [];
-            $tipoPersona = null;
-
-            if ($person->natural) {
-                $tipoPersona = 'natural';
+            if ($tipoPersona=="NATURAL") { 
                 $personaData = [
-                    'per_id' => $person->per_id,
-                    'nat_id' => $person->natural->nat_id,
-                    'nat_nombres' => $person->natural->nat_nombres,
-                    'nat_apellido_paterno' => $person->natural->nat_apellido_paterno,
-                    'nat_apellido_materno' => $person->natural->nat_apellido_materno,
+                    'per_id' => $persona->per_id,
+                    'documento' => $persona->nat_dni,
+                    'nat_nombres' => $persona->nat_nombres,
+                    'nat_apellido_paterno' => $persona->nat_apellido_paterno,
+                    'nat_apellido_materno' => $persona->nat_apellido_materno,
+                    'condicion'=>$persona->per_condicion,
                 ];
-            } elseif ($person->juridica) {
-                $tipoPersona = 'juridica';
+            } else {
                 $personaData = [
-                    'per_id' => $person->per_id,
-                    'jur_id' => $person->juridica->jur_id,
-                    'jur_razon_social' => $person->juridica->jur_razon_social,
+                    'per_id' => $persona->per_id,
+                    'jur_id' => $persona->jur_id,
+                    'jur_razon_social' => $persona->jur_razon_social,
+                    'documento' => $persona->jur_ruc,
+                    'condicion'=>$persona->per_condicion,
                 ];
             }
-
-            $expedientes = Proceeding::where('exp_demandante', $person->per_id)->get();
+            $expedientesData = [];
+                foreach ($procesales as $procesal) {
+                    $expediente = Proceeding::where('exp_id', $procesal->exp_id)->first();
+                    $expedientesData[] = [
+                        'exp_id' => $expediente->exp_id,
+                        'exp_numero' => $expediente->exp_numero,
+                    ];
+                }
 
             DB::commit();
 
@@ -172,12 +96,8 @@ class PersonController extends Controller
                 'state' => 0,
                 'persona' => $personaData,
                 'tipo_persona' => $tipoPersona,
-                'expedientes' => $expedientes->map(function ($expediente) {
-                    return [
-                        'exp_id' => $expediente->exp_id,
-                        'exp_numero' => $expediente->exp_numero,
-                    ];
-                }),
+                'expedientes' => $expedientesData
+                ,
             ];
 
             return response()->json($response, 200);
@@ -191,36 +111,45 @@ class PersonController extends Controller
     {
         try {
             DB::beginTransaction();
-
-            $documento = $request->documento;
-            $person = $this->getPersonByDocument($documento);
-
-            if (!$person) {
-                return response()->json(['state' => 1, 'message' => 'Persona no encontrada'], 404);
+            $doc=$request->documento;
+                $tipoPersona=null;
+                $persona=null;
+                $procesales=[];
+            if (strlen($doc) === 8) {
+                $tipoPersona="NATURAL";
+                $persona = Person::where('nat_dni', $doc)->first();
+            } else {
+                $tipoPersona="JURIDICA";
+                $persona = Person::where('jur_ruc', $doc)->first();
             }
-
+            $procesales=Procesal::where('per_id',$persona->per_id)->get();
             $personaData = [];
-            $tipoPersona = null;
-
-            if ($person->natural) {
-                $tipoPersona = 'natural';
+            if ($tipoPersona=="NATURAL") { 
                 $personaData = [
-                    'per_id' => $person->per_id,
-                    'nat_id' => $person->natural->nat_id,
-                    'nat_nombres' => $person->natural->nat_nombres,
-                    'nat_apellido_paterno' => $person->natural->nat_apellido_paterno,
-                    'nat_apellido_materno' => $person->natural->nat_apellido_materno,
+                    'per_id' => $persona->per_id,
+                    'documento' => $persona->nat_dni,
+                    'nat_nombres' => $persona->nat_nombres,
+                    'nat_apellido_paterno' => $persona->nat_apellido_paterno,
+                    'nat_apellido_materno' => $persona->nat_apellido_materno,
+                    'condicion'=>$persona->per_condicion,
                 ];
-            } elseif ($person->juridica) {
-                $tipoPersona = 'juridica';
+            } else {
                 $personaData = [
-                    'per_id' => $person->per_id,
-                    'jur_id' => $person->juridica->jur_id,
-                    'jur_razon_social' => $person->juridica->jur_razon_social,
+                    'per_id' => $persona->per_id,
+                    'jur_id' => $persona->jur_id,
+                    'jur_razon_social' => $persona->jur_razon_social,
+                    'documento' => $persona->jur_ruc,
+                    'condicion'=>$persona->per_condicion,
                 ];
             }
-
-            $expedientes = Proceeding::where('exp_demandado', $person->per_id)->get();
+            $expedientesData = [];
+            foreach ($procesales as $procesal) {
+                    $expediente = Proceeding::where('exp_id', $procesal->exp_id)->first();
+                    $expedientesData[] = [
+                        'exp_id' => $expediente->exp_id,
+                        'exp_numero' => $expediente->exp_numero,
+                    ];
+                }
 
             DB::commit();
 
@@ -228,12 +157,8 @@ class PersonController extends Controller
                 'state' => 0,
                 'persona' => $personaData,
                 'tipo_persona' => $tipoPersona,
-                'expedientes' => $expedientes->map(function ($expediente) {
-                    return [
-                        'exp_id' => $expediente->exp_id,
-                        'exp_numero' => $expediente->exp_numero,
-                    ];
-                }),
+                'expedientes' => $expedientesData
+                ,
             ];
 
             return response()->json($response, 200);
@@ -381,11 +306,11 @@ class PersonController extends Controller
     protected function getPersonByDocument($doc)
     {
         if (strlen($doc) === 8) {
-            $persona = PeopleNatural::where('nat_dni', $doc)->first();
-            return $persona ? Person::where('nat_id', $persona->nat_id)->first() : null;
+            $persona = Person::where('nat_dni', $doc)->first();
+            return $persona ? Procesal::where('per_id', $persona->per_id)->first() : null;
         } else {
-            $persona = PeopleJuridic::where('jur_ruc', $doc)->first();
-            return $persona ? Person::where('jur_id', $persona->jur_id)->first() : null;
+            $persona = Person::where('jur_ruc', $doc)->first();
+            return $persona ? Procesal::where('per_id', $persona->per_id)->first() : null;
         }
     }
     
@@ -421,14 +346,4 @@ class PersonController extends Controller
     }
 }
 
-    
-    
-
-    protected function getPaymentsByDocument($doc)
-    {
-        $person = $this->getPersonByDocument($doc);
-        return $person ? Payment::where('per_id', $person->per_id)
-            ->with('expediente')
-            ->get() : collect([]);
-    }
 }

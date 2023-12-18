@@ -20,18 +20,16 @@ class Proceeding extends Model
         'exp_especialidad',
         'exp_monto_pretencion',
         'exp_estado_proceso',
-        'exp_demandante',
-        'exp_demandado',
         'exp_juzgado',
         'abo_id',
         'multiple'
     ];
 
     protected $dates = ['deleted_at'];
-    // public function procesales()
-    // {
-    //     return $this->hasMany(Procesal::class, 'exp_id', 'exp_id');
-    // }
+    public function procesal()
+    {
+    return $this->hasMany(Procesal::class, 'exp_id', 'exp_id');
+    }
     public function pretension()
     {
         return $this->belongsTo(Claim::class, 'exp_pretencion', 'pre_id');
