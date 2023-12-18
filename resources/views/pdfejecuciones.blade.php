@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Lista de Expedientes</title>
+    <title>{{$tipo}}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -70,15 +70,19 @@
 
 <body>
 
-    <div class="header">
-        <p class="header-title">Total a Pagar/Cobrar Por Sentencia En Ejecución</p>
-    </div>
-    @if(empty($data))
+<div class="header">
+    <img src="{{ asset('images/log.jpg') }}" style="position: absolute; 
+        top: 10px; right: 10px; width: 180px; height: auto; z-index: 9999;" />
+
+    <p class="header-title" style="margin-right: 250px;">{{$tipo}}</p>
+</div>
+    @if(empty($formattedData))
     <p>No hay datos disponibles</p>
 @else
     <table>
         <thead>
             <tr>
+            <th scope="col" width=3%>N°</th>
                 <th>Número</th>
                 <th>Fecha de Inicio</th>
                 <th>Demandante</th>
@@ -101,33 +105,48 @@
                 $sumaTotal = 0;
             @endphp
 
-            @foreach($data as $expediente)
+            @foreach($formattedData as $expediente)
                 <tr>
+                <td>{{$loop->iteration}}</td>
                     <td>{{ $expediente['numero'] ?? '' }}</td>
                     <td>{{ $expediente['fecha_inicio'] ?? ''}}</td>
                     <td>
-                        @if($expediente['procesal'] === 'demandante')
-                            @if($expediente['tipo_persona'] === 'natural')
-                                {{ ucwords(strtolower($expediente['nombres'] ?? '')) . ' ' . ucwords(strtolower($expediente['apellido_paterno'] ?? '')) . ' ' . ucwords(strtolower($expediente['apellido_materno'] ?? '')) }}
+                    @if($expediente['procesal'][0]['tipo_procesal'] === 'DEMANDANTE')
+                            @if($expediente['multiple']=== '0')
+                                    @if($expediente['procesal'][0]['tipo_persona'] === 'NATURAL')
+                                        {{ ucwords(strtolower($expediente['procesal'][0]['nombres'] ?? '')) . ' 
+                                            ' . ucwords(strtolower($expediente['procesal'][0]['apellido_paterno'] ?? '')) . ' 
+                                            ' . ucwords(strtolower($expediente['procesal'][0]['apellido_materno'] ?? '')) }}
+                                    @else
+                                        {{ ucwords(strtolower($expediente['procesal'][0]['razon_social'] ?? '')) }}
+                                    @endif
                             @else
-                                {{ ucwords(strtolower($expediente['razon_social'] ?? '')) }}
-                            @endif
+                            Múltiples
+                        @endif
+                        
                         @else
-                           UNPRG
+                            UNPRG
                         @endif
                     </td>
                     <td>
-                        @if($expediente['procesal'] !== 'demandante')
-                            @if($expediente['tipo_persona'] === 'natural')
-                                {{ ucwords(strtolower($expediente['nombres'] ?? '')) . ' ' . ucwords(strtolower($expediente['apellido_paterno'] ?? '')) . ' ' . ucwords(strtolower($expediente['apellido_materno'] ?? '')) }}
+                        @if($expediente['procesal'][0]['tipo_procesal'] !== 'DEMANDANTE')
+                            @if($expediente['multiple']=== '0')
+                                    @if($expediente['procesal'][0]['tipo_persona'] === 'NATURAL')
+                                        {{ ucwords(strtolower($expediente['procesal'][0]['nombres'] ?? '')) . ' 
+                                            ' . ucwords(strtolower($expediente['procesal'][0]['apellido_paterno'] ?? '')) . ' 
+                                            ' . ucwords(strtolower($expediente['procesal'][0]['apellido_materno'] ?? '')) }}
+                                    @else
+                                        {{ ucwords(strtolower($expediente['procesal'][0]['razon_social'] ?? '')) }}
+                                    @endif
                             @else
-                                {{ ucwords(strtolower($expediente['razon_social'] ?? '')) }}
-                            @endif
+                            Múltiples
+                        @endif
+                        
                         @else
-                           UNPRG
+                            UNPRG
                         @endif
                     </td>
-                    <td>
+                    <td> 
                         {{ !empty($expediente['monto_ejecucion1']) ? $expediente['monto_ejecucion1'] : '0.00' }}
                     </td>
                     <td>
