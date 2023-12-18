@@ -495,6 +495,32 @@ class ProceedingController extends Controller
         return response()->json(['data' => $formattedData], 200);
     }
 
+    protected function buscarPorId(Request $request)
+    {
+        $expId = $request->exp_id;
+        $proceeding = \App\Models\Proceeding::orderBy('created_at', 'DESC')
+            ->whereIn('exp_estado_proceso', ['EN TRAMITE', 'EN EJECUCION'])
+            ->with('procesal.persona', 'juzgado')
+            ->find($expId);
+
+        if ($proceeding !== null) {
+            $processedProcesals = $this->formatProcesalData($proceeding->procesal);
+            $commonData = [
+                'exp_id' => $proceeding->exp_id,
+                'numero' => $proceeding->exp_numero,
+                'juzgado' => $proceeding->juzgado ? $proceeding->juzgado->co_nombre : null,
+                'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
+                'multiple' => $proceeding->multiple,
+                'procesal' => $processedProcesals,
+            ];
+
+            return response()->json(['data' => $commonData], 200);
+        } else {
+            // Manejar el caso cuando no se encuentra el registro
+            return response()->json(['error' => 'Expediente no encontrado'], 404);
+        }
+    }
+
     //formatear los procesales
     protected function formatProcesalData($procesal)
     {

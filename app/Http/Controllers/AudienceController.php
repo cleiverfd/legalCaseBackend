@@ -92,7 +92,7 @@ class AudienceController extends Controller
                 'au_hora' => $request->au_hora,
                 'au_lugar' => $request->au_lugar,
                 'au_detalles' => $request->au_detalles,
-                'au_dias_faltantes' => $dias_faltantes, // Guarda la cantidad de días faltantes
+                'au_dias_faltantes' => $dias_faltantes,
             ]);
 
 
