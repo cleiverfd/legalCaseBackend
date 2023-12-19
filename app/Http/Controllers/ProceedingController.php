@@ -350,8 +350,7 @@ class ProceedingController extends Controller
             'instancia',
             'distritoJudicial',
             'materia',
-            'demandante.persona',
-            'demandado.persona'
+            'procesal.persona',
         )
             ->find($id);
 
@@ -359,60 +358,35 @@ class ProceedingController extends Controller
             return response()->json(['error' => 'Expediente no encontrado'], 404);
         }
 
-        $procesal = null;
-        $person = null;
+        $dataGeneral = null;
+        $dataProcesal = null;
+        $dataEje = null;
+        $dataEscritos = null;
 
-        if ($proceeding->exp_demandante !== null) {
-            $person = $proceeding->demandante;
-            $procesal = 'demandante';
-        } elseif ($proceeding->exp_demandado !== null) {
-            $person = $proceeding->demandado;
-            $procesal = 'demandado';
-        }
-
-        $personData = null;
-        $tipo_persona = null;
-
-        // Información de distrito judicial
-        $districtName = optional($proceeding->distritoJudicial)->judis_nombre;
-
-        // Información de instancia
-        $instanceName = optional($proceeding->instancia)->ins_nombre;
-
-        // Información de especialidad
-        $specialtyName = optional($proceeding->specialty)->esp_nombre;
-
-        $judicial = [
-            'distrito_judicial' => $districtName,
-            'instancia' => $instanceName,
-            'especialidad' => $specialtyName,
+        $dataGeneral = [
+            'exp_id' => $proceeding->exp_id,
+            'exp_numero' => $proceeding->exp_numero,
+            'exp_juzgado' => $proceeding->juzgado->co_nombre,
+            'exp_distrito_judicial' => $proceeding->distritoJudicial->judis_nombre,
+            'exp_fecha_inicio' => $proceeding->exp_fecha_inicio,
+            'exp_especialidad' => $proceeding->specialty->esp_nombre,
+            'exp_materia' => $proceeding->materia->mat_nombre,
+            'exp_estado' => $proceeding->exp_estado_proceso
         ];
 
-        if ($person) {
-            if ($person->nat_id !== null) {
-                $personData = $this->getNaturalPersonData($person);
-                $tipo_persona = 'Natural';
-            } elseif ($person->jur_id !== null) {
-                $personData = $this->getJuridicalPersonData($person);
-                $tipo_persona = 'Juridica';
-            }
-        }
-
-        $data = $this->transformProceedingData($proceeding, $personData, $tipo_persona);
-        $data['per_id'] = optional($person)->per_id;
+        $dataProcesal = $this->formatProcesalData($proceeding->procesal);
 
         // Traer archivos
-        $eje = \App\Models\LegalDocument::where('exp_id', $id)->where('doc_tipo', 'EJE')
+        $dataEje = \App\Models\LegalDocument::where('exp_id', $id)->where('doc_tipo', 'EJE')
             ->orderBy('created_at', 'DESC')->get();
-        $escritos = \App\Models\LegalDocument::where('exp_id', $id)->where('doc_tipo', 'ESCRITO')
+        $dataEscritos = \App\Models\LegalDocument::where('exp_id', $id)->where('doc_tipo', 'ESCRITO')
             ->orderBy('created_at', 'DESC')->get();
 
         return response()->json([
-            'data' => $data,
-            'eje' => $eje,
-            'escritos' => $escritos,
-            'procesal' => $procesal,
-            'judicial' => $judicial
+            'expediente' => $dataGeneral,
+            'procesales' => $dataProcesal,
+            'eje' => $dataEje,
+            'escritos' => $dataEscritos,
         ], 200);
     }
 
