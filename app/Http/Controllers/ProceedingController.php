@@ -16,13 +16,13 @@ class ProceedingController extends Controller
 
     protected function index()
     {
-        $prceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
+        $procedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->whereIn('exp_estado_proceso', ['EN TRAMITE', 'EN EJECUCION'])
             ->with('procesal.persona', 'pretension', 'materia')
             ->get();
 
          $formattedData = [];
-        foreach ($proceedings as $proceeding) {
+        foreach ($procedings as $proceeding) {
             $processedProcesals = $this->formatProcesalData($proceeding->procesal);
             $commonData = [
                 'exp_id' => $proceeding->exp_id,
