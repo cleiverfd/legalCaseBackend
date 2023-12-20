@@ -16,12 +16,12 @@ class ProceedingController extends Controller
 
     protected function index()
     {
-        $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
+        $prceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
             ->whereIn('exp_estado_proceso', ['EN TRAMITE', 'EN EJECUCION'])
             ->with('procesal.persona', 'pretension', 'materia')
             ->get();
 
-        $formattedData = [];
+         $formattedData = [];
         foreach ($proceedings as $proceeding) {
             $processedProcesals = $this->formatProcesalData($proceeding->procesal);
             $commonData = [
@@ -392,55 +392,45 @@ class ProceedingController extends Controller
 
     protected function showupdate($id)
     {
-        $person = null;
-        $procesal = null;
-        $personData = null;
-        $tipo_persona = null;
-
-        $proceeding = \App\Models\Proceeding::with('specialty', 'instancia', 'distritoJudicial')
-            ->with('abogado.persona')
-            ->find($id);
-
-        if (!$proceeding) {
-            return response()->json(['error' => 'Expediente no encontrado'], 404);
-        }
-
-        if ($proceeding->exp_demandante !== null) {
-            $person = \App\Models\Person::with('address.district.province.departament')
-                ->where('per_id', $proceeding->exp_demandante)
-                ->first();
-            $procesal = 'demandante';
-        } elseif ($proceeding->exp_demandado !== null) {
-            $person = \App\Models\Person::with('address.district.province.departament')
-                ->where('per_id', $proceeding->exp_demandado)
-                ->first();
-            $procesal = 'demandado';
-        }
-
-        if ($person) {
-            if ($person->nat_id !== null) {
-                $personData = $this->getNaturalPersonData($person);
-                $tipo_persona = 'natural';
-            } elseif ($person->jur_id !== null) {
-                $personData = $person->juridica;
-                $tipo_persona = 'juridica';
-            }
-        }
-
+        $proceeding = \App\Models\Proceeding::
+        with('abogado.persona')->
+        find($id);
+        $proceeding1 = \App\Models\Proceeding::with('procesal.persona','procesal.address')->find($id);
+        $processedProcesalData = $proceeding1->procesal->map(function ($proc) {
+            return [
+                'proc_id' => $proc->proc_id,
+                "tipo_procesal"=> $proc->tipo_procesal,
+                "tipo_persona"=> $proc->tipo_persona,
+                "per_id"=> $proc->per_id,
+                "exp_id"=> $proc->exp_id,
+                'nat_dni' => $proc->persona->nat_dni,
+                'nat_apellido_paterno' => $proc->persona->nat_apellido_paterno,
+                "nat_apellido_materno" => $proc->persona->nat_apellido_materno,
+                "nat_nombres" => $proc->persona->nat_nombres,
+                "nat_telefono" => $proc->persona->nat_telefono,
+                "nat_correo" => $proc->persona->nat_correo,
+                "jur_ruc" => $proc->persona->jur_ruc,
+                "jur_razon_social" => $proc->persona->jur_razon_social,
+                "jur_telefono" => $proc->persona->jur_telefono,
+                "jur_correo" => $proc->persona->jur_correo,
+                "jur_rep_legal" => $proc->persona->jur_rep_legal,
+                "per_condicion" => $proc->persona->per_condicion,
+                'dir_id' => $proc->address->dir_id,
+                'dir_calle_av' => $proc->address->dir_calle_av,
+                "dis_id"=> $proc->address->dis_id,
+                "pro_id"=> $proc->address->pro_id,
+                "dep_id"=> $proc->address->dep_id,
+            ];
+        });
         $costos = \App\Models\ExecutionAmount::where('exp_id', $proceeding->exp_id)
             ->first();
 
         return response()->json([
             'proceeding' => $proceeding,
-            'person' => $person,
-            'tipo_persona' => $tipo_persona,
-            'personData' => $personData,
-            'procesal' => $procesal,
+            'personData' =>$processedProcesalData,
             'costos' => $costos,
         ], 200);
     }
-
-
     protected function take()
     {
         $proceedings = \App\Models\Proceeding::latest('created_at')
