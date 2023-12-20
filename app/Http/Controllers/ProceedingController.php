@@ -27,7 +27,7 @@ class ProceedingController extends Controller
             $commonData = [
                 'exp_id' => $proceeding->exp_id,
                 'numero' => $proceeding->exp_numero,
-                'fecha_inicio' => date('d-m-Y', strtotime($proceeding->exp_fecha_inicio)),
+                'fecha_inicio' =>$proceeding->exp_fecha_inicio,
                 'pretencion' => $proceeding->pretension->pre_nombre,
                 'materia' => $proceeding->materia->mat_nombre,
                 'monto_pretencion' => $proceeding->exp_monto_pretencion,
