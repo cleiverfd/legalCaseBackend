@@ -25,6 +25,7 @@ class AbogadoSeeder extends Seeder
             ['16794061', 'Rios', 'Lora', 'Christian Miguel', '991526970', 'crioslo@unprg.edu.pe'],
             ['47345175', 'Guevara', 'Acosta', 'Diana Carolina', '975943495', 'cguevaraac@unprg.edu.pe'],
             ['16797179', 'Coronado', 'Rioja', 'Antonio Lenin', '957945569', 'acoronador@unprg.edu.pe'],
+            ['71415468', 'Delgado', 'Burga', 'Evelyn', '978172422', 'edelgadobu@unprg.edu.pe'],
         ];
 
         foreach ($datosAbogados as $datosAbogado) {
