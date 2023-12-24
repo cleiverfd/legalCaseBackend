@@ -16,7 +16,6 @@ class ExpedientesSeeder extends Seeder
     public function run()
     {
         // \App\Models\User::factory(10)->create();
-        \App\Models\PeopleNatural::factory()->count(50)->create();
         \App\Models\Person::factory()->count(50)->create();
         \App\Models\Proceeding::factory()->count(50)->create();
         \App\Models\Address::factory()->count(50)->create();

@@ -350,6 +350,7 @@ class ProceedingController extends Controller
             'instancia',
             'distritoJudicial',
             'materia',
+            'pretension',
             'procesal.persona',
         )
             ->find($id);
@@ -371,6 +372,8 @@ class ProceedingController extends Controller
             'exp_fecha_inicio' => $proceeding->exp_fecha_inicio,
             'exp_especialidad' => $proceeding->specialty->esp_nombre,
             'exp_materia' => $proceeding->materia->mat_nombre,
+            'exp_pretension' =>$proceeding->pretension->pre_nombre,
+            'exp_monto_pretension'=>$proceeding->exp_monto_pretencion,
             'exp_estado' => $proceeding->exp_estado_proceso
         ];
 
@@ -399,22 +402,22 @@ class ProceedingController extends Controller
         $processedProcesalData = $proceeding1->procesal->map(function ($proc) {
             return [
                 'proc_id' => $proc->proc_id,
-                "tipo_procesal"=> $proc->tipo_procesal,
-                "tipo_persona"=> $proc->tipo_persona,
+                "tipo_procesal"=> ucwords(strtolower($proc->tipo_procesal)),
+                "tipo_persona"=> ucwords(strtolower($proc->tipo_persona)),
                 "per_id"=> $proc->per_id,
                 "exp_id"=> $proc->exp_id,
                 'nat_dni' => $proc->persona->nat_dni,
-                'nat_apellido_paterno' => $proc->persona->nat_apellido_paterno,
-                "nat_apellido_materno" => $proc->persona->nat_apellido_materno,
-                "nat_nombres" => $proc->persona->nat_nombres,
+                'nat_apellido_paterno' => ucwords(strtolower($proc->persona->nat_apellido_paterno)),
+                "nat_apellido_materno" => ucwords(strtolower($proc->persona->nat_apellido_materno)),
+                "nat_nombres" => ucwords(strtolower($proc->persona->nat_nombres)),
                 "nat_telefono" => $proc->persona->nat_telefono,
                 "nat_correo" => $proc->persona->nat_correo,
                 "jur_ruc" => $proc->persona->jur_ruc,
-                "jur_razon_social" => $proc->persona->jur_razon_social,
+                "jur_razon_social" => ucwords(strtolower($proc->persona->jur_razon_social)),
                 "jur_telefono" => $proc->persona->jur_telefono,
                 "jur_correo" => $proc->persona->jur_correo,
                 "jur_rep_legal" => $proc->persona->jur_rep_legal,
-                "per_condicion" => $proc->persona->per_condicion,
+                "per_condicion" => ucwords(strtolower($proc->persona->per_condicion)),
                 'dir_id' => $proc->address->dir_id,
                 'dir_calle_av' => $proc->address->dir_calle_av,
                 "dis_id"=> $proc->address->dis_id,
