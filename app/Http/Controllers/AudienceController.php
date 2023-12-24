@@ -78,16 +78,18 @@ class AudienceController extends Controller
             // Calcula la diferencia de días
             $interval = $au_fecha_obj->diff($hoy_obj);
             $dias_faltantes = $interval->days;
-
+            //expediente
+            $exp=\App\Models\Proceeding::find($request->exp_id);
             $audience = Audience::create([
-                'per_id' => trim($request->per_id),
                 'exp_id' => strtoupper(trim($request->exp_id)),
+                'abo_id'=>$exp->abo_id,
                 'au_fecha' => $au_fecha,
                 'au_link' => $request->au_link,
                 'au_hora' => $request->au_hora,
                 'au_lugar' => $request->au_lugar,
                 'au_detalles' => $request->au_detalles,
                 'au_dias_faltantes' => $dias_faltantes,
+                'per_id'=>$request->per_id
             ]);
 
 

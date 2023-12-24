@@ -48,4 +48,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Person::class, 'per_id', 'per_id');
     }
+    public function abogado()
+    {
+        return $this->hasMany(Lawyer::class, 'per_id', 'per_id');
+    }
+
 }

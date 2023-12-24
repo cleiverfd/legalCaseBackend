@@ -20,9 +20,8 @@ class Audiencias extends Migration
             $table->text('au_detalles', 255)->nullable();
             $table->text('au_dias_faltantes')->nullable();
             $table->unsignedBigInteger('exp_id')->nullable();
-            $table->foreignId('per_id')->nullable()->constrained('persons', 'per_id');
+            $table->foreignId('per_id')->nullable();
             $table->unsignedBigInteger('abo_id')->nullable();
-
             $table->foreign('exp_id')
                 ->references('exp_id')
                 ->on('proceedings')
@@ -33,6 +32,12 @@ class Audiencias extends Migration
                 ->on('lawyers')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
+            $table->foreign('per_id')
+                ->references('per_id')
+                ->on('persons')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+
 
             $table->timestamps();
             $table->softDeletes();

@@ -351,6 +351,7 @@ class ProceedingController extends Controller
             'distritoJudicial',
             'materia',
             'pretension',
+            'pretension',
             'procesal.persona',
         )
             ->find($id);
