@@ -80,7 +80,7 @@ Route::middleware(['auth:api'])->group(function () {
 
     // Demandantes
     Route::prefix('demandante')->group(function () {
-        Route::get('/', 'App\Http\Controllers\PersonController@index')->name('demandante.index');
+        Route::post('/', 'App\Http\Controllers\PersonController@index')->name('demandante.index');
         Route::get('/detalledemandante/{doc}', 'App\Http\Controllers\PersonController@detalledemandante')->name('demandante.detalledemandante');
         Route::post('/expedientes', 'App\Http\Controllers\PersonController@traerexpedientes')->name('demandante.traerexpedientes');
     // Nuevas rutas para obtener información por documento

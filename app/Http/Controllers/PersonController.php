@@ -23,15 +23,25 @@ class PersonController extends Controller
 
     protected function index(Request $request)
     {
-        $data = Person::orderBy('created_at', 'DESC')
-            ->where('tipo_procesal', 'DEMANDANTE')
+        $tipoProcesal = $request->input('tipo_procesal');
+
+        $data = Person::orderByDesc('created_at')
+            ->where('tipo_procesal', $tipoProcesal)
             ->whereHas('procesal.expediente', function ($query) {
                 $query->whereIn('exp_estado_proceso', ['EN TRAMITE', 'EN EJECUCION']);
             })
-            ->get();
+            ->get(['per_id', 'nat_dni', 'nat_apellido_paterno', 'nat_apellido_materno', 'nat_nombres', 'nat_telefono', 'nat_correo', 'jur_ruc', 'jur_razon_social', 'jur_telefono', 'jur_correo', 'jur_rep_legal', 'tipo_procesal', 'per_condicion', 'created_at', 'updated_at', 'deleted_at'])
+            ->map(function ($person) {
+                $person->nat_apellido_paterno = ucfirst(strtolower($person->nat_apellido_paterno));
+                $person->nat_apellido_materno = ucfirst(strtolower($person->nat_apellido_materno));
+                $person->nat_nombres = ucwords(strtolower($person->nat_nombres));
+                $person->jur_razon_social = ucwords(strtolower($person->jur_razon_social));
+                return $person;
+            });
 
-        return response()->json(['data' => $data], 200);
+        return response()->json(['data' => $data, 'procesal' => $tipoProcesal], 200);
     }
+
     //traer los demandados
     protected function indexdemandados(Request $request)
     {
@@ -172,7 +182,7 @@ class PersonController extends Controller
         if (strlen($doc) === 8) {
             $person = Person::where('nat_dni', $doc)->first();
             $tipo_persona = 'NATURAL';
-        }else{
+        } else {
             $person = Person::where('jur_ruc', $doc)->first();
             $tipo_persona = 'JURIDICA';
         }
@@ -191,8 +201,8 @@ class PersonController extends Controller
 
         $expediente = $procesal->expediente;
         $direccion = Address::where('proc_id', $procesal->proc_id)
-        ->with('district.province.departament')
-        ->first();
+            ->with('district.province.departament')
+            ->first();
 
         if (!$expediente) {
             return response()->json(['state' => 1, 'message' => 'Expediente no encontrado para el proceso'], 404);
