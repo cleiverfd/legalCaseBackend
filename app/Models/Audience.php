@@ -26,7 +26,6 @@ class Audience extends Model
     {
         return $this->belongsTo(Proceeding::class, 'exp_id', 'exp_id');
     }
-
     public function person()
     {
         return $this->belongsTo(Person::class, 'per_id', 'per_id');
@@ -35,7 +34,6 @@ class Audience extends Model
     {
         return $this->belongsTo(Proceeding::class, 'exp_id', 'exp_id');
     }
-
     public static function obtenerAudienciasFaltantes()
     {
         $today = Carbon::now('America/Lima')->startOfDay();

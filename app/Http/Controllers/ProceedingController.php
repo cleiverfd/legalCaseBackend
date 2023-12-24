@@ -350,6 +350,7 @@ class ProceedingController extends Controller
             'instancia',
             'distritoJudicial',
             'materia',
+            'pretension',
             'procesal.persona',
         )
             ->find($id);
@@ -371,7 +372,9 @@ class ProceedingController extends Controller
             'exp_fecha_inicio' => $proceeding->exp_fecha_inicio,
             'exp_especialidad' => $proceeding->specialty->esp_nombre,
             'exp_materia' => $proceeding->materia->mat_nombre,
-            'exp_estado' => $proceeding->exp_estado_proceso
+            'exp_estado' => $proceeding->exp_estado_proceso,
+            'exp_pretension'=>$proceeding->pretension->pre_nombre,
+            'exp_monto_pretension'=>$proceeding->exp_monto_pretencion
         ];
 
         $dataProcesal = $this->formatProcesalData($proceeding->procesal);
