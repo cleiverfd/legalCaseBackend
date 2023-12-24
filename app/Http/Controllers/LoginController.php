@@ -48,7 +48,8 @@ class LoginController extends Controller
                 'correo' => $personaNatural->nat_correo,
             ];
         if($user->usu_rol=='ABOGADO'){
-            $abogado= $user->abogado;
+            $abogado = \App\Models\Lawyer::where(
+                'per_id',$personaNatural->per_id)->first();
         }
         return response()->json([
                 'user' => [
@@ -60,7 +61,7 @@ class LoginController extends Controller
                     'email' => $user->email,
                     'token' => $accessToken,
                     'datos' => $datosPersonaNatural,
-                    'abo_id'=>$user->usu_rol=='ABOGADO' ? $abogado->abo_id:null
+                    'abo_id'=>$user->usu_rol=='ABOGADO' ?$abogado->abo_id:null,
                 ],
                 'state' => 200
             ], 200);

@@ -32,7 +32,7 @@ class LawyerController extends Controller
                 'abo_id' => $lawyer->abo_id,
                 'abo_carga_laboral' => $lawyer->abo_carga_laboral,
                 'abo_disponibilidad' => $lawyer->abo_disponibilidad,
-                'nat_id' => $lawyer->persona->nat_id,
+                'per_id' => $lawyer->persona->per_id,
                 'nat_dni' => $lawyer->persona->nat_dni,
                 'nat_apellido_paterno' => ucwords(strtolower($lawyer->persona->nat_apellido_paterno)),
                 'nat_apellido_materno' => ucwords(strtolower($lawyer->persona->nat_apellido_materno)),
@@ -56,7 +56,7 @@ class LawyerController extends Controller
         try {
             \DB::beginTransaction();
 
-            $persona = \App\Models\PeopleNatural::create([
+            $persona = \App\Models\Person::create([
                 'nat_dni' => trim($request->nat_dni),
                 'nat_apellido_paterno' => strtoupper(trim($request->nat_apellido_paterno)),
                 'nat_apellido_materno' => strtoupper(trim($request->nat_apellido_materno)),
@@ -91,8 +91,8 @@ class LawyerController extends Controller
     {
         try {
             \DB::beginTransaction();
-
-            $persona = \App\Models\PeopleNatural::find($request->nat_id);
+            $abogado = \App\Models\Lawyer::find($request->abo_id);
+            $persona = \App\Models\Person::find($abogado->per_id);
             $persona->nat_dni = trim($request->nat_dni);
             $persona->nat_apellido_paterno = strtoupper(trim($request->nat_apellido_paterno));
             $persona->nat_apellido_materno = strtoupper(trim($request->nat_apellido_materno));
@@ -101,7 +101,7 @@ class LawyerController extends Controller
             $persona->nat_correo = trim($request->nat_correo);
             $persona->save();
             //actulizar  su usuario 
-            $user = \App\Models\User::where('per_id', $persona->nat_id)->first();
+            $user = \App\Models\User::where('per_id', $persona->per_id)->first();
             $user->name = strtoupper(trim($request->nat_apellido_paterno . ' ' . $request->nat_apellido_materno . ' ' . $request->nat_nombres));
             $user->email = trim($request->nat_correo);
             $user->usu_rol = 'ABOGADO';
