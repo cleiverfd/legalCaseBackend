@@ -77,9 +77,9 @@ class PersonController extends Controller
                 $personaData = [
                     'per_id' => $persona->per_id,
                     'documento' => $persona->nat_dni,
-                    'nat_nombres' => $persona->nat_nombres,
-                    'nat_apellido_paterno' => $persona->nat_apellido_paterno,
-                    'nat_apellido_materno' => $persona->nat_apellido_materno,
+                    'nat_nombres' => ucwords(strtolower($persona->nat_nombres)),
+                    'nat_apellido_paterno' => ucfirst(strtolower($persona->nat_apellido_paterno)),
+                    'nat_apellido_materno' => ucfirst(strtolower($persona->nat_apellido_materno)),
                     'condicion' => $persona->per_condicion,
                 ];
             } else {
