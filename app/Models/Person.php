@@ -34,4 +34,8 @@ class Person extends Model
     public function audiencia(){
         return $this->hasMany(Audience::class, 'per_id');
     }
+
+    public function abogado(){
+        return $this->hasMany(Lawyer::class, 'per_id');
+    }
 }

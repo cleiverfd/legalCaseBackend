@@ -19,5 +19,4 @@ class Lawyer extends Model
     {
         return $this->belongsTo(Person::class, 'per_id', 'per_id');
     }
-
 }
