@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Http\Resources\{
-    LawyerResource
-};
 use App\Models\Proceeding;
-use App\Models\Audience;
-use App\Models\Lawyer;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Uuid;
+use App\Models\Person;
+use App\Models\User;
+use App\Models\Lawyer;
+use App\Http\Requests\LawyerRequest;
+use App\Http\Resources\LawyerResource;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
 
 class LawyerController extends Controller
 {
@@ -51,42 +54,124 @@ class LawyerController extends Controller
         return \response()->json(['data' => $data], 200);
     }
 
-    protected function registrar(Request $request)
+    // protected function registrar(Request $request)
+    // {
+    //     try {
+    //         DB::beginTransaction();
+
+    //         $persona = \App\Models\Person::create([
+    //             'nat_dni' => trim($request->nat_dni),
+    //             'nat_apellido_paterno' => strtoupper(trim($request->nat_apellido_paterno)),
+    //             'nat_apellido_materno' => strtoupper(trim($request->nat_apellido_materno)),
+    //             'nat_nombres' => strtoupper(trim($request->nat_nombres)),
+    //             'nat_telefono' => strtoupper(trim($request->nat_telefono)),
+    //             'nat_correo' => trim($request->nat_correo)
+    //         ]);
+
+    //         $user = \App\Models\User::create([
+    //             'name' => strtoupper(trim($request->nat_apellido_paterno . ' '
+    //                 . $request->nat_apellido_materno . ' ' . $request->nat_nombres)),
+    //             'email' => trim($request->nat_correo),
+    //             'usu_rol' => 'ABOGADO',
+    //             'per_id' => $persona->per_id,
+    //             'password' => bcrypt(trim($request->nat_dni)),
+    //         ]);
+    //         $abogado = \App\Models\Lawyer::create([
+    //             'abo_carga_laboral' => 0,
+    //             'abo_disponibilidad' => 'LIBRE',
+    //             'per_id' => $persona->per_id,
+    //         ]);
+
+    //         DB::commit();
+
+    //         return \response()->json(['state' => 0, 'data' => $abogado], 200);
+    //     } catch (Exception $e) {
+    //         DB::rollback();
+    //         return ['state' => '1', 'exception' => (string) $e];
+    //     }
+    // }
+    public function store(Request $request)
     {
         try {
-            \DB::beginTransaction();
-
-            $persona = \App\Models\Person::create([
-                'nat_dni' => trim($request->nat_dni),
-                'nat_apellido_paterno' => strtoupper(trim($request->nat_apellido_paterno)),
-                'nat_apellido_materno' => strtoupper(trim($request->nat_apellido_materno)),
-                'nat_nombres' => strtoupper(trim($request->nat_nombres)),
-                'nat_telefono' => strtoupper(trim($request->nat_telefono)),
-                'nat_correo' => trim($request->nat_correo)
+            // Validación de duplicados para DNI
+            $existingDni = Person::withTrashed()
+                ->where('nat_dni', $request->input('nat_dni'))
+                ->first();
+    
+            if ($existingDni) {
+                // Si ya existe una persona con el mismo DNI, devuelve un mensaje de error
+                return response()->json([
+                    'state' => 1,
+                    'message' => 'Error al registrar abogado: La dni ya existe.',
+                ], 422); // 422 Unprocessable Entity indica un error de validación
+            }
+    
+            // Validación de duplicados para correo electrónico
+            $existingEmail = Person::withTrashed()
+                ->where('nat_correo', strtolower($request->input('nat_correo')))
+                ->first();
+    
+            if ($existingEmail) {
+                // Si ya existe una persona con el mismo correo electrónico, devuelve un mensaje de error
+                return response()->json([
+                    'state' => 1,
+                    'message' => 'Error al registrar abogado: el correo electronico ya existe.',
+                ], 422); // 422 Unprocessable Entity indica un error de validación
+            }
+    
+            DB::beginTransaction();
+    
+            // Creación de la persona
+            $persona = Person::create([
+                'nat_dni' => $request->input('nat_dni'),
+                'nat_apellido_paterno' => ucwords(strtolower($request->input('nat_apellido_paterno'))),
+                'nat_apellido_materno' => ucwords(strtolower($request->input('nat_apellido_materno'))),
+                'nat_nombres' => ucwords(strtolower($request->input('nat_nombres'))),
+                'nat_telefono' => $request->input('nat_telefono'),
+                'nat_correo' => strtolower($request->input('nat_correo')),
             ]);
-
-            $user = \App\Models\User::create([
-                'name' => strtoupper(trim($request->nat_apellido_paterno . ' '
-                    . $request->nat_apellido_materno . ' ' . $request->nat_nombres)),
-                'email' => trim($request->nat_correo),
+    
+            // Creación del usuario
+            User::create([
+                'name' => $request->input('nat_nombres'),
+                'email' => $request->input('nat_correo'),
                 'usu_rol' => 'ABOGADO',
-                'per_id' => $persona->nat_id,
-                'password' => bcrypt(trim($request->nat_dni)),
+                'per_id' => $persona->per_id,
+                'password' => bcrypt($request->input('nat_dni')),
             ]);
-            $abogado = \App\Models\Lawyer::create([
+    
+            // Creación del abogado
+            $abogado = Lawyer::create([
                 'abo_carga_laboral' => 0,
                 'abo_disponibilidad' => 'LIBRE',
-                'nat_id' => $persona->nat_id,
+                'per_id' => $persona->per_id,
             ]);
-
-            \DB::commit();
-
-            return \response()->json(['state' => 0, 'data' => $abogado], 200);
+    
+            DB::commit();
+    
+            // Recarga los modelos para obtener los datos actualizados de la base de datos
+            $persona = $persona->fresh();
+            $abogado = $abogado->fresh();
+    
+            // Combina los datos de persona y abogado en un solo objeto JSON
+            $jsonData = array_merge($persona->toArray(), $abogado->toArray());
+    
+            return response()->json([
+                'state' => 0,
+                'message' => 'Abogado registrado exitosamente',
+                'data' => $jsonData
+            ], 201);
         } catch (Exception $e) {
-            \DB::rollback();
-            return ['state' => '1', 'exception' => (string) $e];
+            DB::rollback();
+            return response()->json([
+                'state' => 1,
+                'message' => 'Error al registrar abogado',
+                'exception' => $e->getMessage()
+            ], 500);
         }
     }
+    
+
     protected function update(Request $request)
     {
         try {
@@ -115,24 +200,31 @@ class LawyerController extends Controller
         }
     }
 
-    protected function eliminar($id)
+    protected function destroy($id): JsonResponse
     {
         try {
-            \DB::beginTransaction();
+            DB::beginTransaction();
 
-            $abogado = \App\Models\Lawyer::find($id);
-            if (!$abogado) {
-                return \response()->json(['message' => 'Abogado no encontrado'], 404);
-            }
+            $abogado = Lawyer::findOrFail($id);
+            $personaId = $abogado->per_id;
+
             $abogado->delete();
-            \DB::commit();
+            User::where('per_id', $personaId)->delete();
+            Person::findOrFail($personaId)->delete();
 
-            return \response()->json(['message' => 'Abogado eliminado'], 200);
-        } catch (Exception $e) {
-            \DB::rollback();
-            return \response()->json(['message' => 'Error al eliminar el abogado', 'exception' => $e->getMessage()], 500);
+            DB::commit();
+
+            return response()->json(null, JsonResponse::HTTP_NO_CONTENT);
+        } catch (ModelNotFoundException $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Abogado no encontrado'], JsonResponse::HTTP_NOT_FOUND);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Error al eliminar el abogado', 'exception' => $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+
     protected function expedientes(Request $request)
     {
         try {

@@ -6,6 +6,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\JudicialDistrictController;
 use App\Http\Controllers\ProceedingController;
+use App\Http\Controllers\LawyerController;
 
 Route::prefix('/user')->group(function () {
     Route::post('/login', 'App\Http\Controllers\LoginController@login');
@@ -22,19 +23,22 @@ Route::middleware(['auth:api'])->group(function () {
 
     // Abogados
     Route::prefix('lawyer')->group(function () {
-        Route::get('/', 'App\Http\Controllers\LawyerController@index')->name('lawyer.index');
-        Route::post('/show', 'App\Http\Controllers\LawyerController@show')->name('lawyer.show');
-        Route::post('/registrar', 'App\Http\Controllers\LawyerController@registrar')->name('lawyer.registrar');
-        Route::post('/update', 'App\Http\Controllers\LawyerController@update')->name('lawyer.update');
-        Route::post('eliminar/{id}', 'App\Http\Controllers\LawyerController@eliminar')->name('lawyer.eliminar');
-       //audiencias  por abogado
-        Route::post('/audiencias', 'App\Http\Controllers\LawyerController@audiencias')->name('lawyer.audiencias');
-        //alertas por abogado
-        Route::post('/alertas', 'App\Http\Controllers\LawyerController@alertas')->name('lawyer.alertas');
-        //expedientes por abogado
-        Route::post('/expedientes', 'App\Http\Controllers\LawyerController@expedientes')->name('lawyer.expedientes');
-
-        Route::post('/changeOfLawyer', 'App\Http\Controllers\LawyerController@changeOfLawyer')->name('lawyer.changeOfLawyer');
+        Route::get('/', [LawyerController::class, 'index'])->name('lawyer.index');
+        Route::post('/show', [LawyerController::class, 'show'])->name('lawyer.show');
+        Route::post('/store', [LawyerController::class, 'store'])->name('lawyer.store');
+        Route::post('/update', [LawyerController::class, 'update'])->name('lawyer.update');
+        Route::post('/delete/{id}', [LawyerController::class, 'destroy'])->name('lawyer.destroy');
+        
+        // Audiencias por abogado
+        Route::post('/audiencias', [LawyerController::class, 'audiencias'])->name('lawyer.audiencias');
+        
+        // Alertas por abogado
+        Route::post('/alertas', [LawyerController::class, 'alertas'])->name('lawyer.alertas');
+        
+        // Expedientes por abogado
+        Route::post('/expedientes', [LawyerController::class, 'expedientes'])->name('lawyer.expedientes');
+    
+        Route::post('/changeOfLawyer', [LawyerController::class, 'changeOfLawyer'])->name('lawyer.changeOfLawyer');
     });
 
     // Expedientes
