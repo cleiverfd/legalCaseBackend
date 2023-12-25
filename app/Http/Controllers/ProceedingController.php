@@ -295,47 +295,51 @@ class ProceedingController extends Controller
                     ]
                 );
             }
-            $persona = null;
-            $direccion = null;
-            $per = null;
-            if ($request->tipoper == 'natural') {
-                $persona = \App\Models\PeopleNatural::find($request->pnat['nat_id']);
-                $persona->nat_dni = strtoupper(trim($request->pnat['nat_dni']));
-                $persona->nat_apellido_paterno = strtoupper(trim($request->pnat['nat_apellido_paterno']));
-                $persona->nat_apellido_materno = strtoupper(trim($request->pnat['nat_apellido_materno']));
-                $persona->nat_nombres = strtoupper(trim($request->pnat['nat_nombres']));
-                $persona->nat_telefono = strtoupper(trim($request->pnat['nat_telefono']));
-                $persona->nat_correo = strtoupper(trim($request->pnat['nat_correo']));
-                $persona->save();
-            } else {
-                $persona = \App\Models\PeopleJuridic::find($request->pjuc['jur_id']);
-                $persona->jur_ruc = strtoupper(trim($request->pjuc['jur_ruc']));
-                $persona->jur_razon_social = strtoupper(trim($request->pjuc['jur_razon_social']));
-                $persona->jur_telefono = strtoupper(trim($request->pjuc['jur_telefono']));
-                $persona->jur_correo = strtoupper(trim($request->pjuc['jur_correo']));
-                $persona->jur_rep_legal = strtoupper(trim($request->pjuc['jur_rep_legal']));
-                $persona->save();
-            }
-            $direccion = \App\Models\Address::updateOrCreate(
-                ['per_id' => $request->expediente['persona']],
-                [
-                    'dir_calle_av' => trim($request->direccion['dir_calle_av']),
-                    'dis_id' => trim($request->direccion['dis_id']),
-                    'pro_id' => trim($request->direccion['pro_id']),
-                    'dep_id' => trim($request->direccion['dep_id']),
-                ]
-            );
+            $personas = $request->Personas;
 
-            /*Actulizar el expediente  asignando laersona y el abogado*/
-            $EX = \App\Models\Proceeding::find($exp->exp_id);
-            if ($request->procesal == 'demandante') {
-                $EX->exp_demandante = $request->expediente['persona'];
-            } else {
-                $EX->exp_demandado = $request->expediente['persona'];
+            foreach ($personas as $persona) {
+                $person = null;
+                if ($persona['tipo_persona'] == 'NATURAL') {
+                    // Crear registro para persona natural
+                    $person = \App\Models\Person::updateOrcreate(
+                        ['per_id' => strtoupper(trim($persona['per_id']))],
+                        [   'nat_dni' => strtoupper(trim($persona['nat_dni'])),
+                            'nat_apellido_paterno' => strtoupper(trim($persona['nat_apellido_paterno'])),
+                            'nat_apellido_materno' => strtoupper(trim($persona['nat_apellido_materno'])),
+                            'nat_nombres' => strtoupper(trim($persona['nat_nombres'])),
+                            'nat_telefono' => strtoupper(trim($persona['nat_telefono'])),
+                            'nat_correo' => trim($persona['nat_correo']),
+                            'per_condicion' => $persona['per_condicion'],
+                            'tipo_procesal' => $persona['tipo_procesal']
+                        ]
+                    );
+                } else {
+                    $person = \App\Models\Person::updateOrCreate(
+                        ['per_id' => strtoupper(trim($persona['per_id']))],
+                        [   
+                            'jur_ruc' => strtoupper(trim($persona['jur_ruc'])),
+                            'jur_razon_social' => strtoupper(trim($persona['jur_razon_social'])),
+                            'jur_telefono' => strtoupper(trim($persona['jur_telefono'])),
+                            'jur_correo' => trim($persona['jur_correo']),
+                            'jur_rep_legal' => strtoupper(trim($persona['jur_rep_legal'])),
+                            'per_condicion' => $persona['per_condicion'],
+                            'tipo_procesal' => $persona['tipo_procesal']
+                        ]
+                    );
+                }
+                $direccion = null;
+                $direccion = \App\Models\Address::updateOrCreate(
+                    ['proc_id' => $persona['proc_id']],
+                    [
+                        'dir_calle_av' => trim($persona['dir_calle_av']),
+                        'dis_id' => trim($persona['dis_id']),
+                        'pro_id' => trim($persona['pro_id']),
+                        'dep_id' => trim($persona['dep_id']),
+                    ]
+                );
             }
-            $EX->save();
             DB::commit();
-            return \response()->json(['state' => 0, 'data' => $EX], 200);
+            return \response()->json(['state' => 0, 'data' => 'OK'], 200);
         } catch (Exception $e) {
             DB::rollback();
             return ['state' => '1', 'exception' => (string) $e];
@@ -403,8 +407,8 @@ class ProceedingController extends Controller
         $processedProcesalData = $proceeding1->procesal->map(function ($proc) {
             return [
                 'proc_id' => $proc->proc_id,
-                "tipo_procesal"=> ucwords(strtolower($proc->tipo_procesal)),
-                "tipo_persona"=> ucwords(strtolower($proc->tipo_persona)),
+                "tipo_procesal"=> $proc->tipo_procesal,
+                "tipo_persona"=> $proc->tipo_persona,
                 "per_id"=> $proc->per_id,
                 "exp_id"=> $proc->exp_id,
                 'nat_dni' => $proc->persona->nat_dni,
@@ -418,7 +422,7 @@ class ProceedingController extends Controller
                 "jur_telefono" => $proc->persona->jur_telefono,
                 "jur_correo" => $proc->persona->jur_correo,
                 "jur_rep_legal" => $proc->persona->jur_rep_legal,
-                "per_condicion" => ucwords(strtolower($proc->persona->per_condicion)),
+                "per_condicion" => $proc->persona->per_condicion,
                 'dir_id' => $proc->address->dir_id,
                 'dir_calle_av' => $proc->address->dir_calle_av,
                 "dis_id"=> $proc->address->dis_id,
