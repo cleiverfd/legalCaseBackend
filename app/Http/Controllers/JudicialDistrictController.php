@@ -6,7 +6,12 @@ use Illuminate\Http\Request;
 use App\Models\JudicialDistrict;
 use App\Models\Instance;
 use App\Models\Specialty;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class JudicialDistrictController extends Controller
 {
@@ -15,95 +20,102 @@ class JudicialDistrictController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(Request $request)
-    {
-        $judicialDistricts =JudicialDistrict::orderBy('created_at', 'DESC')
-            ->get(['judis_id', 'judis_nombre']);
-
-        return response()->json(['data' => $judicialDistricts], 200);
-    }
-
-
-    public function instancia(Request $request)
+    public function index()
     {
         try {
-            // $request->validate([
-            //     'judis_id' => 'required|exists:judicial_districts,judis_id',
-            // ]);
-
-            $instances = Instance::where('judis_id', $request->judis_id)
-                ->orderBy('created_at', 'DESC')
-                ->get(['ins_id','ins_nombre','judis_id']);
-
-            return response()->json(['data' => $instances], 200);
+            $judicialDistricts = JudicialDistrict::latest()->get();
+            return response()->json(['state' => 'success', 'data' => $judicialDistricts], 200);
+        } catch (QueryException $e) {
+            $errorMessage = $e->getMessage();
+            return response()->json(['state' => 'error', 'message' => 'Error de base de datos: ' . $errorMessage], 500);
         } catch (\Exception $e) {
-            Log::error('Error en JudicialDistrictController: ' . $e->getMessage());
-            return response()->json(['error' => 'Ha ocurrido un error en el servidor'], 500);
+            return response()->json(['state' => 'error', 'message' => 'Error inesperado: ' . $e->getMessage()], 500);
         }
     }
 
-
-    public function especialidad(Request $request)
-    {
-        // $request->validate([
-        //     'ins_id' => 'required|exists:instances,id',
-        // ]);
-
-        $specialties = Specialty::where('ins_id', $request->ins_id)
-            ->orderBy('created_at', 'DESC')
-            ->get(['esp_id','esp_nombre','ins_id']);
-
-        return response()->json(['data' => $specialties], 200);
-    }
-    //CRUD
     protected function show(Request $request)
     {
-        $JD = JudicialDistrict::where('judis_id', $request->judis_id)->first();
-        return \response()->json(['data' => $JD], 200);
-    }
-
-    protected function registrar(Request $request)
-    {
         try {
-            \DB::beginTransaction();
-           $JD = JudicialDistrict::create([
-                'judis_nombre' => strtoupper(trim($request->judis_nombre)),
-            ]);
-            \DB::commit();
-            return \response()->json(['state' => 0, 'data' => $JD], 200);
-        } catch (Exception $e) {
-            \DB::rollback();
-            return ['state' => '1', 'exception' => (string) $e];
+            $judicialDistrict = JudicialDistrict::findOrFail($request->judis_id);
+
+            return response()->json(['state' => 'success', 'data' => $judicialDistrict], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['state' => 'error', 'message' => 'Recurso no encontrado'], 404);
+        } catch (\Exception $e) {
+            Log::error('Error inesperado en JudicialDistrictController@show: ' . $e->getMessage());
+            return response()->json(['state' => 'error', 'message' => 'Error inesperado. Por favor, contacta al soporte técnico.'], 500);
         }
     }
+
+    protected function store(Request $request)
+    {
+        $validatedData = $request->validate([
+            'judis_nombre' => 'required|string|max:255',
+        ]);
+
+        try {
+            DB::beginTransaction();
+            $judicialDistrict = JudicialDistrict::create([
+                'judis_nombre' => ucwords(strtolower(trim($request->judis_nombre))),
+            ]);
+            
+            DB::commit();
+            return response()->json(['state' => 'success', 'data' => $judicialDistrict], 201);
+        } catch (QueryException $e) {
+            DB::rollback();
+            $errorMessage = $e->getMessage();
+            $errorCode = $e->getCode();
+
+            if ($errorCode == 23000) {
+                return response()->json(['state' => 'error', 'message' => 'Ya existe un registro con este nombre.'], 422);
+            }
+
+            return response()->json(['state' => 'error', 'message' => 'Error de base de datos: ' . $errorMessage], 500);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['state' => 'error', 'message' => 'Error inesperado: ' . $e->getMessage()], 500);
+        }
+    }
+
     protected function update(Request $request)
     {
         try {
-            \DB::beginTransaction();
-            $JD = JudicialDistrict::find($request->judis_id);
-            $JD->judis_nombre = strtoupper(trim($request->judis_nombre));
-            $JD->save();
-            \DB::commit();
-            return \response()->json(['state' => 0, 'data' => 'actulizado correcto'], 200);
+            $this->validate($request, [
+                'judis_nombre' => 'required|string|max:255',
+            ]);
+
+            $judicialDistrict = JudicialDistrict::findOrFail($request->judis_id);
+            $judicialDistrict->update([
+                'judis_nombre' => ucwords(strtolower(trim($request->judis_nombre))),
+            ]);
+            $updatedData = JudicialDistrict::find($judicialDistrict->judis_id);
+
+            return response()->json(['state' => 'success', 'data' => $updatedData, 'message' => 'Actualización exitosa'], 200);
+        } catch (ValidationException $e) {
+            return response()->json(['state' => 'error', 'message' => 'Error de validación', 'details' => $e->validator->errors()], 422);
         } catch (Exception $e) {
-            \DB::rollback();
-            return ['state' => '1', 'exception' => (string) $e];
+            return response()->json(['state' => 'error', 'message' => 'Recurso no encontrado'], 404);
+        } catch (Exception $e) {
+            return response()->json(['state' => 'error', 'message' => 'Error interno del servidor', 'details' => $e->getMessage()], 500);
         }
     }
 
-    protected function eliminar(Request $request)
+    protected function destroy(Request $request)
     {
         try {
-            \DB::beginTransaction();
+            DB::beginTransaction();
 
-            $JD = JudicialDistrict::find($request->judis_id);
-            $JD->delete();
-            \DB::commit();
+            $judicialDistrict = JudicialDistrict::findOrFail($request->judis_id);
+            $judicialDistrict->delete();
 
-            return \response()->json(['state'=>0,'data' => 'eliminado'], 200);
+            DB::commit();
+
+            return response()->json(['state' => 'success'], 200);
         } catch (Exception $e) {
-            \DB::rollback();
-            return \response()->json(['message' => 'Error al eliminar ', 'exception' => $e->getMessage()], 500);
+            return response()->json(['state' => 'error', 'message' => 'Recurso no encontrado'], 404);
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['state' => 'error', 'message' => 'Error interno del servidor', 'details' => $e->getMessage()], 500);
         }
     }
 }
