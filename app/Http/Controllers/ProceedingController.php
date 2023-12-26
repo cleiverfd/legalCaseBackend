@@ -533,4 +533,30 @@ class ProceedingController extends Controller
 
         return $processedProcesals;
     }
+    public function filterprocesal(Request $request){
+           $persona=null;
+            $documento = trim($request->doc);
+            if($request->tipo=='NATURAL'){
+            $persona =\App\Models\Person::
+            where('nat_dni',$documento)->first();
+            }else{
+            $persona = \App\Models\Person::
+             where('jur_ruc',$documento)->first();
+            }
+            if($persona){
+                $per = \App\Models\Procesal::
+                where('per_id',$persona->per_id)->first();
+                 if(!$per){
+                    return \response()->json(['state' => 1, 'data' =>'Persona no Encontrada'], 200);
+                 }
+                $dir=\App\Models\Address::
+                where('proc_id',$per->proc_id)->first();
+                
+                return \response()->json(['state' => 0, 'data' => $persona,
+                'dir'=>$dir], 200);  
+            }
+            return \response()->json(['state' => 1, 'data' =>'Persona no Encontrada'], 200);      
+            
+         
+    }  
 }

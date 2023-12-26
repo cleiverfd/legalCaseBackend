@@ -51,6 +51,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/registrarcaso', 'App\Http\Controllers\ProceedingController@registrarcaso')->name('proceeding.registrarcaso');
         Route::post('/listarestado', 'App\Http\Controllers\ProceedingController@listarestado')->name('proceeding.listarestado');
         Route::post('/buscarPorId', 'App\Http\Controllers\ProceedingController@buscarPorId')->name('proceeding.buscarPorId');
+        Route::post('/filterprocesal', 'App\Http\Controllers\ProceedingController@filterprocesal')->name('proceeding.filterprocesal');       
     });
 
     //  Distritos Judiciales
