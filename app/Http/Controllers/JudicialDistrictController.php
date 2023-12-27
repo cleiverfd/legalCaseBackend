@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\JudicialDistrict;
-use App\Models\Instance;
-use App\Models\Specialty;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
@@ -49,7 +47,7 @@ class JudicialDistrictController extends Controller
 
     protected function store(Request $request)
     {
-        $validatedData = $request->validate([
+        $this->validate($request, [
             'judis_nombre' => 'required|string|max:255',
         ]);
 

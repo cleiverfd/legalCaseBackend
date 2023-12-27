@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\InstanceController;
 use App\Http\Controllers\JudicialDistrictController;
 use App\Http\Controllers\ProceedingController;
 use App\Http\Controllers\LawyerController;
@@ -64,11 +65,11 @@ Route::middleware(['auth:api'])->group(function () {
     });
     //instancias
     Route::prefix('instance')->group(function () {
-        Route::get('/', 'App\Http\Controllers\InstanceController@index')->name('Instance.index');
-        Route::post('/show', 'App\Http\Controllers\InstanceController@show')->name('Instance.show');
-        Route::post('/store', 'App\Http\Controllers\InstanceController@store')->name('Instance.store');
-        Route::post('/update', 'App\Http\Controllers\InstanceController@update')->name('Instance.update');
-        Route::post('/destroy', 'App\Http\Controllers\InstanceController@destroy')->name('Instance.eliminar');
+        Route::get('/', [InstanceController::class, 'index'])->name('Instance.index');
+        Route::get('/show', [InstanceController::class, 'show'])->name('Instance.show');
+        Route::post('/store', [InstanceController::class, 'store'])->name('Instance.store');
+        Route::put('/update', [InstanceController::class, 'update'])->name('Instance.update');
+        Route::delete('/destroy', [InstanceController::class, 'destroy'])->name('Instance.destroy');
     });
     //especialidades
     Route::prefix('specialty')->group(function () {
