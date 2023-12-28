@@ -200,7 +200,7 @@ class PersonController extends Controller
         }
 
         $expediente = $procesal->expediente;
-        $direccion = Address::where('proc_id', $procesal->proc_id)
+        $direccion = Address::where('per_id', $person->per_id)
             ->with('district.province.departament')
             ->first();
 

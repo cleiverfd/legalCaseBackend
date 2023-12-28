@@ -231,67 +231,27 @@ class LawyerController extends Controller
             \DB::beginTransaction();
             $proceedings = \App\Models\Proceeding::orderBy('created_at', 'DESC')
                 ->where('abo_id', $request->abo_id)
-                ->with('person.juridica', 'person.persona', 'pretension', 'materia')
+                ->with('procesal.persona', 'pretension', 'materia')
                 ->get();
-            $data = $proceedings->map(function ($proceeding) {
-                $procesal = null;
-                $tipo_persona = null;
-                if ($proceeding) {
-                    if ($proceeding->exp_demandante !== null) {
-                        $person = $proceeding->demandante;
-                        $procesal = 'demandante';
-                    } elseif ($proceeding->exp_demandado !== null) {
-                        $person = $proceeding->demandado;
-                        $procesal = 'demandado';
-                    }
-                }
-                $fecha_inicio = $proceeding->exp_fecha_inicio;
-                $fecha_formateada = date('d-m-Y', strtotime($fecha_inicio));
+    
+             $formattedData = [];
+            foreach ($proceedings as $proceeding) {
+                $processedProcesals = $this->formatProcesalData($proceeding->procesal);
                 $commonData = [
                     'exp_id' => $proceeding->exp_id,
                     'numero' => $proceeding->exp_numero,
-                    'fecha_inicio' => $fecha_formateada,
-                    'pretencion' => ucwords(strtolower($proceeding->pretension->pre_nombre)),
-                    'materia' => ucwords(strtolower($proceeding->materia->mat_nombre)),
-                    'especialidad' => ucwords(strtolower($proceeding->exp_especialidad)),
+                    'fecha_inicio' =>$proceeding->exp_fecha_inicio,
+                    'pretencion' => $proceeding->pretension->pre_nombre,
+                    'materia' => $proceeding->materia->mat_nombre,
                     'monto_pretencion' => $proceeding->exp_monto_pretencion,
                     'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
-                    'procesal' => $procesal
+                    'multiple' => $proceeding->multiple,
+                    'procesal' => $processedProcesals,
                 ];
-                if ($person) {
-                    if ($person->nat_id !== null) {
-                        $personData = $person->persona;
-                        $tipo_persona = 'natural';
-                    } elseif ($person->jur_id !== null) {
-                        $personData = $person->juridica;
-                        $tipo_persona = 'juridica';
-                    }
-                }
+                $formattedData[] = $commonData;
+            }
 
-                if ($tipo_persona === 'natural') {
-                    $personDataArray = [
-                        'dni' => $personData->nat_dni,
-                        'apellido_paterno' => ucwords(strtolower($personData->nat_apellido_paterno)),
-                        'apellido_materno' => ucwords(strtolower($personData->nat_apellido_materno)),
-                        'nombres' => ucwords(strtolower($personData->nat_nombres)),
-                        'telefono' => $personData->nat_telefono,
-                        'correo' => strtolower($personData->nat_correo),
-                    ];
-                } elseif ($tipo_persona === 'juridica') {
-                    $personDataArray = [
-                        'ruc' => ucwords(strtolower($personData->jur_ruc)),
-                        'razon_social' => ucwords(strtolower($personData->jur_razon_social)),
-                        'telefono' => $personData->jur_telefono,
-                        'correo' => strtolower($personData->jur_correo),
-                    ];
-                } else {
-                    $personDataArray = [];
-                }
-
-                return array_merge($commonData, $personDataArray, ['tipo_persona' => $tipo_persona]);
-            });
-
-            return response()->json(['data' => $data], 200);
+            return response()->json(['data' => $formattedData], 200);
 
             \DB::commit();
             return \response()->json(['state' => 0, 'data' => ''], 200);
@@ -414,5 +374,42 @@ class LawyerController extends Controller
             // Manejar cualquier error
             return response()->json(['error' => $e->getMessage(), 'state' => 1], 500);
         }
+    }
+    protected function formatProcesalData($procesal)
+    {
+        $processedProcesals = [];
+
+        foreach ($procesal as $procesalItem) {
+            $data = [
+                'proc_id' => $procesalItem->proc_id,
+                'per_id' => $procesalItem->per_id,
+                'tipo_procesal' => $procesalItem->tipo_procesal,
+                'tipo_persona' => $procesalItem->tipo_persona,
+            ];
+
+            if ($procesalItem->tipo_persona === 'NATURAL') {
+                $data = array_merge($data, [
+                    'dni' => $procesalItem->persona->nat_dni,
+                    'apellido_paterno' => ucwords(strtolower($procesalItem->persona->nat_apellido_paterno)),
+                    'apellido_materno' => ucwords(strtolower($procesalItem->persona->nat_apellido_materno)),
+                    'nombres' => ucwords(strtolower($procesalItem->persona->nat_nombres)),
+                    'telefono' => $procesalItem->persona->nat_telefono,
+                    'correo' => strtolower($procesalItem->persona->nat_correo),
+                    'condicion' => strtolower($procesalItem->persona->per_condicion),
+                ]);
+            } else {
+                $data = array_merge($data, [
+                    'ruc' => $procesalItem->persona->jur_ruc,
+                    'razon_social' => ucwords(strtolower($procesalItem->persona->jur_razon_social)),
+                    'telefono' => $procesalItem->persona->jur_telefono,
+                    'correo' => strtolower($procesalItem->persona->jur_correo),
+                    'condicion' => strtolower($procesalItem->persona->per_condicion),
+                ]);
+            }
+
+            $processedProcesals[] = $data;
+        }
+
+        return $processedProcesals;
     }
 }

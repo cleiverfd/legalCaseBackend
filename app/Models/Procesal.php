@@ -24,10 +24,6 @@ class Procesal extends Model
     {
         return $this->belongsTo(Person::class, 'per_id', 'per_id');
     }
-    public function address()
-    {
-        return $this->belongsTo(Address::class, 'proc_id');
-    }
     public function expediente()
     {
         return $this->belongsTo(Proceeding::class, 'exp_id');

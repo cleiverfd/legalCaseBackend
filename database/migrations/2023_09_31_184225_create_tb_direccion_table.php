@@ -32,10 +32,10 @@ return new class extends Migration
                 ->references('dep_id')
                 ->on('departments')
                 ->onDelete('cascade');
-             $table->unsignedBigInteger('proc_id')->nullable();
-             $table->foreign('proc_id')
-                    ->references('proc_id')
-                    ->on('procesals')
+             $table->unsignedBigInteger('per_id')->nullable();
+             $table->foreign('per_id')
+                    ->references('per_id')
+                    ->on('persons')
                     ->onDelete('cascade')
                     ->onUpdate('cascade');
             $table->timestamps();

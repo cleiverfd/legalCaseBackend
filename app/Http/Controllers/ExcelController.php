@@ -18,13 +18,23 @@ public function convertirMinusculasTildadasAMayusculas($cadena) {
 }
 public function index(Request $request)
 {
-    try {
-        \DB::beginTransaction();
+    // try {
+    //     \DB::beginTransaction();
 
         $file = $request->file('excel');
         $data = Excel::toArray([], $file)[0];
+        $notInsertedRows = [];
+
         for ($i = 1; $i < count($data); $i++) {
-             $row = $data[$i];
+            try {
+            $row = $data[$i];
+            if (empty($row[0]) || empty($row[6]) || empty($row[7]) || (empty($row[5]) && empty($row[8]))
+                || (empty($row[11]) && empty($row[15])) || empty($row[19]) || empty($row[20]) || empty($row[21]) || empty($row[23])) {
+               $notInsertedRows[] = $i+1;
+                continue;
+            }
+         
+                \DB::beginTransaction();
              $nombredistrito=trim($row[5]);
              $distrito = \App\Models\JudicialDistrict::where('judis_nombre', $nombredistrito)->first();
 
@@ -60,7 +70,7 @@ public function index(Request $request)
                 'exp_materia' =>$materia->mat_id,
                 'exp_pretencion' =>$pretension->pre_id,
                 'exp_monto_pretencion' => strtoupper(trim($row[3])),
-                'exp_estado_proceso' =>strtoupper(trim($row[24])),
+                'exp_estado_proceso' =>$row[24]?strtoupper(trim($row[24])):'EN TRAMITE',
                 'exp_especialidad' =>$especialidad->esp_id,
                 'exp_dis_judicial' => $distrito->judis_id,
                 'exp_instancia' => $instancia->ins_id,
@@ -109,32 +119,26 @@ public function index(Request $request)
                     'tipo_persona'=>$tipo
                 ]
             );
-
-            $nombredepartamento = trim($row[19]);
-            if ($nombredepartamento) {
+                $nombredepartamento = trim($row[19]);
                 $departamento = \App\Models\Department::where('dep_nombre', $nombredepartamento)->first();
                 $nombreprovincia = trim($row[20]);
                 $provincia = null;
                 $distrito = null;
-
-                if ($departamento) {
-                    $provincia = \App\Models\Province::where('dep_id', $departamento->dep_id)
-                        ->where('pro_nombre', $nombreprovincia)->first();
-                    if ($provincia) {
-                        $nombredistrito = trim($row[21]);
-                        $distrito = \App\Models\District::where('pro_id', $provincia->pro_id)
-                            ->where('dis_nombre', $nombredistrito)->first();
-                    }
-                }
-            }
-
+                $provincia = \App\Models\Province::where('dep_id', $departamento->dep_id)
+                         ->where('pro_nombre', $nombreprovincia)->first();
+                $nombredistrito1 = trim($row[21]);
+                if ($nombredistrito1 == 'JLO') {
+                             $nombredistrito1 = 'José Leonardo Ortiz';
+                         }
+                $distrito = \App\Models\District::where('pro_id', $provincia->pro_id)
+                         ->where('dis_nombre', $nombredistrito1)->first();
             $direccion = \App\Models\Address::updateOrCreate(
-                ['proc_id' => $procesal->proc_id],
+                ['per_id' =>$persona->per_id],
                 [
                     'dir_calle_av' => trim($row[22]),
-                    'dis_id' => $distrito ? $distrito->dis_id : 250402,
-                    'pro_id' => $provincia ? $provincia->pro_id : 2505,
-                    'dep_id' => $departamento ? $departamento->dep_id : 26,
+                    'dis_id' => $distrito->dis_id,
+                    'pro_id' =>$provincia->pro_id,
+                    'dep_id' =>$departamento->dep_id,
                 ]
             );
 
@@ -142,13 +146,14 @@ public function index(Request $request)
              $abogado->abo_disponibilidad = 'OCUPADO';
              $abogado->abo_carga_laboral = $abogado->abo_carga_laboral + 1;
              $abogado->save();
+             \DB::commit();
+         } catch (Exception $e) {
+             \DB::rollback(); 
+             $notInsertedRows[] = $i+1;
+               
+         }
         }
-        \DB::commit();
-        return response()->json(['state' => 0, 'data' => $data], 200);
-    } catch (Exception $e) {
-        \DB::rollback();
-          return response()->json(['state' => 1, 'exception' => (string) $e]);
-    }
+    return response()->json(['state' => 0, 'data' => $notInsertedRows], 200);
 }
 
 }
