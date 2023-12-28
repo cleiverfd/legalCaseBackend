@@ -15,7 +15,7 @@ class Address extends Model
         'dis_id',
         'pro_id',
         'dep_id',
-        'proc_id'
+        'per_id'
     ];
     protected $dates = ['deleted_at'];
     public function district()
@@ -31,7 +31,7 @@ class Address extends Model
         return $this->belongsTo(Department::class, 'dep_id');
     }
 
-    public function procesal(){
-        return $this->belongsTo(Procesal::class, 'proc_id');
+    public function persona(){
+        return $this->belongsTo(Person::class, 'per_id','per_id');
     }
 }

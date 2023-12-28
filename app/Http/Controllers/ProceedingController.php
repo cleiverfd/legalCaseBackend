@@ -190,7 +190,7 @@ class ProceedingController extends Controller
                 );
                 $direccion = null;
                 $direccion = \App\Models\Address::updateOrCreate(
-                    ['proc_id' => $procesal->proc_id],
+                    ['per_id' => $procesal->per_id],
                     [
                         'dir_calle_av' => trim($request->dir['dir_calle_av']),
                         'dis_id' => trim($request->dir['dis_id']),
@@ -241,7 +241,7 @@ class ProceedingController extends Controller
                     );
                     $direccion = null;
                     $direccion = \App\Models\Address::updateOrCreate(
-                        ['proc_id' => $procesal->proc_id],
+                        ['per_id' => $procesal->per_id],
                         [
                             'dir_calle_av' => trim($persona['dir_calle_av']),
                             'dis_id' => trim($persona['dis_id']),
@@ -329,7 +329,7 @@ class ProceedingController extends Controller
                 }
                 $direccion = null;
                 $direccion = \App\Models\Address::updateOrCreate(
-                    ['proc_id' => $persona['proc_id']],
+                    ['per_id' => $persona['per_id']],
                     [
                         'dir_calle_av' => trim($persona['dir_calle_av']),
                         'dis_id' => trim($persona['dis_id']),
@@ -403,7 +403,7 @@ class ProceedingController extends Controller
         $proceeding = \App\Models\Proceeding::
         with('abogado.persona')->
         find($id);
-        $proceeding1 = \App\Models\Proceeding::with('procesal.persona','procesal.address')->find($id);
+        $proceeding1 = \App\Models\Proceeding::with('procesal.persona.address')->find($id);
         $processedProcesalData = $proceeding1->procesal->map(function ($proc) {
             return [
                 'proc_id' => $proc->proc_id,
@@ -423,11 +423,11 @@ class ProceedingController extends Controller
                 "jur_correo" => $proc->persona->jur_correo,
                 "jur_rep_legal" => $proc->persona->jur_rep_legal,
                 "per_condicion" => $proc->persona->per_condicion,
-                'dir_id' => $proc->address->dir_id,
-                'dir_calle_av' => $proc->address->dir_calle_av,
-                "dis_id"=> $proc->address->dis_id,
-                "pro_id"=> $proc->address->pro_id,
-                "dep_id"=> $proc->address->dep_id,
+                'dir_id' => $proc->persona->address[0]->dir_id,
+                'dir_calle_av' => $proc->persona->address[0]->dir_calle_av,
+                "dis_id"=> $proc->persona->address[0]->dis_id,
+                "pro_id"=> $proc->persona->address[0]->pro_id,
+                "dep_id"=> $proc->persona->address[0]->dep_id,
             ];
         });
         $costos = \App\Models\ExecutionAmount::where('exp_id', $proceeding->exp_id)
@@ -550,7 +550,7 @@ class ProceedingController extends Controller
                     return \response()->json(['state' => 1, 'data' =>'Persona no Encontrada'], 200);
                  }
                 $dir=\App\Models\Address::
-                where('proc_id',$per->proc_id)->first();
+                where('per_id',$persona->per_id)->first();
                 
                 return \response()->json(['state' => 0, 'data' => $persona,
                 'dir'=>$dir], 200);  

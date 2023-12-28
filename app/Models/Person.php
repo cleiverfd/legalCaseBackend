@@ -38,4 +38,8 @@ class Person extends Model
     public function abogado(){
         return $this->hasMany(Lawyer::class, 'per_id');
     }
+    public function address()
+    {
+        return $this->hasMany(Address::class, 'per_id','per_id');
+    }
 }

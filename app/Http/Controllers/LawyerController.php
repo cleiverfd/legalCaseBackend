@@ -187,7 +187,7 @@ class LawyerController extends Controller
             $persona->save();
             //actulizar  su usuario 
             $user = \App\Models\User::where('per_id', $persona->per_id)->first();
-            $user->name = strtoupper(trim($request->nat_apellido_paterno . ' ' . $request->nat_apellido_materno . ' ' . $request->nat_nombres));
+            $user->name = ucwords(strtolower(trim($request->nat_nombres.' '.$request->nat_apellido_paterno . ' ' . $request->nat_apellido_materno )));
             $user->email = trim($request->nat_correo);
             $user->usu_rol = 'ABOGADO';
             $user->password = bcrypt(trim($request->nat_dni));

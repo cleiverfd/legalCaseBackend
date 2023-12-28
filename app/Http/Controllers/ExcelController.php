@@ -18,115 +18,142 @@ public function convertirMinusculasTildadasAMayusculas($cadena) {
 }
 public function index(Request $request)
 {
-    try {
-        \DB::beginTransaction();
+    // try {
+    //     \DB::beginTransaction();
 
         $file = $request->file('excel');
         $data = Excel::toArray([], $file)[0];
+        $notInsertedRows = [];
+
         for ($i = 1; $i < count($data); $i++) {
-             $row = $data[$i];
-            //buscar la especialidad a travez del distrito judicial
-             $nombredistrito=$this->convertirMinusculasTildadasAMayusculas(trim($row[5]));
+            try {
+            $row = $data[$i];
+            if (empty($row[0]) || empty($row[6]) || empty($row[7]) || (empty($row[5]) && empty($row[8]))
+                || (empty($row[11]) && empty($row[15])) || empty($row[19]) || empty($row[20]) || empty($row[21]) || empty($row[23])) {
+               $notInsertedRows[] = $i+1;
+                continue;
+            }
+         
+                \DB::beginTransaction();
+             $nombredistrito=trim($row[5]);
              $distrito = \App\Models\JudicialDistrict::where('judis_nombre', $nombredistrito)->first();
-             $nombreinstancia=$this->convertirMinusculasTildadasAMayusculas(trim($row[6]));
-             $instancia = \App\Models\Instance::where('judis_id', $distrito->judis_id)
-             ->where('ins_nombre',$nombreinstancia)->first();
-             $nombreespecialidad=$this->convertirMinusculasTildadasAMayusculas(trim($row[7]));
-             $especialidad = \App\Models\Specialty::where('ins_id', $instancia->ins_id)
-             ->where('esp_nombre',$nombreespecialidad)->first();
-            
+
+             $nombreinstancia=(trim($row[6]));
+             $instancia = \App\Models\Instance::
+
+             where('ins_nombre',$nombreinstancia)->first();
+             $nombreespecialidad=trim($row[7]);
+             $especialidad = \App\Models\Specialty::
+             where('esp_nombre',$nombreespecialidad)->first();
+
+             $nombrejuzgado=trim($row[8]);
+             $juzgado= \App\Models\Court::where('judis_id',$distrito->judis_id)
+             ->where('co_nombre',$nombrejuzgado)->first();
+
+             $nombrepre=trim($row[2]);
+             $pretension= \App\Models\Claim::where('pre_nombre',$nombrepre)
+             ->first();
+
+             $nombremateria=trim($row[4]);
+             $materia= \App\Models\Subject::
+             where('mat_nombre',$nombremateria)->first();
+             
+            $nombreabogado=trim($row[23]);
+            $user=\App\Models\User::
+            where('name',$nombreabogado)->first();
+            $abogado=\App\Models\Lawyer::
+            where('per_id',$user->per_id)->first();
+
             $exp = \App\Models\Proceeding::create([
                 'exp_numero' => strtoupper(trim($row[0])),
                 'exp_fecha_inicio' => Carbon::parse($row[1])->format('Y-m-d'),
-                'exp_materia' => $this->convertirMinusculasTildadasAMayusculas(trim($row[4])),
-                'exp_pretencion' =>$this->convertirMinusculasTildadasAMayusculas(trim($row[2])),
+                'exp_materia' =>$materia->mat_id,
+                'exp_pretencion' =>$pretension->pre_id,
                 'exp_monto_pretencion' => strtoupper(trim($row[3])),
-                'exp_estado_proceso' => 'EN TRAMITE',
-                'exp_juzgado' => $this->convertirMinusculasTildadasAMayusculas(trim($row[8])),
+                'exp_estado_proceso' =>$row[24]?strtoupper(trim($row[24])):'EN TRAMITE',
                 'exp_especialidad' =>$especialidad->esp_id,
+                'exp_dis_judicial' => $distrito->judis_id,
+                'exp_instancia' => $instancia->ins_id,
+                'exp_juzgado' =>$juzgado->co_id,
+                'multiple' =>0,
+                'abo_id' => $abogado->abo_id
             ]);
             $persona = null;
             $direccion = null;
-            $per = null;
+            $procesal = null;
+            $tipo=null;
 
             // Verificar si la persona ya existe
-            if ($row[10]!=null) {
-                $persona = \App\Models\PeopleNatural::updateOrCreate(
-                    ['nat_dni' =>trim($row[10])],
+            if ($row[11]!=null) {
+                $persona = \App\Models\Person::updateOrCreate(
+                    ['nat_dni' =>trim($row[11])],
                     [
-                        'nat_apellido_paterno' => $this->convertirMinusculasTildadasAMayusculas(trim($row[11])),
-                        'nat_apellido_materno' => $this->convertirMinusculasTildadasAMayusculas(trim($row[12])),
-                        'nat_nombres' => $this->convertirMinusculasTildadasAMayusculas(trim($row[13])),
-                        'nat_telefono' => $this->convertirMinusculasTildadasAMayusculas(trim($row[16])),
-                        'nat_correo' => trim($row[17])
+                        'nat_apellido_paterno' =>  strtoupper(trim($row[12])),
+                        'nat_apellido_materno' =>  strtoupper(trim($row[13])),
+                        'nat_nombres' =>  strtoupper(trim($row[14])),
+                        'nat_telefono' =>  strtoupper(trim($row[17])),
+                        'nat_correo' => trim($row[18])==null ? trim($row[11]):trim($row[18]),
+                        'per_condicion'=>strtoupper(trim($row[10]))
                     ]
                 );
-
-                $per = \App\Models\Person::updateOrCreate(
-                    ['nat_id' => $persona->nat_id],
-                    []
-                );
+                 $tipo='NATURAL';
             } else {
-                $persona = \App\Models\PeopleJuridic::updateOrCreate(
-                    ['jur_ruc' => strtoupper(trim($row[14]))],
+                $persona = \App\Models\Person::updateOrCreate(
+                    ['jur_ruc' => strtoupper(trim($row[15]))],
                     [
-                        'jur_razon_social' => $this->convertirMinusculasTildadasAMayusculas(trim($row[15])),
-                        'jur_telefono' => $this->convertirMinusculasTildadasAMayusculas(trim($row[16])),
-                        'jur_correo' => trim($row[17]),
+                        'jur_razon_social' => strtoupper(trim($row[16])),
+                        'jur_telefono' =>  strtoupper(trim($row[17])),
+                        'jur_correo' =>  trim($row[18])==null ? trim($row[15]):trim($row[18]),
                         'jur_rep_legal' => '-',
+                        'per_condicion'=>strtoupper(trim($row[10]))
                     ]
                 );
-
-                $per = \App\Models\Person::updateOrCreate(
-                    ['jur_id' => $persona->jur_id],
-                    []
-                );
+                $tipo='JURIDICA';
             }
-            // Obtener el ID de la persona
-            $perId = $per->per_id;
-            // Dirección del demandante o demandado
-            $nombredepartamento=trim($row[18]);
-            $departamento= \App\Models\Department::where('dep_nombre', $nombredepartamento)->first();
-            $nombreprovincia=trim($row[19]);
-            $provincia= \App\Models\Province::where('dep_id', $departamento->dep_id)
-            ->where('pro_nombre',$nombreprovincia )->first();
-            $nombredistrito=trim($row[20]);
-            $distrito= \App\Models\District::where('pro_id', $provincia->pro_id)
-            ->where('dis_nombre',$nombredistrito)->first();
-
-            $direccion = \App\Models\Address::updateOrCreate(
-                ['per_id' => $perId],
+            
+            $procesal = \App\Models\Procesal::Create(
                 [
-                    'dir_calle_av' => trim($row[21]),
-                    'dis_id' =>$distrito->dis_id,
+                    'per_id'=> $persona->per_id,
+                    'exp_id'=>$exp->exp_id,
+                    'tipo_procesal'=> strtoupper(trim($row[9])),
+                    'tipo_persona'=>$tipo
+                ]
+            );
+                $nombredepartamento = trim($row[19]);
+                $departamento = \App\Models\Department::where('dep_nombre', $nombredepartamento)->first();
+                $nombreprovincia = trim($row[20]);
+                $provincia = null;
+                $distrito = null;
+                $provincia = \App\Models\Province::where('dep_id', $departamento->dep_id)
+                         ->where('pro_nombre', $nombreprovincia)->first();
+                $nombredistrito1 = trim($row[21]);
+                if ($nombredistrito1 == 'JLO') {
+                             $nombredistrito1 = 'José Leonardo Ortiz';
+                         }
+                $distrito = \App\Models\District::where('pro_id', $provincia->pro_id)
+                         ->where('dis_nombre', $nombredistrito1)->first();
+            $direccion = \App\Models\Address::updateOrCreate(
+                ['per_id' =>$persona->per_id],
+                [
+                    'dir_calle_av' => trim($row[22]),
+                    'dis_id' => $distrito->dis_id,
                     'pro_id' =>$provincia->pro_id,
                     'dep_id' =>$departamento->dep_id,
                 ]
             );
-              // traer  id de abogado
-            $personaabodado= \App\Models\PeopleNatural::where('nat_dni',$row[22])->first();
-            $aboId = \App\Models\Lawyer::where('nat_id', $personaabodado->nat_id)->first();
-             /*Actulizar el expediente  asignando la persona y el abogado*/
-             $EX = \App\Models\Proceeding::find($exp->exp_id);
-             if('DEMANDANTE'==$row[9]){
-             $EX->exp_demandante = strtoupper(trim($perId));}
-             else{
-             $EX->exp_demandado=strtoupper(trim($perId));
-             }
-             $EX->abo_id =  $aboId->abo_id;
-             $EX->save();
-             /*ACTULIZAR ESTADO DE ABOGADO */
-             $abogado = \App\Models\Lawyer::find($aboId ->abo_id);
+
+             $abogado = \App\Models\Lawyer::find($abogado ->abo_id);
              $abogado->abo_disponibilidad = 'OCUPADO';
              $abogado->abo_carga_laboral = $abogado->abo_carga_laboral + 1;
              $abogado->save();
+             \DB::commit();
+         } catch (Exception $e) {
+             \DB::rollback(); 
+             $notInsertedRows[] = $i+1;
+               
+         }
         }
-        \DB::commit();
-        return response()->json(['state' => 0, 'data' => $data], 200);
-    } catch (Exception $e) {
-        \DB::rollback();
-          return response()->json(['state' => 1, 'exception' => (string) $e]);
-    }
+    return response()->json(['state' => 0, 'data' => $notInsertedRows], 200);
 }
 
 }
