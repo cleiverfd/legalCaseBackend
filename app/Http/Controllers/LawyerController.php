@@ -336,11 +336,11 @@ class LawyerController extends Controller
             $abogadoAnteriorId = $request->input('abogado_actual');
             $nuevoAbogadoId = $request->input('abogado_nuevo');
 
-            // Validar que ambos abogados existan
+           
             $abogadoAnterior = Lawyer::findOrFail($abogadoAnteriorId);
             $nuevoAbogado = Lawyer::findOrFail($nuevoAbogadoId);
 
-            // Actualizar los expedientes
+            
             Proceeding::whereIn('exp_id', $expedientesAsociados)
                 ->where('abo_id', $abogadoAnterior->abo_id)
                 ->update(['abo_id' => $nuevoAbogado->abo_id]);
