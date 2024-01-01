@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('proceedings', function (Blueprint $table) {
             $table->id('exp_id');
-            $table->string('exp_numero', 255);
+            $table->string('exp_numero', 255)->unique();
             $table->string('exp_fecha_inicio', 255)->nullable();
             $table->unsignedBigInteger('exp_pretencion')->nullable();
             $table->unsignedBigInteger('exp_materia')->nullable();
