@@ -18,4 +18,8 @@ class LegalDocument extends Model
         'exp_id'
     ];
     protected $dates = ['created_at', 'updated_at', 'deleted_at'];
+    public function proceeding()
+    {
+        return $this->belongsTo(Proceeding::class, 'exp_id', 'exp_id');
+    }
 }

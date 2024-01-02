@@ -28,7 +28,7 @@ class ProceedingController extends Controller
                 'exp_id' => $proceeding->exp_id,
                 'numero' => $proceeding->exp_numero,
                 'fecha_inicio' =>$proceeding->exp_fecha_inicio,
-                'pretencion' => $proceeding->pretension->pre_nombre,
+                'pretencion' =>optional($proceeding->pretension)->pre_nombre,
                 'materia' => $proceeding->materia->mat_nombre,
                 'monto_pretencion' => $proceeding->exp_monto_pretencion,
                 'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
@@ -377,7 +377,7 @@ class ProceedingController extends Controller
             'exp_fecha_inicio' => $proceeding->exp_fecha_inicio,
             'exp_especialidad' => $proceeding->specialty->esp_nombre,
             'exp_materia' => $proceeding->materia->mat_nombre,
-            'exp_pretension' =>$proceeding->pretension->pre_nombre,
+            'exp_pretension' =>optional($proceeding->pretension)->pre_nombre,
             'exp_monto_pretension'=>$proceeding->exp_monto_pretencion,
             'exp_estado' => $proceeding->exp_estado_proceso
         ];
@@ -453,7 +453,7 @@ class ProceedingController extends Controller
                 'exp_id' => $proceeding->exp_id,
                 'numero' => $proceeding->exp_numero,
                 'fecha_inicio' => date('d-m-Y', strtotime($proceeding->exp_fecha_inicio)),
-                'pretencion' => $proceeding->pretension->pre_nombre,
+                'pretencion' => optional($proceeding->pretension)->pre_nombre,
                 'materia' => $proceeding->materia->mat_nombre,
                 'monto_pretencion' => $proceeding->exp_monto_pretencion,
                 'estado_proceso' => ucwords(strtolower($proceeding->exp_estado_proceso)),
