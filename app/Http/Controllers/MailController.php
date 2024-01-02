@@ -115,7 +115,7 @@ class MailController extends Controller
                     Mail::to($destino)->send($correo);
                 }
                 $i++;
-            }
+            }  
         \DB::commit();
          return response()->json(['state' =>0 ,'data'=>'OK'], 200);
         } catch (\Exception $e) {
