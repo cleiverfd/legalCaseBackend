@@ -18,14 +18,14 @@ public function convertirMinusculasTildadasAMayusculas($cadena) {
 }
 public function index(Request $request)
 {
-    try {
-        \DB::beginTransaction();
+    // try {
+    //     \DB::beginTransaction();
 
-         $file = $request->file('excel');
+        $file = $request->file('excel');
         $data = Excel::toArray([], $file)[0];
         $notInsertedRows = [];
         for ($i = 1; $i < count($data); $i++) {
-            // try {
+            try {
             $row = $data[$i];
 
             // if(empty($row[5]) && empty($row[8])){
@@ -166,14 +166,14 @@ public function index(Request $request)
              $abogado->abo_carga_laboral = $abogado->abo_carga_laboral + 1;
              $abogado->save();
              \DB::commit();
-        
-    }
+         } catch (Exception $e) {
+             \DB::rollback(); 
+             $notInsertedRows[] = $i.'=error='.$e;
+               
+         }
+        }
     return response()->json(['state' => 0, 'data' => $notInsertedRows], 200);
-   } catch (Exception $e) 
-   {
-    \DB::rollback(); 
-     return response()->json(['state' => 1], 200); 
-}   
+    // return response()->json(['state' => 0, 'data' => $data], 200);
 }
 
 }
