@@ -56,8 +56,8 @@ class LoginController extends Controller
                     'id' => $user->id,
                     'usu_rol'=>$user->usu_rol,
                     'name' =>   ucwords(strtolower($personaNatural->nat_apellido_paterno)).' '.
-                    ucwords(strtolower($personaNatural->nat_apellido_materno)).' '.
-                    ucwords(strtolower($personaNatural->nat_nombres)),
+                     ucwords(strtolower($personaNatural->nat_apellido_materno)).' '.
+                     ucwords(strtolower($personaNatural->nat_nombres)),
                     'email' => $user->email,
                     'token' => $accessToken,
                     'datos' => $datosPersonaNatural,
@@ -73,6 +73,7 @@ class LoginController extends Controller
 
     public function salir(Request $request)
     {
-    
+    Auth::user()->token()->revoke();
+    return \response()->json(['state'=>200,'user'=> Auth::user()],200);
     }
 }

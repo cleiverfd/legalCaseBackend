@@ -24,33 +24,31 @@ public function index(Request $request)
         $file = $request->file('excel');
         $data = Excel::toArray([], $file)[0];
         $notInsertedRows = [];
-
         for ($i = 1; $i < count($data); $i++) {
             try {
             $row = $data[$i];
-            if (empty($row[0]) || 
-                empty($row[6]) || 
-                empty($row[7]) || 
-                (empty($row[5]) && empty($row[8]))
-                || (empty($row[11]) && empty($row[15])) 
-                || empty($row[19]) 
-                || empty($row[20]) 
-                || empty($row[21]) 
-                || empty($row[23])) {
-               $notInsertedRows[] = $i+1;
-                continue;
-            }
+
+            // if(empty($row[5]) && empty($row[8])){
+            //     $notInsertedRows[] = $i.'=juzgado';
+            //     continue; 
+            // }
+            
             if (\App\Models\Proceeding::where('exp_numero',strtoupper(trim($row[0])))->exists()) {
-                $notInsertedRows[] = $i+1;
+                $notInsertedRows[] = $i.'expedienteexiste';
+                continue; 
+            }
+            if(empty($row[11]) && empty($row[15])){
+                $notInsertedRows[] = $i.'ruc-dni';
                 continue; 
             }
              $nombreabogado=trim($row[23]);
              $user=\App\Models\User::
              where('name',$nombreabogado)->first();
+
              if ($user === null || empty($user)) {
-                $notInsertedRows[] = $i + 1;
+                $notInsertedRows[] = $i.'=no abogado';
                 continue;
-            }
+             }
             $abogado=\App\Models\Lawyer::
             where('per_id',$user->per_id)->first();
             \DB::beginTransaction();
@@ -68,10 +66,10 @@ public function index(Request $request)
              $nombrejuzgado=trim($row[8]);
              $juzgado= \App\Models\Court::where('judis_id',$distrito->judis_id)
              ->where('co_nombre',$nombrejuzgado)->first();
-             if ($juzgado === null || empty($juzgado)) {
-                $notInsertedRows[] = $i + 1;
-                continue;
-            }
+            //  if ($juzgado === null || empty($juzgado)) {
+            //     $notInsertedRows[] = $i.'=juszgado-distritosi';
+            //     continue;
+            // }
              $nombrepre=trim($row[2]);
              $pretension= \App\Models\Claim::where('pre_nombre',$nombrepre)
              ->first();
@@ -79,7 +77,8 @@ public function index(Request $request)
              $nombremateria=trim($row[4]);
              $materia= \App\Models\Subject::
              where('mat_nombre',$nombremateria)->first();
-
+             //
+            
             $exp = \App\Models\Proceeding::create([
                 'exp_numero' => strtoupper(trim($row[0])),
                 'exp_fecha_inicio' => Carbon::parse($row[1])->format('Y-m-d'),
@@ -98,7 +97,6 @@ public function index(Request $request)
             $direccion = null;
             $procesal = null;
             $tipo=null;
-
             // Verificar si la persona ya existe
             if ($row[11]!=null) {
                 $persona = \App\Models\Person::updateOrCreate(
@@ -170,7 +168,7 @@ public function index(Request $request)
              \DB::commit();
          } catch (Exception $e) {
              \DB::rollback(); 
-             $notInsertedRows[] = $i+1;
+             $notInsertedRows[] = $i.'=error='.$e;
                
          }
         }
